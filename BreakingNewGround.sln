@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.AppHost",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.ServiceDefaults", "BreakingNewGround.ServiceDefaults\BreakingNewGround.ServiceDefaults.csproj", "{5759C8E2-2D26-4EE3-C76E-B40FDF4E31C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL", "BreakingNewGround.Server.DAL\BreakingNewGround.Server.DAL.csproj", "{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5759C8E2-2D26-4EE3-C76E-B40FDF4E31C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5759C8E2-2D26-4EE3-C76E-B40FDF4E31C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5759C8E2-2D26-4EE3-C76E-B40FDF4E31C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

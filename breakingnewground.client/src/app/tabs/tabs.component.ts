@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 export class TabsComponent {
   navLinks = [
+    { path: 'medicines', label: 'Medicines' },
     { path: 'weatherforecast', label: 'WeatherForecast' },
-    { path: 'medicines', label: 'Medicines' }
   ];
 }

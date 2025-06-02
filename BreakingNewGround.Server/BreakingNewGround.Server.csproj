@@ -14,6 +14,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.4.7" />
   </ItemGroup>
@@ -22,6 +27,7 @@
     <ProjectReference Include="..\breakingnewground.client\breakingnewground.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
   	</ProjectReference>
+    <ProjectReference Include="..\BreakingNewGround.Server.DAL\BreakingNewGround.Server.DAL.csproj" />
     <ProjectReference Include="..\BreakingNewGround.ServiceDefaults\BreakingNewGround.ServiceDefaults.csproj" />
   </ItemGroup>
 
