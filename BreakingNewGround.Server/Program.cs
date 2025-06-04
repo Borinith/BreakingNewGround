@@ -1,4 +1,6 @@
+using BreakingNewGround.Server;
 using BreakingNewGround.Server.DAL.Data;
+using BreakingNewGround.Server.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +18,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<MedicinesContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
 
 using var app = builder.Build();
 

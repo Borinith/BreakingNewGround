@@ -5,7 +5,7 @@ const target = env["services__breakingnewground-server__https__0"] ?? 'https://l
 const PROXY_CONFIG = [
   {
     context: [
-      "/WeatherForecast",
+      "/api",
       "/openapi",
       "/scalar",
     ],

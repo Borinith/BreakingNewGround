@@ -25,7 +25,7 @@ export class WeatherForecastComponent implements OnInit {
   }
 
   getForecasts() {
-    this.http.get<WeatherForecast[]>('/WeatherForecast/GetWeatherForecast').subscribe(
+    this.http.get<WeatherForecast[]>('/api/WeatherForecast/GetWeatherForecast').subscribe(
       (result) => {
         this.forecasts = result;
       },
