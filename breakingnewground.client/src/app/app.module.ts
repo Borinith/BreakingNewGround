@@ -1,4 +1,3 @@
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,7 +21,6 @@ import { MedicinesModule } from './tabs/medicines/medicines.module'
     BrowserModule,
     BrowserAnimationsModule,
     MatTabsModule,
-    HttpClientModule,
     AppRoutingModule,
     MedicinesModule
   ],

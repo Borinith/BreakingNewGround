@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 interface WeatherForecast {
   date: string;
@@ -18,7 +18,7 @@ export class WeatherForecastComponent implements OnInit {
 
   public forecasts: WeatherForecast[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.getForecasts();
@@ -28,6 +28,7 @@ export class WeatherForecastComponent implements OnInit {
     this.http.get<WeatherForecast[]>('/api/WeatherForecast/GetWeatherForecast').subscribe(
       (result) => {
         this.forecasts = result;
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error(error);

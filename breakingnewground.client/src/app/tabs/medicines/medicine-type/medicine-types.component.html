@@ -1,0 +1,27 @@
+<h2>Medicine types</h2>
+
+<form (ngSubmit)="addMedicineType()">
+  <input type="text" [(ngModel)]="newMedicineType.name" name="name" placeholder="Name">
+  <button mat-button type="submit">Add</button>
+</form>
+
+<table>
+  <thead>
+  <tr>
+    <th>Id</th>
+    <th>Name</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let medicineType of medicineTypes">
+    <td>{{medicineType.id}}</td>
+    <td>
+      <input [(ngModel)]="medicineType.name" name="name{{medicineType.id}}">
+    </td>
+    <td>
+      <button mat-button (click)="updateMedicineType(medicineType)">Save</button>
+      <button mat-button color="warn" (click)="deleteMedicineType(medicineType.id)">Delete</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

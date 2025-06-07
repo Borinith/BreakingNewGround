@@ -15,7 +15,9 @@
   <tbody>
   <tr *ngFor="let medicineBodyType of medicineBodyTypes">
     <td>{{medicineBodyType.id}}</td>
-    <td><input [(ngModel)]="medicineBodyType.name" name="name{{medicineBodyType.id}}"></td>
+    <td>
+      <input [(ngModel)]="medicineBodyType.name" name="name{{medicineBodyType.id}}">
+    </td>
     <td>
       <button mat-button (click)="updateMedicineBodyType(medicineBodyType)">Save</button>
       <button mat-button color="warn" (click)="deleteMedicineBodyType(medicineBodyType.id)">Delete</button>

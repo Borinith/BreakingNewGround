@@ -4,6 +4,7 @@ import { TabsComponent } from './tabs/tabs.component';
 import { MedicinesComponent } from './tabs/medicines/medicines.component';
 import { WeatherForecastComponent } from './tabs/weatherforecast/weatherforecast.component';
 import { MedicineBodyTypesComponent } from './tabs/medicines/medicine-body-type/medicine-body-types.component';
+import { MedicineTypesComponent } from './tabs/medicines/medicine-type/medicine-types.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,7 @@ const routes: Routes = [
         component: MedicinesComponent,
         children: [
           { path: 'medicinebodytypes', component: MedicineBodyTypesComponent },
+          { path: 'medicinetypes', component: MedicineTypesComponent },
           { path: '', redirectTo: 'medicinebodytypes', pathMatch: 'full' },
           { path: '**', redirectTo: 'medicinebodytypes' }
         ]

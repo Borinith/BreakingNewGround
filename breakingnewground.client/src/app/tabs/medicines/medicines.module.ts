@@ -8,12 +8,14 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { MedicinesComponent } from './medicines.component';
 import { MedicineBodyTypesComponent } from './medicine-body-type/medicine-body-types.component';
+import { MedicineTypesComponent } from './medicine-type/medicine-types.component';
 
 
 @NgModule({
   declarations: [
     MedicinesComponent,
     MedicineBodyTypesComponent,
+    MedicineTypesComponent
   ],
   imports: [
     CommonModule,
@@ -24,7 +26,8 @@ import { MedicineBodyTypesComponent } from './medicine-body-type/medicine-body-t
     HttpClientModule
   ],
   exports: [
-    MedicineBodyTypesComponent
+    MedicineBodyTypesComponent,
+    MedicineTypesComponent
   ]
 })
 export class MedicinesModule { }
