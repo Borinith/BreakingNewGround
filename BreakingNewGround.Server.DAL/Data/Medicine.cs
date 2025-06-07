@@ -13,6 +13,7 @@ namespace BreakingNewGround.Server.DAL.Data
         [Column("id")]
         public long Id { get; set; }
 
+        [Required]
         [Column("name")]
         public required string Name { get; set; }
 

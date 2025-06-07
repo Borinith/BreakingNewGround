@@ -27,8 +27,8 @@ namespace BreakingNewGround.Server.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public async Task<T?> GetByIdAsync(long id)
+        [Route("[action]/{id:long}")]
+        public async Task<T> GetByIdAsync(long id)
         {
             return await _genericCrudService.GetByIdAsync(id);
         }
@@ -48,7 +48,7 @@ namespace BreakingNewGround.Server.Controllers
         }
 
         [HttpDelete]
-        [Route("[action]")]
+        [Route("[action]/{id:long}")]
         public async Task<bool> DeleteAsync(long id)
         {
             return await _genericCrudService.DeleteAsync(id);
