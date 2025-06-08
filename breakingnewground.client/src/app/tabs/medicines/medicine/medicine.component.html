@@ -1,0 +1,52 @@
+<h2>Medicines</h2>
+
+<form (ngSubmit)="addMedicine()">
+  <input type="text" [(ngModel)]="newMedicine.name" name="name" placeholder="Name">
+  <input type="date" [(ngModel)]="newMedicine.expirationDate" name="expirationDate" placeholder="Expiration date">
+  <input type="number" [(ngModel)]="newMedicine.bodyTypeId" name="bodyTypeId" placeholder="Body type Id">
+  <input type="number" [(ngModel)]="newMedicine.typeId" name="typeId" placeholder="Type Id">
+  <input type="number" [(ngModel)]="newMedicine.count" name="count" placeholder="Count">
+  <input type="text" [(ngModel)]="newMedicine.comment" name="comment" placeholder="Comment">
+  <button mat-button type="submit">Add</button>
+</form>
+
+<table>
+  <thead>
+  <tr>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Expiration date</th>
+    <th>Body type Id</th>
+    <th>Type Id</th>
+    <th>Count</th>
+    <th>Comment</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let medicine of medicines">
+    <td>{{medicine.id}}</td>
+    <td>
+      <input [(ngModel)]="medicine.name" name="name{{medicine.id}}">
+    </td>
+    <td>
+      <input [(ngModel)]="medicine.expirationDate" name="expirationDate{{medicine.id}}">
+    </td>
+    <td>
+      <input type="number" [(ngModel)]="medicine.bodyTypeId" name="bodyTypeId{{medicine.id}}">
+    </td>
+    <td>
+      <input type="number" [(ngModel)]="medicine.typeId" name="typeId{{medicine.id}}">
+    </td>
+    <td>
+      <input type="number" [(ngModel)]="medicine.count" name="count{{medicine.id}}">
+    </td>
+    <td>
+      <input [(ngModel)]="medicine.comment" name="comment{{medicine.id}}">
+    </td>
+    <td>
+      <button mat-button (click)="updateMedicine(medicine)">Save</button>
+      <button mat-button color="warn" (click)="deleteMedicine(medicine.id)">Delete</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

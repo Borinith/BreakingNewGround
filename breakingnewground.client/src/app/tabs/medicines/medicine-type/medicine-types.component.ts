@@ -5,7 +5,7 @@ import { MedicineType } from './medicine-type.model';
 @Component({
   selector: 'app-medicinetypes',
   templateUrl: './medicine-types.component.html',
-  standalone: false,
+  standalone: false
 })
 export class MedicineTypesComponent implements OnInit {
   medicineTypes: MedicineType[] = [];

@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 
 import { MedicinesComponent } from './medicines.component';
+import { MedicineComponent } from './medicine/medicine.component';
 import { MedicineBodyTypesComponent } from './medicine-body-type/medicine-body-types.component';
 import { MedicineTypesComponent } from './medicine-type/medicine-types.component';
 
@@ -14,6 +15,7 @@ import { MedicineTypesComponent } from './medicine-type/medicine-types.component
 @NgModule({
   declarations: [
     MedicinesComponent,
+    MedicineComponent,
     MedicineBodyTypesComponent,
     MedicineTypesComponent
   ],
@@ -26,6 +28,7 @@ import { MedicineTypesComponent } from './medicine-type/medicine-types.component
     HttpClientModule
   ],
   exports: [
+    MedicineComponent,
     MedicineBodyTypesComponent,
     MedicineTypesComponent
   ]

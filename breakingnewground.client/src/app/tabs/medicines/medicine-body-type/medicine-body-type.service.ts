@@ -20,12 +20,12 @@ export class MedicineBodyTypeService {
     return this.http.get<MedicineBodyType>(`${this.apiUrl}/GetById/${id}`);
   }
 
-  create(product: MedicineBodyType): Observable<MedicineBodyType> {
-    return this.http.post<MedicineBodyType>(`${this.apiUrl}/Create`, product);
+  create(medicineBodyType: MedicineBodyType): Observable<MedicineBodyType> {
+    return this.http.post<MedicineBodyType>(`${this.apiUrl}/Create`, medicineBodyType);
   }
 
-  update(product: MedicineBodyType): Observable<MedicineBodyType> {
-    return this.http.put<MedicineBodyType>(`${this.apiUrl}/Update`, product);
+  update(medicineBodyType: MedicineBodyType): Observable<MedicineBodyType> {
+    return this.http.put<MedicineBodyType>(`${this.apiUrl}/Update`, medicineBodyType);
   }
 
   delete(id: number): Observable<boolean> {

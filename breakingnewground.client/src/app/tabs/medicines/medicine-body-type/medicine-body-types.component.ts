@@ -5,7 +5,7 @@ import { MedicineBodyType } from './medicine-body-type.model';
 @Component({
   selector: 'app-medicinebodytypes',
   templateUrl: './medicine-body-types.component.html',
-  standalone: false,
+  standalone: false
 })
 export class MedicineBodyTypesComponent implements OnInit {
   medicineBodyTypes: MedicineBodyType[] = [];
