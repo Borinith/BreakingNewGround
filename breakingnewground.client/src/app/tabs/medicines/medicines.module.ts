@@ -1,15 +1,18 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatTableModule } from '@angular/material/table';
+import { RouterModule } from '@angular/router';
 
-import { MedicinesComponent } from './medicines.component';
-import { MedicineComponent } from './medicine/medicine.component';
 import { MedicineBodyTypesComponent } from './medicine-body-type/medicine-body-types.component';
 import { MedicineTypesComponent } from './medicine-type/medicine-types.component';
+import { MedicineComponent } from './medicine/medicine.component';
+import { MedicinesComponent } from './medicines.component';
 
 
 @NgModule({
@@ -21,11 +24,14 @@ import { MedicineTypesComponent } from './medicine-type/medicine-types.component
   ],
   imports: [
     CommonModule,
+    HttpClientModule,
     FormsModule,
-    MatSidenavModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatListModule,
-    RouterModule,
-    HttpClientModule
+    MatSidenavModule,
+    MatTableModule,
+    RouterModule
   ],
   exports: [
     MedicineComponent,

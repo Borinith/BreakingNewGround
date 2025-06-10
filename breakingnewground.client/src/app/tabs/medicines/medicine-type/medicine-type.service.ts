@@ -1,34 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BaseEntityService } from '../base-entity/base-entity.service';
 import { MedicineType } from './medicine-type.model';
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class MedicineTypeService {
-  private apiUrl = '/api/MedicineType';
+export class MedicineTypeService extends BaseEntityService<MedicineType> {
 
-  constructor(private http: HttpClient) { }
-
-  getAll(): Observable<MedicineType[]> {
-    return this.http.get<MedicineType[]>(`${this.apiUrl}/GetAll`);
-  }
-
-  getById(id: number): Observable<MedicineType> {
-    return this.http.get<MedicineType>(`${this.apiUrl}/GetById/${id}`);
-  }
-
-  create(medicineType: MedicineType): Observable<MedicineType> {
-    return this.http.post<MedicineType>(`${this.apiUrl}/Create`, medicineType);
-  }
-
-  update(medicineType: MedicineType): Observable<MedicineType> {
-    return this.http.put<MedicineType>(`${this.apiUrl}/Update`, medicineType);
-  }
-
-  delete(id: number): Observable<boolean> {
-    return this.http.delete<boolean>(`${this.apiUrl}/Delete/${id}`);
+  constructor(http: HttpClient) {
+    super(http, '/api/MedicineType');
   }
 }

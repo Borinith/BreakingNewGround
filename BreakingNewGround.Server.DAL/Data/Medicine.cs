@@ -22,14 +22,14 @@ namespace BreakingNewGround.Server.DAL.Data
 
         [Column("body_type_id")]
         [ForeignKey(nameof(BodyType))]
-        public long BodyTypeId { get; set; }
+        public long? BodyTypeId { get; set; }
 
         [DeleteBehavior(DeleteBehavior.SetNull)]
         public virtual MedicineBodyType? BodyType { get; set; }
 
         [Column("type_id")]
         [ForeignKey(nameof(Type))]
-        public long TypeId { get; set; }
+        public long? TypeId { get; set; }
 
         [DeleteBehavior(DeleteBehavior.SetNull)]
         public virtual MedicineType? Type { get; set; }

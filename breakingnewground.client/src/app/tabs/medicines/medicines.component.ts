@@ -6,4 +6,5 @@ import { Component } from '@angular/core';
   standalone: false,
   styleUrls: ['./medicines.component.css']
 })
+
 export class MedicinesComponent { }
