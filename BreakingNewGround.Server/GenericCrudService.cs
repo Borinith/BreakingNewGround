@@ -3,6 +3,8 @@ using BreakingNewGround.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace BreakingNewGround.Server
@@ -27,9 +29,12 @@ namespace BreakingNewGround.Server
             return model;
         }
 
-        public async Task<T> GetByIdAsync(long id)
+        public async Task<T> GetByIdAsync(long id, string[] includes)
         {
-            var entity = await _context.Set<T>().FindAsync(id);
+            var query = ApplyIncludes(_context.Set<T>().AsNoTracking(), includes);
+            var lambda = ExtractByValue("Id", id);
+
+            var entity = await query.FirstOrDefaultAsync(lambda);
 
             if (entity is null)
             {
@@ -39,9 +44,11 @@ namespace BreakingNewGround.Server
             return entity;
         }
 
-        public async Task<T[]> GetAllAsync()
+        public async Task<T[]> GetAllAsync(string[] includes)
         {
-            return await _context.Set<T>().AsNoTracking().ToArrayAsync();
+            var query = ApplyIncludes(_context.Set<T>().AsNoTracking(), includes);
+
+            return await query.ToArrayAsync();
         }
 
         public async Task<T> UpdateAsync(T model)
@@ -65,6 +72,22 @@ namespace BreakingNewGround.Server
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private static IQueryable<T> ApplyIncludes(IQueryable<T> query, string[] includes)
+        {
+            return includes.Any()
+                ? includes.Aggregate(query, (current, include) => current.Include(include))
+                : query;
+        }
+
+        private static Expression<Func<T, bool>> ExtractByValue<TValue>(string property, TValue value)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var constant = Expression.Constant(value);
+            var body = Expression.Equal(Expression.Property(parameter, property), constant);
+
+            return Expression.Lambda<Func<T, bool>>(body, parameter);
         }
     }
 }

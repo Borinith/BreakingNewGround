@@ -11,12 +11,17 @@ namespace BreakingNewGround.Server.Controllers
         where T : class
     {
         private readonly IGenericCrudService<T> _genericCrudService;
+        private readonly string[] _includes;
         private readonly ILogger<GenericCrudController<T>> _logger;
 
-        protected GenericCrudController(IGenericCrudService<T> genericCrudService, ILogger<GenericCrudController<T>> logger)
+        protected GenericCrudController(
+            IGenericCrudService<T> genericCrudService,
+            ILogger<GenericCrudController<T>> logger,
+            params string[] includes)
         {
             _genericCrudService = genericCrudService;
             _logger = logger;
+            _includes = includes;
         }
 
         [HttpPost]
@@ -30,14 +35,14 @@ namespace BreakingNewGround.Server.Controllers
         [Route("[action]/{id:long}")]
         public async Task<T> GetByIdAsync(long id)
         {
-            return await _genericCrudService.GetByIdAsync(id);
+            return await _genericCrudService.GetByIdAsync(id, _includes);
         }
 
         [HttpGet]
         [Route("[action]")]
         public async Task<T[]> GetAllAsync()
         {
-            return await _genericCrudService.GetAllAsync();
+            return await _genericCrudService.GetAllAsync(_includes);
         }
 
         [HttpPut]

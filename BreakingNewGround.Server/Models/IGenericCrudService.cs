@@ -7,9 +7,9 @@ namespace BreakingNewGround.Server.Models
     {
         Task<T> CreateAsync(T model);
 
-        Task<T> GetByIdAsync(long id);
+        Task<T> GetByIdAsync(long id, string[] includes);
 
-        Task<T[]> GetAllAsync();
+        Task<T[]> GetAllAsync(string[] includes);
 
         Task<T> UpdateAsync(T model);
 

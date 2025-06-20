@@ -10,7 +10,7 @@ namespace BreakingNewGround.Server.Controllers
     public class MedicineController : GenericCrudController<Medicine>
     {
         public MedicineController(IGenericCrudService<Medicine> genericCrudService, ILogger<GenericCrudController<Medicine>> logger)
-            : base(genericCrudService, logger)
+            : base(genericCrudService, logger, "BodyType", "Type")
         {
         }
     }
