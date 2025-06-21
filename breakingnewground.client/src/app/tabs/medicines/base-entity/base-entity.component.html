@@ -1,33 +1,39 @@
 <h2 id="tabLabel">{{componentName}}</h2>
 
-<table mat-table [dataSource]="items" class="mat-elevation-z2">
-  <!-- колонки таблицы -->
-  <ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef> ID </th>
-    <td mat-cell *matCellDef="let item"> {{item.id}} </td>
-  </ng-container>
+<div *ngIf="isLoading" class="loading-container">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
 
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef> Название </th>
-    <td mat-cell *matCellDef="let item"> {{item.name}} </td>
-  </ng-container>
+<div *ngIf="!isLoading" class="content-container">
+  <table mat-table [dataSource]="items" class="mat-elevation-z2">
+    <!-- колонки таблицы -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> ID </th>
+      <td mat-cell *matCellDef="let item"> {{item.id}} </td>
+    </ng-container>
 
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef> Действия </th>
-    <td mat-cell *matCellDef="let item">
-      <button color="warn" (click)="deleteItem(item.id)">delete</button>
-    </td>
-  </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Название </th>
+      <td mat-cell *matCellDef="let item"> {{item.name}} </td>
+    </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-</table>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Действия </th>
+      <td mat-cell *matCellDef="let item">
+        <button color="warn" (click)="deleteItem(item.id)">delete</button>
+      </td>
+    </ng-container>
 
-<!-- форма добавления -->
-<div class="add-form">
-  <mat-form-field>
-    <input matInput placeholder="Название" [(ngModel)]="newItem.name" name="newItemName">
-  </mat-form-field>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
 
-  <button mat-flat-button color="primary" (click)="addItem()">Добавить</button>
+  <!-- форма добавления -->
+  <div class="add-form">
+    <mat-form-field>
+      <input matInput placeholder="Название" [(ngModel)]="newItem.name" name="newItemName">
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" (click)="addItem()">Добавить</button>
+  </div>
 </div>

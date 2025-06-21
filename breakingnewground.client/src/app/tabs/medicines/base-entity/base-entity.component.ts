@@ -7,11 +7,12 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   componentName: string;
   items: T[] = [];
   newItem: T;
+  isLoading = true;
 
   constructor(
     protected service: BaseEntityService<T>,
     protected name: string,
-    private cdr: ChangeDetectorRef) {
+    protected cdr: ChangeDetectorRef) {
     this.componentName = name;
     this.newItem = {} as T;
   }
@@ -21,8 +22,11 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   }
 
   getAllItems() {
+    this.isLoading = true;
+
     this.service.getAll().subscribe(data => {
       this.items = data;
+      this.isLoading = false;
       this.cdr.detectChanges();
     });
   }

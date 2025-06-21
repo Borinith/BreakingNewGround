@@ -6,7 +6,8 @@ import { MedicineBodyTypeService } from './medicine-body-type.service';
 @Component({
   selector: 'app-medicinebodytypes',
   templateUrl: '../base-entity/base-entity.component.html',
-  standalone: false
+  standalone: false,
+  styleUrls: ['../medicines.component.css']
 })
 
 export class MedicineBodyTypesComponent extends BaseEntityComponent<MedicineBodyType> {

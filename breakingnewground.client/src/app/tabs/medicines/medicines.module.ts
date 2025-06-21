@@ -2,9 +2,12 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTableModule } from '@angular/material/table';
 import { RouterModule } from '@angular/router';
@@ -14,6 +17,8 @@ import { MedicineTypesComponent } from './medicine-type/medicine-types.component
 import { MedicineComponent } from './medicine/medicine.component';
 import { MedicinesComponent } from './medicines.component';
 
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS, provideNativeDateAdapter } from '@angular/material/core';
+import { MY_DATE_FORMATS } from './date-formats';
 
 @NgModule({
   declarations: [
@@ -26,9 +31,12 @@ import { MedicinesComponent } from './medicines.component';
     CommonModule,
     HttpClientModule,
     FormsModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
     MatListModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
     MatSidenavModule,
     MatTableModule,
     RouterModule
@@ -37,6 +45,11 @@ import { MedicinesComponent } from './medicines.component';
     MedicineComponent,
     MedicineBodyTypesComponent,
     MedicineTypesComponent
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }
   ]
 })
 export class MedicinesModule { }

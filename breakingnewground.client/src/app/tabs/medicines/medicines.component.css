@@ -1,52 +1,57 @@
-/* Style the tab */
-.tab {
-  float: left;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-  width: 30%;
-  height: 300px;
-}
-
-  /* Style the buttons inside the tab */
-  .tab button {
-    display: block;
-    background-color: inherit;
-    color: black;
-    padding: 22px 16px;
-    width: 100%;
-    border: none;
-    outline: none;
-    text-align: left;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 17px;
-  }
-
-    /* Change background color of buttons on hover */
-    .tab button:hover {
-      background-color: #ddd;
-    }
-
-    /* Create an active/current "tab button" class */
-    .tab button.active {
-      background-color: #ccc;
-    }
-
-/* Style the tab content */
-.tabcontent {
-  float: left;
-  padding: 0px 12px;
-  border: 1px solid #ccc;
-  width: 70%;
-  border-left: none;
-  height: 300px;
-}
-
 .example-container {
   height: 100vh;
 }
 
-.active-link {
-  font-weight: bold;
-  color: #3f51b5;
+.sidenav {
+  width: 220px;
+  background: #fafafa;
+  border-right: 1px solid #ddd;
+}
+
+mat-drawer {
+  color: #333;
+}
+
+mat-nav-list a {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: all 0.2s;
+}
+
+  mat-nav-list a mat-icon {
+    margin-right: 12px;
+  }
+
+  mat-nav-list a.active-link {
+    background: #e3f2fd;
+    border-left: 4px solid #1976d2;
+    font-weight: bold;
+    color: #1976d2;
+  }
+
+    mat-nav-list a.active-link mat-icon {
+      color: #1976d2;
+    }
+
+  mat-nav-list a:hover {
+    background: #f1f1f1;
+  }
+
+mat-table {
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,52 +1,92 @@
 <h2>Medicines</h2>
 
-<form (ngSubmit)="addMedicine()">
-  <input type="text" [(ngModel)]="newMedicine.name" name="name" placeholder="Name">
-  <input type="date" [(ngModel)]="newMedicine.expirationDate" name="expirationDate" placeholder="Expiration date">
-  <input type="number" [(ngModel)]="newMedicine.bodyTypeId" name="bodyTypeId" placeholder="Body type Id">
-  <input type="number" [(ngModel)]="newMedicine.typeId" name="typeId" placeholder="Type Id">
-  <input type="number" [(ngModel)]="newMedicine.count" name="count" placeholder="Count">
-  <input type="text" [(ngModel)]="newMedicine.comment" name="comment" placeholder="Comment">
-  <button mat-button type="submit">Add</button>
-</form>
+<div *ngIf="isLoading" class="loading-container">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
 
-<table>
-  <thead>
-  <tr>
-    <th>Id</th>
-    <th>Name</th>
-    <th>Expiration date</th>
-    <th>Body type Id</th>
-    <th>Type Id</th>
-    <th>Count</th>
-    <th>Comment</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let medicine of medicines">
-    <td>{{medicine.id}}</td>
-    <td>
-      <input [(ngModel)]="medicine.name" name="name{{medicine.id}}">
-    </td>
-    <td>
-      <input [(ngModel)]="medicine.expirationDate" name="expirationDate{{medicine.id}}">
-    </td>
-    <td>
-      <input type="number" [(ngModel)]="medicine.bodyTypeId" name="bodyTypeId{{medicine.id}}">
-    </td>
-    <td>
-      <input type="number" [(ngModel)]="medicine.typeId" name="typeId{{medicine.id}}">
-    </td>
-    <td>
-      <input type="number" [(ngModel)]="medicine.count" name="count{{medicine.id}}">
-    </td>
-    <td>
-      <input [(ngModel)]="medicine.comment" name="comment{{medicine.id}}">
-    </td>
-    <td>
-      <button mat-button (click)="updateMedicine(medicine)">Save</button>
-      <button mat-button color="warn" (click)="deleteMedicine(medicine.id)">Delete</button>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<div *ngIf="!isLoading" class="content-container">
+  <div class="add-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Название</mat-label>
+      <input matInput [(ngModel)]="newItem.name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Срок годности</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="newItem.expirationDate" />
+      <mat-hint>DD.MM.YYYY</mat-hint>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Категория</mat-label>
+      <mat-select [(ngModel)]="newItem.bodyTypeId">
+        <mat-option *ngFor="let mbt of medicineBodyTypes" [value]="mbt.id">
+          {{ mbt.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Тип лекарства</mat-label>
+      <mat-select [(ngModel)]="newItem.typeId">
+        <mat-option *ngFor="let mt of medicineTypes" [value]="mt.id">
+          {{ mt.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Количество</mat-label>
+      <input matInput type="number" [(ngModel)]="newItem.count" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Комментарий</mat-label>
+      <input matInput [(ngModel)]="newItem.comment" />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="addItem()">
+      Добавить
+    </button>
+  </div>
+
+  <mat-table [dataSource]="items" class="mat-elevation-z2">
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> Название </mat-header-cell>
+      <mat-cell *matCellDef="let medicine"> {{ medicine.name }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="expirationDate">
+      <mat-header-cell *matHeaderCellDef> Срок годности </mat-header-cell>
+      <mat-cell *matCellDef="let medicine"> {{ medicine.expirationDate }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="medicineBodyType">
+      <mat-header-cell *matHeaderCellDef> Категория </mat-header-cell>
+      <mat-cell *matCellDef="let medicine">{{ getMedicineBodyType(medicine.bodyTypeId) }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="medicineType">
+      <mat-header-cell *matHeaderCellDef> Тип лекарства </mat-header-cell>
+      <mat-cell *matCellDef="let medicine">{{ getMedicineType(medicine.typeId) }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="count">
+      <mat-header-cell *matHeaderCellDef> Количество </mat-header-cell>
+      <mat-cell *matCellDef="let medicine"> {{ medicine.count }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="comment">
+      <mat-header-cell *matHeaderCellDef> Комментарий </mat-header-cell>
+      <mat-cell *matCellDef="let medicine"> {{ medicine.comment }} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="['name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment']"></mat-row>
+
+  </mat-table>
+
+</div>

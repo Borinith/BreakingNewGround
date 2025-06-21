@@ -1,0 +1,23 @@
+.content-container {
+  padding: 24px;
+}
+
+.add-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+  .add-form mat-form-field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+mat-table {
+  width: 100%;
+  margin-top: 24px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
