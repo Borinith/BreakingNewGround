@@ -7,11 +7,17 @@
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 24px;
+  align-items: stretch;
 }
+
+  .add-form button {
+    height: 56px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
 
   .add-form mat-form-field {
     flex: 1;
-    min-width: 200px;
   }
 
 mat-table {

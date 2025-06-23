@@ -17,7 +17,9 @@ import { MedicineTypesComponent } from './medicine-type/medicine-types.component
 import { MedicineComponent } from './medicine/medicine.component';
 import { MedicinesComponent } from './medicines.component';
 
-import { MAT_DATE_LOCALE, MAT_DATE_FORMATS, provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { enGB } from 'date-fns/locale';
+import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
 import { MY_DATE_FORMATS } from './date-formats';
 
 @NgModule({
@@ -47,8 +49,8 @@ import { MY_DATE_FORMATS } from './date-formats';
     MedicineTypesComponent
   ],
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
-    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: enGB },
+    provideDateFnsAdapter(),
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }
   ]
 })

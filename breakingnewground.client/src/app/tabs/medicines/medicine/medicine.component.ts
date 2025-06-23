@@ -11,6 +11,7 @@ import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
+import { formatISO } from 'date-fns/formatISO';
 
 @Component({
   selector: 'app-medicine',
@@ -68,5 +69,9 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   getMedicineType(id: number): string {
     const medicineType = this.medicineTypes.find(x => x.id === id);
     return medicineType ? medicineType.name : '—';
+  }
+
+  formatDate(e: any): void {
+    this.newItem.expirationDate = formatISO(e.target.value, { representation: 'date' });
   }
 }

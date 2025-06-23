@@ -13,7 +13,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Срок годности</mat-label>
-      <input matInput [matDatepicker]="picker" [(ngModel)]="newItem.expirationDate" />
+      <input matInput [matDatepicker]="picker" [(ngModel)]="newItem.expirationDate" (dateChange)="formatDate($event)" />
       <mat-hint>DD.MM.YYYY</mat-hint>
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
