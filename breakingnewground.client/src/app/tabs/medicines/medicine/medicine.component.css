@@ -27,3 +27,14 @@ mat-table {
   border-radius: 8px;
   overflow: hidden;
 }
+
+.delete-cell {
+  text-align: right;
+  padding-right: 8px;
+}
+
+.delete-cell button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

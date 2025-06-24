@@ -53,6 +53,10 @@
   </div>
 
   <mat-table [dataSource]="items" class="mat-elevation-z2">
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+      <mat-cell *matCellDef="let medicine"> {{medicine.id}} </mat-cell>
+    </ng-container>
 
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Название </mat-header-cell>
@@ -84,8 +88,17 @@
       <mat-cell *matCellDef="let medicine"> {{ medicine.comment }} </mat-cell>
     </ng-container>
 
-    <mat-header-row *matHeaderRowDef="['name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment']"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: ['name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment']"></mat-row>
+    <ng-container matColumnDef="delete">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let medicine" class="delete-cell">
+        <button mat-icon-button color="warn" (click)="deleteItem(medicine.id)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"></mat-row>
 
   </mat-table>
 
