@@ -6,6 +6,7 @@ export abstract class BaseEntityComponent<T> implements OnInit {
 
   componentName: string;
   items: T[] = [];
+  originalItems: any[] = [];
   newItem: T;
   isLoading = true;
 
@@ -26,6 +27,7 @@ export abstract class BaseEntityComponent<T> implements OnInit {
 
     this.service.getAll().subscribe(data => {
       this.items = data;
+      this.originalItems = data.map(item => ({ ...item }));
       this.isLoading = false;
       this.cdr.detectChanges();
     });
@@ -39,7 +41,9 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   }
 
   updateItem(item: T) {
-    this.service.update(item).subscribe(() => this.getAllItems());
+    if (this.isValidAndNewItem(item)) {
+      this.service.update(item).subscribe(() => this.getAllItems());
+    }
   }
 
   deleteItem(id: number) {
@@ -48,5 +52,19 @@ export abstract class BaseEntityComponent<T> implements OnInit {
         this.getAllItems()
       }
     });
+  }
+
+  private isValidAndNewItem(item: any): boolean {
+    if (!item || !item.name || item.name.trim() === '') {
+      console.warn('Invalid data');
+      return false;
+    }
+
+    if (this.originalItems.map(x => x.name).includes(item.name)) {
+      console.log('Item with this name already exists');
+      return false;
+    }
+
+    return true;
   }
 }

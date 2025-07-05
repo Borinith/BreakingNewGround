@@ -42,6 +42,32 @@ mat-nav-list a {
     background: #f1f1f1;
   }
 
+.content-container {
+  padding: 24px;
+}
+
+.add-form-common {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: stretch;
+}
+
+  .add-form-common button {
+    height: 56px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .add-form-common mat-form-field {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-basis: 30%;
+  }
+
 mat-table {
   width: 100%;
   background: #fff;
@@ -57,7 +83,7 @@ mat-table {
 }
 
 .delete-cell {
-  text-align: right;
+  text-align: center;
   padding-right: 8px;
 }
 
@@ -66,3 +92,27 @@ mat-table {
     align-items: center;
     justify-content: center;
   }
+
+.inline-field {
+  width: 100%;
+  margin: 0;
+}
+
+  .inline-field .mat-form-field-infix {
+    padding: 0 8px;
+  }
+
+.inline-field.mat-form-field {
+  height: 25px;
+}
+
+.inline-field input,
+.inline-field .mat-select-trigger {
+  height: 25px;
+  line-height: 25px;
+  padding: 0;
+}
+
+mat-cell .mat-form-field-wrapper {
+  padding-bottom: 0;
+}

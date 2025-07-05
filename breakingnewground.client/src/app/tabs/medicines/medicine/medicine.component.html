@@ -47,9 +47,7 @@
       <input matInput [(ngModel)]="newItem.comment" />
     </mat-form-field>
 
-    <button mat-raised-button color="primary" (click)="addItem()">
-      Добавить
-    </button>
+    <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
   </div>
 
   <mat-table [dataSource]="items" class="mat-elevation-z2">
