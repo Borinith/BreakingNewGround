@@ -15,6 +15,6 @@ export class MedicineBodyTypesComponent extends BaseEntityComponent<MedicineBody
   displayedColumns: string[] = ['id', 'name', 'actions'];
 
   constructor(service: MedicineBodyTypeService, cdr: ChangeDetectorRef) {
-    super(service, 'Medicine body types', cdr);
+    super(service, 'Категории', cdr);
   }
 }

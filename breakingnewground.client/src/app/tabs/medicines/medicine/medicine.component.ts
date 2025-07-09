@@ -24,6 +24,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
 
   medicineBodyTypes: MedicineBodyType[] = [];
   medicineTypes: MedicineType[] = [];
+  override originalItems: Medicine[] = [];
 
   override isLoading = true;
 
@@ -32,7 +33,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     private medicineBodyTypeService: MedicineBodyTypeService,
     private medicineTypeService: MedicineTypeService,
     cdr: ChangeDetectorRef) {
-    super(service, 'Medicines', cdr);
+    super(service, 'Лекарства', cdr);
   }
 
   override ngOnInit(): void {
@@ -49,6 +50,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     }).subscribe({
       next: ({ medicines, medicineBodyTypes, medicineTypes }) => {
         this.items = medicines;
+        this.originalItems = medicines.map(item => ({ ...item }));
         this.medicineBodyTypes = medicineBodyTypes;
         this.medicineTypes = medicineTypes;
         this.isLoading = false;
@@ -61,17 +63,59 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     });
   }
 
-  getMedicineBodyType(id: number): string {
-    const medicineBodyType = this.medicineBodyTypes.find(x => x.id === id);
-    return medicineBodyType ? medicineBodyType.name : '—';
-  }
+  loadMedicinesData() {
+    this.isLoading = true;
 
-  getMedicineType(id: number): string {
-    const medicineType = this.medicineTypes.find(x => x.id === id);
-    return medicineType ? medicineType.name : '—';
+    this.service.getAll().subscribe(medicines => {
+      this.items = medicines;
+      this.originalItems = medicines.map(item => ({ ...item }));
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    });
   }
 
   formatDate(e: any): void {
     this.newItem.expirationDate = formatISO(e.target.value, { representation: 'date' });
+  }
+
+  onDateChange(medicine: Medicine, date: Date | null) {
+    if (!date) {
+      return;
+    }
+
+    medicine.expirationDate = formatISO(date, { representation: 'date' });
+    this.updateItem(medicine);
+  }
+
+  override updateItem(item: Medicine) {
+    if (this.isValidItem(item)) {
+      this.service.update(item).subscribe(() => this.loadMedicinesData());
+    }
+  }
+
+  private isValidItem(item: Medicine): boolean {
+    if (!item || !item.name || item.name.trim() === '') {
+      console.warn('Invalid data');
+      return false;
+    }
+    
+    item.count = item.count < 0 ? 0 : item.count;
+    item.comment = (item.comment?.trim() === '') ? null : item.comment;
+
+    const originalItem = this.originalItems.find(x => x.id == item.id);
+
+    if ((originalItem === undefined)
+      || (originalItem.name == item.name
+        && originalItem.expirationDate == item.expirationDate
+        && originalItem.bodyTypeId == item.bodyTypeId
+        && originalItem.typeId == item.typeId
+        && originalItem.count == item.count
+        && originalItem.comment == item.comment)
+    ) {
+      console.log('This item already exists');
+      return false;
+    }
+
+    return true;
   }
 }

@@ -34,10 +34,12 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   }
 
   addItem() {
-    this.service.create(this.newItem).subscribe(() => {
-      this.newItem = {} as T;
-      this.getAllItems();
-    });
+    if (this.isValidAndNewItem(this.newItem)) {
+      this.service.create(this.newItem).subscribe(() => {
+        this.newItem = {} as T;
+        this.getAllItems();
+      });
+    }
   }
 
   updateItem(item: T) {

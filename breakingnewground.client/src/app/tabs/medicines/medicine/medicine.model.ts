@@ -5,5 +5,5 @@ export interface Medicine {
   bodyTypeId: number;
   typeId: number;
   count: number;
-  comment: string;
+  comment: string | null;
 }

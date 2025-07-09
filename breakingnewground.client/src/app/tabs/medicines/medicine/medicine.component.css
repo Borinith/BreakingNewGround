@@ -28,6 +28,38 @@ mat-table {
   overflow: hidden;
 }
 
+mat-header-cell, mat-cell {
+  justify-content: center;
+}
+
+.mat-column-id {
+  flex: 0 0 3%;
+}
+
+.mat-column-name {
+  flex: 0 0 16%;
+}
+
+.mat-column-expirationDate {
+  flex: 0 0 17%;
+}
+
+.mat-column-medicineBodyType {
+  flex: 0 0 14%;
+}
+
+.mat-column-medicineType {
+  flex: 0 0 16%;
+}
+
+.mat-column-count {
+  flex: 0 0 9%;
+}
+
+.mat-column-comment {
+  flex: 0 0 16%;
+}
+
 .delete-cell {
   text-align: right;
   padding-right: 8px;

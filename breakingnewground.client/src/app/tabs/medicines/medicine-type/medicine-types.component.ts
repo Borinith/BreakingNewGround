@@ -15,6 +15,6 @@ export class MedicineTypesComponent extends BaseEntityComponent<MedicineType> {
   displayedColumns: string[] = ['id', 'name', 'actions'];
 
   constructor(service: MedicineTypeService, cdr: ChangeDetectorRef) {
-    super(service, 'Medicine types', cdr);
+    super(service, 'Типы лекарств', cdr);
   }
 }

@@ -1,4 +1,4 @@
-<h2>Medicines</h2>
+<h2 id="tabLabel">{{componentName}}</h2>
 
 <div *ngIf="isLoading" class="loading-container">
   <mat-spinner diameter="50"></mat-spinner>
@@ -58,32 +58,88 @@
 
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Название </mat-header-cell>
-      <mat-cell *matCellDef="let medicine"> {{ medicine.name }} </mat-cell>
+      <mat-cell *matCellDef="let medicine">
+        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
+          <input matInput
+                 [(ngModel)]="medicine.name"
+                 name="name{{medicine.id}}"
+                 (blur)="updateItem(medicine)"
+                 placeholder="Название">
+        </mat-form-field>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="expirationDate">
       <mat-header-cell *matHeaderCellDef> Срок годности </mat-header-cell>
-      <mat-cell *matCellDef="let medicine"> {{ medicine.expirationDate }} </mat-cell>
+      <mat-cell *matCellDef="let medicine">
+        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
+          <input matInput
+                 [matDatepicker]="picker"
+                 [(ngModel)]="medicine.expirationDate"
+                 (dateChange)="onDateChange(medicine, $event.value)"
+                 (blur)="onDateChange(medicine, medicine.expirationDate)"
+                 placeholder="YYYY‑MM‑DD"
+                 name="expirationDate{{medicine.id}}">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="medicineBodyType">
       <mat-header-cell *matHeaderCellDef> Категория </mat-header-cell>
-      <mat-cell *matCellDef="let medicine">{{ getMedicineBodyType(medicine.bodyTypeId) }}</mat-cell>
+      <mat-cell *matCellDef="let medicine">
+        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
+          <mat-select [(ngModel)]="medicine.bodyTypeId"
+                      name="medicineBodyType{{medicine.id}}"
+                      (selectionChange)="updateItem(medicine)">
+            <mat-option *ngFor="let mbt of medicineBodyTypes" [value]="mbt.id">
+              {{ mbt.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="medicineType">
       <mat-header-cell *matHeaderCellDef> Тип лекарства </mat-header-cell>
-      <mat-cell *matCellDef="let medicine">{{ getMedicineType(medicine.typeId) }}</mat-cell>
+      <mat-cell *matCellDef="let medicine">
+        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
+          <mat-select [(ngModel)]="medicine.typeId"
+                      name="medicineType{{medicine.id}}"
+                      (selectionChange)="updateItem(medicine)">
+            <mat-option *ngFor="let mt of medicineTypes" [value]="mt.id">
+              {{ mt.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="count">
       <mat-header-cell *matHeaderCellDef> Количество </mat-header-cell>
-      <mat-cell *matCellDef="let medicine"> {{ medicine.count }} </mat-cell>
+      <mat-cell *matCellDef="let medicine">
+        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
+          <input matInput type="number"
+                 [(ngModel)]="medicine.count"
+                 name="count{{medicine.id}}"
+                 (blur)="updateItem(medicine)"
+                 placeholder="Количество">
+        </mat-form-field>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="comment">
       <mat-header-cell *matHeaderCellDef> Комментарий </mat-header-cell>
-      <mat-cell *matCellDef="let medicine"> {{ medicine.comment }} </mat-cell>
+      <mat-cell *matCellDef="let medicine">
+        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
+          <input matInput
+                 [(ngModel)]="medicine.comment"
+                 name="comment{{medicine.id}}"
+                 (blur)="updateItem(medicine)"
+                 placeholder="Комментарий">
+        </mat-form-field>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="delete">
