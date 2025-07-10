@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.AppHost",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.ServiceDefaults", "BreakingNewGround.ServiceDefaults\BreakingNewGround.ServiceDefaults.csproj", "{5759C8E2-2D26-4EE3-C76E-B40FDF4E31C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL", "BreakingNewGround.Server.DAL\BreakingNewGround.Server.DAL.csproj", "{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL.SQLite", "BreakingNewGround.Server.DAL\BreakingNewGround.Server.DAL.SQLite.csproj", "{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
