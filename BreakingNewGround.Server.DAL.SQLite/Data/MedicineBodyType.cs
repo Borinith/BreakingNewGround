@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BreakingNewGround.Server.DAL.Data
+namespace BreakingNewGround.Server.DAL.SQLite.Data
 {
     [Table("medicine_body_type")]
     public class MedicineBodyType

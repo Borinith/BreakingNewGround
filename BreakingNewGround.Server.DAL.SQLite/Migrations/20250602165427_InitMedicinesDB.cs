@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BreakingNewGround.Server.DAL.Migrations
+namespace BreakingNewGround.Server.DAL.SQLite.Migrations
 {
     /// <inheritdoc />
     public partial class InitMedicinesDB : Migration

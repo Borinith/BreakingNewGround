@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace BreakingNewGround.Server.DAL.Data
+namespace BreakingNewGround.Server.DAL.SQLite.Data
 {
     public class MedicinesContext : DbContext
     {

@@ -27,7 +27,7 @@
     <ProjectReference Include="..\breakingnewground.client\breakingnewground.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
   	</ProjectReference>
-    <ProjectReference Include="..\BreakingNewGround.Server.DAL\BreakingNewGround.Server.DAL.SQLite.csproj" />
+    <ProjectReference Include="..\BreakingNewGround.Server.DAL.SQLite\BreakingNewGround.Server.DAL.SQLite.csproj" />
     <ProjectReference Include="..\BreakingNewGround.ServiceDefaults\BreakingNewGround.ServiceDefaults.csproj" />
   </ItemGroup>
 
