@@ -9,6 +9,8 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   originalItems: any[] = [];
   newItem: T;
   isLoading = true;
+  updatedId: number | null = null;
+  errorId: number | null = null;
 
   constructor(
     protected service: BaseEntityService<T>,
@@ -44,7 +46,24 @@ export abstract class BaseEntityComponent<T> implements OnInit {
 
   updateItem(item: T) {
     if (this.isValidAndNewItem(item)) {
-      this.service.update(item).subscribe(() => this.getAllItems());
+      this.service.update(item)
+        .subscribe({
+          next: () => {
+            this.updatedId = (item as any).id;
+            this.cdr.detectChanges();
+
+            setTimeout(() => {
+              this.updatedId = null;
+              this.cdr.detectChanges();
+
+              this.getAllItems();
+            }, 1000);
+          },
+          error: err => {
+            console.error('Update error', err);
+            this.showError(item);
+          }
+        });
     }
   }
 
@@ -59,6 +78,7 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   private isValidAndNewItem(item: any): boolean {
     if (!item || !item.name || item.name.trim() === '') {
       console.warn('Invalid data');
+      this.showError(item);
       return false;
     }
 
@@ -68,5 +88,15 @@ export abstract class BaseEntityComponent<T> implements OnInit {
     }
 
     return true;
+  }
+
+  protected showError(item: any): void {
+    this.errorId = item.id;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.errorId = null;
+      this.cdr.detectChanges();
+    }, 1000);
   }
 }

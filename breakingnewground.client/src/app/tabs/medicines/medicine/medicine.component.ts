@@ -89,13 +89,30 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
 
   override updateItem(item: Medicine) {
     if (this.isValidItem(item)) {
-      this.service.update(item).subscribe(() => this.loadMedicinesData());
+      this.service.update(item).subscribe({
+        next: () => {
+          this.updatedId = item.id;
+          this.cdr.detectChanges();
+
+          setTimeout(() => {
+            this.updatedId = null;
+            this.cdr.detectChanges();
+
+            this.loadMedicinesData();
+          }, 1000);
+        },
+        error: err => {
+          console.error('Update error', err);
+          this.showError(item);
+        }
+      });
     }
   }
 
   private isValidItem(item: Medicine): boolean {
     if (!item || !item.name || item.name.trim() === '') {
       console.warn('Invalid data');
+      this.showError(item);
       return false;
     }
     

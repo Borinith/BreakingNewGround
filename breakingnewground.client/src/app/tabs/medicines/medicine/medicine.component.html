@@ -152,7 +152,11 @@
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: ['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"></mat-row>
+    <mat-row
+      *matRowDef="let row; columns: ['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"
+      [class.updated-row]="row.id === updatedId"
+      [class.error-row]="row.id === errorId">
+    </mat-row>
 
   </mat-table>
 
