@@ -1,5 +1,5 @@
 using BreakingNewGround.Server;
-using BreakingNewGround.Server.DAL.SQLite.Data;
+using BreakingNewGround.Server.DAL.AzureSQL.Data;
 using BreakingNewGround.Server.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +16,11 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+/*builder.Services.AddDbContext<MedicinesContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnectionSQLite")));*/
+
 builder.Services.AddDbContext<MedicinesContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL")));
 
 builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
 

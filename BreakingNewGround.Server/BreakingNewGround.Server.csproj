@@ -19,15 +19,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.5.6" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.6.0" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\breakingnewground.client\breakingnewground.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
   	</ProjectReference>
-    <ProjectReference Include="..\BreakingNewGround.Server.DAL.SQLite\BreakingNewGround.Server.DAL.SQLite.csproj" />
+    <ProjectReference Include="..\BreakingNewGround.Server.DAL.AzureSQL\BreakingNewGround.Server.DAL.AzureSQL.csproj" />
     <ProjectReference Include="..\BreakingNewGround.ServiceDefaults\BreakingNewGround.ServiceDefaults.csproj" />
   </ItemGroup>
 

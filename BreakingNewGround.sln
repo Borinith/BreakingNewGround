@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.ServiceDe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL.SQLite", "BreakingNewGround.Server.DAL.SQLite\BreakingNewGround.Server.DAL.SQLite.csproj", "{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL.AzureSQL", "BreakingNewGround.Server.DAL.AzureSQL\BreakingNewGround.Server.DAL.AzureSQL.csproj", "{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AC2F02A-BB1B-45EB-9609-0BBF54E9DE52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
