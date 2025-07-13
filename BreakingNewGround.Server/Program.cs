@@ -31,6 +31,7 @@ app.MapDefaultEndpoints();
 #pragma warning restore DF0001
 
 app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapStaticAssets();
 
 // Configure the HTTP request pipeline.
