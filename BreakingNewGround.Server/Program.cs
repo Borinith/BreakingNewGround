@@ -1,12 +1,16 @@
 using BreakingNewGround.Server;
 using BreakingNewGround.Server.DAL.AzureSQL.Data;
 using BreakingNewGround.Server.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +27,45 @@ builder.Services.AddDbContext<MedicinesContext>(options =>
     options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL")));
 
 builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(x =>
+    {
+        x.Password.RequireDigit = false;
+        x.Password.RequireLowercase = true;
+        x.Password.RequireUppercase = false;
+        x.Password.RequireNonAlphanumeric = false;
+        x.Password.RequiredLength = 3;
+    })
+    .AddEntityFrameworkStores<MedicinesContext>()
+    .AddDefaultTokenProviders();
+
+var jwtSection = builder.Configuration.GetSection("Jwt");
+builder.Services.Configure<JwtSettings>(jwtSection);
+
+var jwt = jwtSection.Get<JwtSettings>();
+var key = Encoding.UTF8.GetBytes(jwt!.Key);
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwt.Issuer,
+            ValidAudience = jwt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+    });
 
 using var app = builder.Build();
 
@@ -42,6 +85,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRouting();

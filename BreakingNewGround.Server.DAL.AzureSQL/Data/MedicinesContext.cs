@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Data
 {
-    public class MedicinesContext : DbContext
+    public class MedicinesContext : IdentityDbContext<ApplicationUser>
     {
         public MedicinesContext(DbContextOptions<MedicinesContext> options) : base(options)
         {
