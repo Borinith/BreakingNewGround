@@ -16,3 +16,7 @@ table {
 p {
   font-family: Lato;
 }
+
+.spacer {
+  flex: 1 1 auto;
+}

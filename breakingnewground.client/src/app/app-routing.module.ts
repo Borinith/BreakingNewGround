@@ -1,13 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { TabsComponent } from './tabs/tabs.component';
-import { MedicinesComponent } from './tabs/medicines/medicines.component';
-import { WeatherForecastComponent } from './tabs/weatherforecast/weatherforecast.component';
-import { MedicineComponent } from './tabs/medicines/medicine/medicine.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 import { MedicineBodyTypesComponent } from './tabs/medicines/medicine-body-type/medicine-body-types.component';
 import { MedicineTypesComponent } from './tabs/medicines/medicine-type/medicine-types.component';
+import { MedicineComponent } from './tabs/medicines/medicine/medicine.component';
+import { MedicinesComponent } from './tabs/medicines/medicines.component';
+import { TabsComponent } from './tabs/tabs.component';
+import { WeatherForecastComponent } from './tabs/weatherforecast/weatherforecast.component';
 
 const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   {
     path: 'tabs',
     component: TabsComponent,

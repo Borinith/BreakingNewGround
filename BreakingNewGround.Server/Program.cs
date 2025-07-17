@@ -24,7 +24,7 @@ builder.Services.AddOpenApi();
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnectionSQLite")));*/
 
 builder.Services.AddDbContext<MedicinesContext>(options =>
-    options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL")));
+    options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL"), o => o.EnableRetryOnFailure(3)));
 
 builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
 
@@ -84,12 +84,12 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.UseRouting();
+app.MapDefaultControllerRoute();
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseRouting();
-app.MapDefaultControllerRoute();
 
 app.MapFallbackToFile("/index.html");
 
