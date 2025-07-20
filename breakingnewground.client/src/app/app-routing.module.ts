@@ -8,6 +8,7 @@ import { MedicineComponent } from './tabs/medicines/medicine/medicine.component'
 import { MedicinesComponent } from './tabs/medicines/medicines.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { WeatherForecastComponent } from './tabs/weatherforecast/weatherforecast.component';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -15,6 +16,8 @@ const routes: Routes = [
   {
     path: 'tabs',
     component: TabsComponent,
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'medicines',

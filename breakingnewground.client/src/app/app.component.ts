@@ -8,18 +8,10 @@ import { AuthService } from './services/auth.service';
   standalone: false,
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'breakingnewground.client';
 
   constructor(public auth: AuthService, private router: Router) { }
-
-  ngOnInit() {
-    setInterval(() => {
-      if (!this.auth.isAuthenticated) {
-        this.logout();
-      }
-    }, 60 * 1000);
-  }
 
   logout() {
     this.auth.logout();

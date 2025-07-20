@@ -37,7 +37,9 @@ namespace BreakingNewGround.Server.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var user = new ApplicationUser
+            throw new NotImplementedException();
+
+            /*var user = new ApplicationUser
             {
                 UserName = dto.UserName
             };
@@ -49,7 +51,7 @@ namespace BreakingNewGround.Server.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return Ok();
+            return Ok();*/
         }
 
         [HttpPost]
