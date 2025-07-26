@@ -67,6 +67,8 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddHybridCache();
+
 using var app = builder.Build();
 
 #pragma warning disable DF0001

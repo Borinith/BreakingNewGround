@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
@@ -47,6 +48,7 @@ export function tokenGetter() {
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     MatTabsModule,
     AppRoutingModule,
     MedicinesModule,

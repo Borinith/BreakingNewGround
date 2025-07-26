@@ -1,23 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { tap } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
+import { finalize, tap } from 'rxjs/operators';
 
-interface LoginResponse { token: string; }
+interface LoginResponse { accessToken: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private returnUrl = '/';
   private expirationTimer: any;
+  private refreshInProgress = false;
 
-  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute,
+    private jwtHelper: JwtHelperService
+  ) {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     this.scheduleExpiryLogout();
   }
 
   login(userName: string, password: string) {
     return this.http
-      .post<LoginResponse>('/api/account/login', { userName, password })
+      .post<LoginResponse>('/api/account/login',
+        { userName, password },
+        { withCredentials: true })
       .pipe(tap(res => {
-        localStorage.setItem('jwt', res.token);
+        localStorage.setItem('jwt', res.accessToken);
         this.scheduleExpiryLogout();
       }));
   }
@@ -29,7 +41,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('jwt');
     clearTimeout(this.expirationTimer);
-    window.location.href = '/login';
+    this.router.navigateByUrl(this.returnUrl);
   }
 
   get token(): string | null {
@@ -45,22 +57,43 @@ export class AuthService {
     return !!this.token && !this.isTokenExpired;
   }
 
-  private scheduleExpiryLogout() {
-    clearTimeout(this.expirationTimer);
-
+  getTokenExpiryDelay(): number {
     const token = this.token;
     if (!token) {
-      return;
+      return 0;
     }
 
     const { exp } = this.jwtHelper.decodeToken(token);
     const expiresAtMs = exp * 1000;
-    const delay = expiresAtMs - Date.now();
+
+    return expiresAtMs - Date.now();
+  }
+
+  private scheduleExpiryLogout() {
+    clearTimeout(this.expirationTimer);
+    const delay = this.getTokenExpiryDelay();
 
     if (delay <= 0) {
       this.logout();
     } else {
       this.expirationTimer = setTimeout(() => this.logout(), delay);
     }
+  }
+
+  refreshToken() {
+    if (this.refreshInProgress) {
+      return EMPTY;
+    }
+
+    this.refreshInProgress = true;
+
+    return this.http.post<LoginResponse>('/api/account/refreshToken', {})
+      .pipe(
+        tap(res => {
+          if (res?.accessToken) {
+            localStorage.setItem('jwt', res.accessToken);
+          }
+        }),
+        finalize(() => this.refreshInProgress = false));
   }
 }
