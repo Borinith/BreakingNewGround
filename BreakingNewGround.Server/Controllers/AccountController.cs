@@ -121,10 +121,10 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> RefreshToken()
+        public async Task<IActionResult> UpdateAccessToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-
+            
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
                 return Unauthorized();

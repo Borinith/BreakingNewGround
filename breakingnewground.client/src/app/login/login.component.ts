@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -15,20 +16,19 @@ export class LoginComponent {
   private returnUrl = '/';
   isLoading = false;
 
-  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
+  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute) {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   submit() {
+    this.error = '';
     this.isLoading = true;
-    this.cdr.detectChanges();
 
-    this.auth.login(this.userName, this.password).subscribe({
-      next: () => this.router.navigateByUrl(this.returnUrl),
-      error: () => this.error = 'Неверные имя пользователя или пароль'
-    });
-
-    this.isLoading = false;
-    this.cdr.detectChanges();
+    this.auth.login(this.userName, this.password).pipe(
+      finalize(() => this.isLoading = false))
+      .subscribe({
+        next: () => this.router.navigateByUrl(this.returnUrl),
+        error: () => this.error = 'Неверные имя пользователя или пароль'
+      });
   }
 }

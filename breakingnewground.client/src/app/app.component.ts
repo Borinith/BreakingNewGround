@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { EMPTY } from 'rxjs';
 import { filter, switchMap } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
@@ -12,14 +12,11 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
   title = 'breakingnewground.client';
-  private returnUrl = '/';
   private slideThreshold = 5 * 60 * 1000;
 
   constructor(
     public auth: AuthService,
-    private router: Router,
-    private route: ActivatedRoute) {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    private router: Router) {
 
     this.router.events
       .pipe(
@@ -28,7 +25,7 @@ export class AppComponent {
           const timeLeft = this.auth.getTokenExpiryDelay();
 
           if (timeLeft > 0 && timeLeft < this.slideThreshold) {
-            return this.auth.refreshToken();
+            return this.auth.updateAccessToken();
           }
 
           return EMPTY;
@@ -38,7 +35,6 @@ export class AppComponent {
   }
 
   logout() {
-    this.auth.logout();
-    this.router.navigateByUrl(this.returnUrl);
+    this.auth.logout('/');
   }
 }

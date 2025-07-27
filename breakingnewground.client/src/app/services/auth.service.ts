@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { EMPTY } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
@@ -9,17 +9,14 @@ interface LoginResponse { accessToken: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private returnUrl = '/';
   private expirationTimer: any;
-  private refreshInProgress = false;
+  private updateInProgress = false;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute,
     private jwtHelper: JwtHelperService
   ) {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     this.scheduleExpiryLogout();
   }
 
@@ -38,10 +35,16 @@ export class AuthService {
     return this.http.post<void>('/api/account/register', { userName, password });
   }
 
-  logout() {
+  logout(returnUrl: string = '') {
+    returnUrl = returnUrl !== '' ? returnUrl : this.router.url;
+
     localStorage.removeItem('jwt');
     clearTimeout(this.expirationTimer);
-    this.router.navigateByUrl(this.returnUrl);
+
+    this.router.navigate(['/login'], {
+      queryParams: { returnUrl },
+      replaceUrl: true
+    });
   }
 
   get token(): string | null {
@@ -80,20 +83,20 @@ export class AuthService {
     }
   }
 
-  refreshToken() {
-    if (this.refreshInProgress) {
+  updateAccessToken() {
+    if (this.updateInProgress) {
       return EMPTY;
     }
 
-    this.refreshInProgress = true;
+    this.updateInProgress = true;
 
-    return this.http.post<LoginResponse>('/api/account/refreshToken', {})
+    return this.http.post<LoginResponse>('/api/account/updateAccessToken', {})
       .pipe(
         tap(res => {
           if (res?.accessToken) {
             localStorage.setItem('jwt', res.accessToken);
           }
         }),
-        finalize(() => this.refreshInProgress = false));
+        finalize(() => this.updateInProgress = false));
   }
 }

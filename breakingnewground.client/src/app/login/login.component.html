@@ -17,15 +17,20 @@
            required>
   </mat-form-field>
 
-  <div *ngIf="isLoading" class="loading-container">
-    <mat-spinner diameter="50"></mat-spinner>
-  </div>
-  <div *ngIf="!isLoading">
-    <button mat-raised-button
-            color="primary"
-            type="submit">
-      Войти
-    </button>
-  </div>
+  <button mat-raised-button
+          *ngIf="!isLoading"
+          color="primary"
+          type="submit"
+          [disabled]="isLoading">
+    Войти
+  </button>
+  
+  <mat-progress-spinner *ngIf="isLoading"
+                        diameter="36"
+                        mode="indeterminate"
+                        class="spinner"
+                        style="margin: 0 auto">
+  </mat-progress-spinner>
+
   <div class="error" *ngIf="error">{{ error }}</div>
 </form>
