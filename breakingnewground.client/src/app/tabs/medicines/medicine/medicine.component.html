@@ -78,7 +78,7 @@
                  [(ngModel)]="medicine.expirationDate"
                  (dateChange)="onDateChange(medicine, $event.value)"
                  (blur)="onDateChange(medicine, medicine.expirationDate)"
-                 placeholder="YYYY‑MM‑DD"
+                 placeholder="DD-MM-YYYY"
                  name="expirationDate{{medicine.id}}">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
