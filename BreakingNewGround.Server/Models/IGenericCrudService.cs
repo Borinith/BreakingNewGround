@@ -9,7 +9,7 @@ namespace BreakingNewGround.Server.Models
 
         Task<T> GetByIdAsync(long id, string[] includes);
 
-        Task<T[]> GetAllAsync(string[] includes);
+        Task<PagedResult<T>> GetAllAsync(GetRequest request, string[] includes);
 
         Task<T> UpdateAsync(T model);
 

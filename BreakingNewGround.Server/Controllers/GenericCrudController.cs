@@ -42,7 +42,9 @@ namespace BreakingNewGround.Server.Controllers
         [Route("[action]")]
         public async Task<T[]> GetAllAsync()
         {
-            return await _genericCrudService.GetAllAsync(_includes);
+            var request = new GetRequest();
+
+            return (await _genericCrudService.GetAllAsync(request, _includes)).Items;
         }
 
         [HttpPut]

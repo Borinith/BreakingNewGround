@@ -31,8 +31,8 @@ namespace BreakingNewGround.Server
 
         public async Task<T> GetByIdAsync(long id, string[] includes)
         {
-            var query = ApplyIncludes(_context.Set<T>().AsNoTracking(), includes);
-            var lambda = ExtractByValue("Id", id);
+            var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
+            var lambda = GetLambdaWithExtractByValue("Id", id, ComparisonEnum.Equal);
 
             var entity = await query.FirstOrDefaultAsync(lambda);
 
@@ -44,11 +44,41 @@ namespace BreakingNewGround.Server
             return entity;
         }
 
-        public async Task<T[]> GetAllAsync(string[] includes)
+        public async Task<PagedResult<T>> GetAllAsync(GetRequest request, string[] includes)
         {
-            var query = ApplyIncludes(_context.Set<T>().AsNoTracking(), includes);
+            var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
+            var total = await query.CountAsync();
 
-            return await query.ToArrayAsync();
+            if (request.Filters is not null)
+            {
+                foreach (var filter in request.Filters.Where(x => !string.IsNullOrWhiteSpace(x.Value)))
+                {
+                    query = query.Where(GetLambdaWithExtractByValue(filter.ColumnName, filter.Value, filter.Comparison));
+                }
+            }
+
+            if (request.Order.HasValue)
+            {
+                var sortByColumnName = GetLambdaWithProperty(request.Order.Value.ColumnName);
+
+                query = request.Order.Value.OrderBy == OrderByEnum.Ascending
+                    ? query.OrderBy(sortByColumnName)
+                    : query.OrderByDescending(sortByColumnName);
+            }
+
+            if (request.Skip.HasValue)
+            {
+                query = query.Skip(request.Skip.Value);
+            }
+
+            if (request.Take.HasValue)
+            {
+                query = query.Take(request.Take.Value);
+            }
+
+            var items = await query.ToArrayAsync();
+
+            return new PagedResult<T>(items, total);
         }
 
         public async Task<T> UpdateAsync(T model)
@@ -81,13 +111,33 @@ namespace BreakingNewGround.Server
                 : query;
         }
 
-        private static Expression<Func<T, bool>> ExtractByValue<TValue>(string property, TValue value)
+        private static Expression<Func<T, bool>> GetLambdaWithExtractByValue<TValue>(string property, TValue value, ComparisonEnum comparison)
+        {
+            var expressionParameter = Expression.Parameter(typeof(T), "x");
+            var expressionConstant = Expression.Constant(value);
+            var expressionProperty = Expression.Property(expressionParameter, property);
+
+            var body = comparison switch
+            {
+                ComparisonEnum.Equal => Expression.Equal(expressionProperty, expressionConstant),
+                ComparisonEnum.NotEqual => Expression.NotEqual(expressionProperty, expressionConstant),
+                ComparisonEnum.LessThan => Expression.LessThan(expressionProperty, expressionConstant),
+                ComparisonEnum.LessThanOrEqual => Expression.LessThanOrEqual(expressionProperty, expressionConstant),
+                ComparisonEnum.GreaterThan => Expression.GreaterThan(expressionProperty, expressionConstant),
+                ComparisonEnum.GreaterThanOrEqual => Expression.GreaterThanOrEqual(expressionProperty, expressionConstant),
+                ComparisonEnum.TextStartsWith => (Expression)Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstant),
+                _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null)
+            };
+
+            return Expression.Lambda<Func<T, bool>>(body, expressionParameter);
+        }
+
+        private static Expression<Func<T, string>> GetLambdaWithProperty(string property)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
-            var constant = Expression.Constant(value);
-            var body = Expression.Equal(Expression.Property(parameter, property), constant);
+            var body = Expression.Property(parameter, property);
 
-            return Expression.Lambda<Func<T, bool>>(body, parameter);
+            return Expression.Lambda<Func<T, string>>(body, parameter);
         }
     }
 }
