@@ -8,6 +8,7 @@
         LessThanOrEqual = 3,
         GreaterThan = 4,
         GreaterThanOrEqual = 5,
-        TextStartsWith = 6
+        TextStartsWith = 6,
+        FullTextSearch = 7
     }
 }

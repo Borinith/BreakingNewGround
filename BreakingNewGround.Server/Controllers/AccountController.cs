@@ -46,7 +46,7 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Register(RegisterDto dto)
+        public Task<IActionResult> Register(RegisterDto dto)
         {
             throw new NotImplementedException();
 

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace BreakingNewGround.Server
             return entity;
         }
 
-        public async Task<PagedResult<T>> GetAllAsync(GetRequest request, string[] includes)
+        public async Task<Models.PagedResult<T>> GetAllAsync(GetRequest request, string[] includes)
         {
             var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
             var total = await query.CountAsync();
@@ -59,11 +60,9 @@ namespace BreakingNewGround.Server
 
             if (request.Order.HasValue)
             {
-                var sortByColumnName = GetLambdaWithProperty(request.Order.Value.ColumnName);
-
                 query = request.Order.Value.OrderBy == OrderByEnum.Ascending
-                    ? query.OrderBy(sortByColumnName)
-                    : query.OrderByDescending(sortByColumnName);
+                    ? query.OrderBy(request.Order.Value.ColumnName)
+                    : query.OrderBy(request.Order.Value.ColumnName + " desc");
             }
 
             if (request.Skip.HasValue)
@@ -78,7 +77,7 @@ namespace BreakingNewGround.Server
 
             var items = await query.ToArrayAsync();
 
-            return new PagedResult<T>(items, total);
+            return new Models.PagedResult<T>(items, total);
         }
 
         public async Task<T> UpdateAsync(T model)
@@ -126,18 +125,11 @@ namespace BreakingNewGround.Server
                 ComparisonEnum.GreaterThan => Expression.GreaterThan(expressionProperty, expressionConstant),
                 ComparisonEnum.GreaterThanOrEqual => Expression.GreaterThanOrEqual(expressionProperty, expressionConstant),
                 ComparisonEnum.TextStartsWith => (Expression)Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstant),
+                ComparisonEnum.FullTextSearch => Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstant),
                 _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null)
             };
 
             return Expression.Lambda<Func<T, bool>>(body, expressionParameter);
-        }
-
-        private static Expression<Func<T, string>> GetLambdaWithProperty(string property)
-        {
-            var parameter = Expression.Parameter(typeof(T), "x");
-            var body = Expression.Property(parameter, property);
-
-            return Expression.Lambda<Func<T, string>>(body, parameter);
         }
     }
 }
