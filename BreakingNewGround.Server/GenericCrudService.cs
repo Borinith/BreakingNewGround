@@ -13,6 +13,7 @@ namespace BreakingNewGround.Server
     public class GenericCrudService<T> : IGenericCrudService<T>
         where T : class
     {
+        private const string ID = "Id";
         private readonly MedicinesContext _context;
         private readonly ILogger<GenericCrudService<T>> _logger;
 
@@ -33,7 +34,7 @@ namespace BreakingNewGround.Server
         public async Task<T> GetByIdAsync(long id, string[] includes)
         {
             var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
-            var lambda = GetLambdaWithExtractByValue("Id", id, ComparisonEnum.Equal);
+            var lambda = GetLambdaWithExtractByValue(ID, ValueTypeEnum.Long, id, ComparisonEnum.Equal);
 
             var entity = await query.FirstOrDefaultAsync(lambda);
 
@@ -54,7 +55,7 @@ namespace BreakingNewGround.Server
             {
                 foreach (var filter in request.Filters.Where(x => !string.IsNullOrWhiteSpace(x.Value)))
                 {
-                    query = query.Where(GetLambdaWithExtractByValue(filter.ColumnName, filter.Value, filter.Comparison));
+                    query = query.Where(GetLambdaWithExtractByValue(filter.ColumnName, filter.ValueType, filter.Value, filter.Comparison));
                 }
             }
 
@@ -110,10 +111,25 @@ namespace BreakingNewGround.Server
                 : query;
         }
 
-        private static Expression<Func<T, bool>> GetLambdaWithExtractByValue<TValue>(string property, TValue value, ComparisonEnum comparison)
+        private static Expression<Func<T, bool>> GetLambdaWithExtractByValue<TValue>(string property, ValueTypeEnum valueType, TValue value, ComparisonEnum comparison)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             var expressionParameter = Expression.Parameter(typeof(T), "x");
-            var expressionConstant = Expression.Constant(value);
+
+            var expressionConstant = valueType switch
+            {
+                ValueTypeEnum.Integer => Expression.Constant(Convert.ToInt32(value)),
+                ValueTypeEnum.Long => Expression.Constant(Convert.ToInt64(value)),
+                ValueTypeEnum.String => Expression.Constant(value.ToString()),
+                ValueTypeEnum.DateTime => Expression.Constant(Convert.ToDateTime(value)),
+                ValueTypeEnum.Guid => Expression.Constant(Guid.Parse(value.ToString()!)),
+                _ => throw new ArgumentOutOfRangeException(nameof(valueType), valueType, null)
+            };
+
             var expressionProperty = Expression.Property(expressionParameter, property);
 
             var body = comparison switch

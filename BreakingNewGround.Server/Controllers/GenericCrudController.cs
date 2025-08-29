@@ -38,13 +38,11 @@ namespace BreakingNewGround.Server.Controllers
             return await _genericCrudService.GetByIdAsync(id, _includes);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("[action]")]
-        public async Task<T[]> GetAllAsync()
+        public async Task<PagedResult<T>> GetAllAsync([FromBody] GetRequest request)
         {
-            var request = new GetRequest();
-
-            return (await _genericCrudService.GetAllAsync(request, _includes)).Items;
+            return await _genericCrudService.GetAllAsync(request, _includes);
         }
 
         [HttpPut]

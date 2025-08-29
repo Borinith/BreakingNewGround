@@ -43,9 +43,100 @@ mat-nav-list a {
     background: #f1f1f1;
   }
 
+.content-wrapper {
+  position: relative;
+  padding: 20px;
+}
+
 .content-container {
+  position: relative;
   padding: 24px;
 }
+
+.mat-row, .mat-header-row {
+  border-bottom: none !important;
+}
+
+.mat-header-cell, .mat-cell {
+  text-align: left;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 12px;
+  padding-right: 12px;
+  vertical-align: middle;
+  box-sizing: border-box;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* --- header filter --- */
+  .mat-header-cell.mat-column-name,
+  .mat-column-name .mat-header-cell,
+  .mat-column-name .header-filter {
+    text-align: center;
+  }
+
+.mat-column-name td .inline-field input.mat-input-element {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mat-column-name .inline-field {
+  margin: 0 auto;
+  display: inline-flex !important;
+}
+
+.header-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+  /* сам mat-form-field в шапке — компактный */
+  .header-filter mat-form-field,
+  .header-filter .mat-form-field,
+  .header-filter .mat-mdc-form-field
+  .mat-column-name .inline-field {
+    width: 180px; /* подбери под свои данные */
+    max-width: 320px;
+    margin: 0;
+    vertical-align: middle;
+    display: inline-flex;
+    box-sizing: border-box;
+  }
+
+  /* уменьшаем внутренние paddings для MDC и legacy */
+  .header-filter .mat-mdc-form-field-infix,
+  .header-filter .mat-form-field-infix {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  /* резерв для подсказок/ошибок, но минимальный */
+  .header-filter .mat-mdc-form-field-subscript-wrapper,
+  .header-filter .mat-form-field-subscript-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    margin-top: 0.25rem !important;
+    min-height: 1.0em !important;
+    font-size: 0.78rem !important;
+    line-height: 1 !important;
+  }
+
+  /* уменьшаем нижний padding wrapper (legacy) */
+  .header-filter .mat-form-field-wrapper {
+    padding-bottom: 0.06rem !important;
+  }
+
+  /* input внутри header filter — компактный */
+  .header-filter input.mat-input-element {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    height: auto !important;
+    font-size: 0.92rem;
+  }
 
 .add-form-common {
   display: flex;
@@ -77,12 +168,6 @@ mat-table {
   overflow: hidden;
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .delete-cell {
   text-align: center;
   padding-right: 8px;
@@ -94,29 +179,32 @@ mat-table {
     justify-content: center;
   }
 
+/* ========== inline editable field (в теле строки) ========== */
 .inline-field {
-  width: 100%;
-  margin: 0;
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  min-width: 140px;
+  max-width: 320px;
+  margin-bottom: 6px;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
+  .inline-field .mat-mdc-form-field-infix,
   .inline-field .mat-form-field-infix {
-    padding: 0 8px;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
 
-.inline-field.mat-form-field {
-  height: 25px;
-}
-
-.inline-field input,
-.inline-field .mat-select-trigger {
-  height: 25px;
-  line-height: 25px;
-  padding: 0;
-}
-
-mat-cell .mat-form-field-wrapper {
-  padding-bottom: 0;
-}
+  .inline-field .mat-mdc-form-field-subscript-wrapper,
+  .inline-field .mat-form-field-subscript-wrapper {
+    margin-top: 4px !important;
+    min-height: 1.1em !important;
+    font-size: 0.78rem !important;
+  }
 
 .updated-row {
   animation: highlight-success 1s ease-in-out;
@@ -146,4 +234,21 @@ mat-cell .mat-form-field-wrapper {
 .mat-row.updated-row,
 .mat-row.error-row {
   border: 2px solid transparent;
+}
+
+.content-container.loading {
+  filter: blur(0.5px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.6);
+  z-index: 50;
 }

@@ -1,8 +1,14 @@
-import { Directive, OnInit, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { BehaviorSubject, combineLatest, of, Subject } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
 
 @Directive()
-export abstract class BaseEntityComponent<T> implements OnInit {
+export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, OnDestroy {
 
   componentName: string;
   items: T[] = [];
@@ -11,6 +17,31 @@ export abstract class BaseEntityComponent<T> implements OnInit {
   isLoading = true;
   updatedId: number | null = null;
   errorId: number | null = null;
+  total = 0;
+  pageSize = 10;
+
+  // form controls for header filters
+  filterForm = new FormGroup({
+    id: new FormControl(''),
+    name: new FormControl('')
+  });
+
+  private sort?: MatSort;
+  private paginator?: MatPaginator;
+  private initialized = false;
+
+  // subjects for streaming events
+  private refresh$ = new BehaviorSubject<void>(undefined);
+  private destroy$ = new Subject<void>();
+
+  @ViewChild(MatSort) private set matSort(ms: MatSort | null) {
+    this.sort = ms ?? undefined;
+    this.getAllItems();
+  }
+  @ViewChild(MatPaginator) private set matPaginator(pg: MatPaginator | null) {
+    this.paginator = pg ?? undefined;
+    this.getAllItems();
+  }
 
   constructor(
     protected service: BaseEntityService<T>,
@@ -20,19 +51,123 @@ export abstract class BaseEntityComponent<T> implements OnInit {
     this.newItem = {} as T;
   }
 
-  ngOnInit() {
+  private getAllItems() {
+    this.isLoading = true;
+
+    if (this.initialized) {
+      return;
+    }
+    if (!this.sort || !this.paginator) {
+      return;
+    }
+
+    this.initialized = true;
+    this.cdr.detectChanges();
+
+    this.setupDataStream(this.sort, this.paginator);
+  }
+
+  private setupDataStream(sort: MatSort, paginator: MatPaginator) {
+    const sort$ = sort.sortChange.pipe(
+      startWith({
+        active: sort.active || 'Id',
+        direction: sort.direction || 'asc'
+      })
+    );
+
+    const page$ = paginator.page.pipe(
+      startWith({
+        pageIndex: paginator.pageIndex || 0,
+        pageSize: paginator.pageSize || this.pageSize
+      })
+    );
+
+    // поток фильтров — startWith нужен, чтобы сразу получить начальные значения
+    const filters$ = this.filterForm.valueChanges.pipe(
+      startWith(this.filterForm.value),
+      debounceTime(300),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      tap(() => {
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
+        }
+      })
+    );
+
+    // combineLatest of: all filter values, sort, page, refresh$
+    combineLatest([filters$, sort$, page$, this.refresh$])
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(([filterValues, sort, page]) => {
+          const filtersArr: RequestFilter[] = this.buildFilters(filterValues);
+
+          const request: GetRequest = {
+            filters: filtersArr.length ? filtersArr : null,
+            order: this.buildOrder(sort),
+            skip: page.pageIndex * page.pageSize,
+            take: page.pageSize
+          };
+
+          return this.service.getAll(request).pipe(
+            catchError(err => {
+              console.error('Get all items error', err);
+              return of({ items: [], total: 0 });
+            })
+          );
+        })
+      ).subscribe(data => {
+        this.items = data.items;
+        this.originalItems = data.items.map(item => ({ ...item }));
+        this.total = data.total;
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
+  }
+
+  ngOnInit() { }
+
+  ngAfterViewInit() {
     this.getAllItems();
   }
 
-  getAllItems() {
-    this.isLoading = true;
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-    this.service.getAll().subscribe(data => {
-      this.items = data;
-      this.originalItems = data.map(item => ({ ...item }));
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    });
+  private buildFilters(values: any): RequestFilter[] {
+    const out: RequestFilter[] = [];
+
+    if (values.id && values.id.toString().trim() !== '') {
+      out.push({
+        columnName: 'Id',
+        valueType: ValueTypeEnum.Long,
+        value: values.id.toString(),
+        comparison: RequestComparisonEnum.Equal
+      });
+    }
+
+    if (values.name && values.name.toString().trim() !== '') {
+      out.push({
+        columnName: 'Name',
+        valueType: ValueTypeEnum.String,
+        value: values.name.toString(),
+        comparison: RequestComparisonEnum.TextStartsWith
+      });
+    }
+
+    return out;
+  }
+
+  private buildOrder(sort: any): RequestOrder | null {
+    if (!sort || !sort.active) {
+      return null;
+    }
+    return {
+      columnName: sort.active,
+      orderBy: sort.direction === 'asc' ? OrderByEnum.Ascending : OrderByEnum.Descending
+    };
   }
 
   addItem() {

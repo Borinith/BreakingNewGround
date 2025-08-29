@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { PagedResult } from '../common-models/paged-result.model';
+import { GetRequest } from '../common-models/request.model';
 
 export class BaseEntityService<T> {
 
   constructor(protected http: HttpClient, protected apiUrl: string) {}
 
-  getAll(): Observable<T[]> {
-    return this.http.get<T[]>(`${this.apiUrl}/GetAll`);
+  getAll(request: GetRequest): Observable<PagedResult<T>> {
+    return this.http.post<PagedResult<T>>(`${this.apiUrl}/GetAll`, request);
   }
 
   getById(id: number): Observable<T> {

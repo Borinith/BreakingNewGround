@@ -12,6 +12,7 @@ import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
 import { formatISO } from 'date-fns/formatISO';
+import { GetRequest } from '../common-models/request.model';
 
 @Component({
   selector: 'app-medicine',
@@ -41,18 +42,25 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   }
 
   loadAllData() {
+    const request: GetRequest = {
+      filters: null,
+      order: null,
+      skip: null,
+      take: null
+    };
+
     this.isLoading = true;
 
     forkJoin({
-      medicines: this.service.getAll(),
-      medicineBodyTypes: this.medicineBodyTypeService.getAll(),
-      medicineTypes: this.medicineTypeService.getAll()
+      medicines: this.service.getAll(request),
+      medicineBodyTypes: this.medicineBodyTypeService.getAll(request),
+      medicineTypes: this.medicineTypeService.getAll(request)
     }).subscribe({
       next: ({ medicines, medicineBodyTypes, medicineTypes }) => {
-        this.items = medicines;
-        this.originalItems = medicines.map(item => ({ ...item }));
-        this.medicineBodyTypes = medicineBodyTypes;
-        this.medicineTypes = medicineTypes;
+        this.items = medicines.items;
+        this.originalItems = medicines.items.map(item => ({ ...item }));
+        this.medicineBodyTypes = medicineBodyTypes.items;
+        this.medicineTypes = medicineTypes.items;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -64,11 +72,18 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   }
 
   loadMedicinesData() {
+    const request: GetRequest = {
+      filters: null,
+      order: null,
+      skip: null,
+      take: null
+    };
+
     this.isLoading = true;
 
-    this.service.getAll().subscribe(medicines => {
-      this.items = medicines;
-      this.originalItems = medicines.map(item => ({ ...item }));
+    this.service.getAll(request).subscribe(medicines => {
+      this.items = medicines.items;
+      this.originalItems = medicines.items.map(item => ({ ...item }));
       this.isLoading = false;
       this.cdr.detectChanges();
     });
