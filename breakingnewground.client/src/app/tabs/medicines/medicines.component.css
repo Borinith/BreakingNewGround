@@ -2,6 +2,7 @@
   height: 100vh;
 }
 
+/* Боковая панель слева */
 .sidenav {
   width: 220px;
   background: #fafafa;
@@ -43,6 +44,7 @@ mat-nav-list a {
     background: #f1f1f1;
   }
 
+/* Основной контейнер */
 .content-wrapper {
   position: relative;
   padding: 20px;
@@ -50,94 +52,9 @@ mat-nav-list a {
 
 .content-container {
   position: relative;
-  padding: 24px;
 }
 
-.mat-row, .mat-header-row {
-  border-bottom: none !important;
-}
-
-.mat-header-cell, .mat-cell {
-  text-align: left;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  padding-left: 12px;
-  padding-right: 12px;
-  vertical-align: middle;
-  box-sizing: border-box;
-  border-bottom: none !important;
-  box-shadow: none !important;
-}
-
-/* --- header filter --- */
-  .mat-header-cell.mat-column-name,
-  .mat-column-name .mat-header-cell,
-  .mat-column-name .header-filter {
-    text-align: center;
-  }
-
-.mat-column-name td .inline-field input.mat-input-element {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.mat-column-name .inline-field {
-  margin: 0 auto;
-  display: inline-flex !important;
-}
-
-.header-filter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-  /* сам mat-form-field в шапке — компактный */
-  .header-filter mat-form-field,
-  .header-filter .mat-form-field,
-  .header-filter .mat-mdc-form-field
-  .mat-column-name .inline-field {
-    width: 180px; /* подбери под свои данные */
-    max-width: 320px;
-    margin: 0;
-    vertical-align: middle;
-    display: inline-flex;
-    box-sizing: border-box;
-  }
-
-  /* уменьшаем внутренние paddings для MDC и legacy */
-  .header-filter .mat-mdc-form-field-infix,
-  .header-filter .mat-form-field-infix {
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-
-  /* резерв для подсказок/ошибок, но минимальный */
-  .header-filter .mat-mdc-form-field-subscript-wrapper,
-  .header-filter .mat-form-field-subscript-wrapper {
-    border: none !important;
-    box-shadow: none !important;
-    margin-top: 0.25rem !important;
-    min-height: 1.0em !important;
-    font-size: 0.78rem !important;
-    line-height: 1 !important;
-  }
-
-  /* уменьшаем нижний padding wrapper (legacy) */
-  .header-filter .mat-form-field-wrapper {
-    padding-bottom: 0.06rem !important;
-  }
-
-  /* input внутри header filter — компактный */
-  .header-filter input.mat-input-element {
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-    height: auto !important;
-    font-size: 0.92rem;
-  }
-
+/* Форма добавления */
 .add-form-common {
   display: flex;
   flex-wrap: wrap;
@@ -160,14 +77,7 @@ mat-nav-list a {
     flex-basis: 30%;
   }
 
-mat-table {
-  width: 100%;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  overflow: hidden;
-}
-
+  /* Кнопка удаления */
 .delete-cell {
   text-align: center;
   padding-right: 8px;
@@ -179,33 +89,124 @@ mat-table {
     justify-content: center;
   }
 
-/* ========== inline editable field (в теле строки) ========== */
-.inline-field {
-  display: inline-flex !important;
-  align-items: center;
-  width: auto !important;
-  min-width: 140px;
-  max-width: 320px;
-  margin-bottom: 6px;
+/* Общий стиль таблицы */
+.mat-table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+}
+
+/* Заголовки таблицы */
+.mat-header-row {
+  background-color: #f5f5f5;
+  font-weight: 500;
+}
+
+.mat-header-cell {
+  padding: 12px 16px;
   vertical-align: middle;
+}
+
+/* Ячейки данных */
+.mat-cell {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: top;
+  height: 48px;
+  line-height: 48px;
+}
+
+.mat-row:last-child .mat-cell {
+  border-bottom: none;
+}
+
+/* Выравнивание содержимого ячейки по центру */
+.cell-flex-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
   box-sizing: border-box;
 }
 
-  .inline-field .mat-mdc-form-field-infix,
-  .inline-field .mat-form-field-infix {
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+/* Фильтры в заголовках */
+.header-filter-wrapper {
+  margin-left: 8px;
+  display: block;
+}
+
+.filter-field {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+  .filter-field ::ng-deep .mat-form-field-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
   }
 
-  .inline-field .mat-mdc-form-field-subscript-wrapper,
-  .inline-field .mat-form-field-subscript-wrapper {
-    margin-top: 4px !important;
-    min-height: 1.1em !important;
-    font-size: 0.78rem !important;
+  .filter-field ::ng-deep .mat-form-field-infix {
+    padding: 4px 8px !important;
+    line-height: 1.2 !important;
+    height: 100% !important;
+    box-sizing: border-box;
   }
 
+  .filter-field ::ng-deep .mat-form-field-outline {
+    border-radius: 4px !important;
+  }
+
+  .filter-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+  }
+
+.small ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+}
+
+/* Сортировка в заголовках */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Поля в ячейках */
+.inline-field {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+  .inline-field ::ng-deep .mat-form-field-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .inline-field ::ng-deep .mat-form-field-infix {
+    padding: 6px 8px !important;
+    line-height: 1.4;
+    box-sizing: border-box;
+  }
+
+  .inline-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+  }
+
+/* Стили для состояний строк */
 .updated-row {
   animation: highlight-success 1s ease-in-out;
 }

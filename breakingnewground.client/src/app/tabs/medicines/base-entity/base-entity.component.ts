@@ -85,7 +85,7 @@ export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, O
     // поток фильтров — startWith нужен, чтобы сразу получить начальные значения
     const filters$ = this.filterForm.valueChanges.pipe(
       startWith(this.filterForm.value),
-      debounceTime(300),
+      debounceTime(100),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       tap(() => {
         if (this.paginator) {
@@ -161,7 +161,7 @@ export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, O
   }
 
   private buildOrder(sort: any): RequestOrder | null {
-    if (!sort || !sort.active) {
+    if (!sort || !sort.active || sort.direction === '') {
       return null;
     }
     return {
