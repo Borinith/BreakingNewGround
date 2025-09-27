@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { BehaviorSubject, combineLatest, of, Subject } from 'rxjs';
@@ -19,12 +19,6 @@ export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, O
   errorId: number | null = null;
   total = 0;
   pageSize = 10;
-
-  // form controls for header filters
-  filterForm = new FormGroup({
-    id: new FormControl(''),
-    name: new FormControl('')
-  });
 
   private sort?: MatSort;
   private paginator?: MatPaginator;
@@ -46,6 +40,7 @@ export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, O
   constructor(
     protected service: BaseEntityService<T>,
     protected name: string,
+    protected filterForm: FormGroup,
     protected cdr: ChangeDetectorRef) {
     this.componentName = name;
     this.newItem = {} as T;
@@ -153,6 +148,51 @@ export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, O
         columnName: 'Name',
         valueType: ValueTypeEnum.String,
         value: values.name.toString(),
+        comparison: RequestComparisonEnum.TextStartsWith
+      });
+    }
+
+    if (values.expirationDate && values.expirationDate.toString().trim() !== '') {
+      out.push({
+        columnName: 'ExpirationDate',
+        valueType: ValueTypeEnum.DateTime,
+        value: values.expirationDate,
+        comparison: RequestComparisonEnum.Equal
+      });
+    }
+
+    if (values.medicineBodyType && values.medicineBodyType.toString().trim() !== '') {
+      out.push({
+        columnName: 'BodyTypeId',
+        valueType: ValueTypeEnum.Long,
+        value: values.medicineBodyType.toString(),
+        comparison: RequestComparisonEnum.Equal
+      });
+    }
+
+    if (values.medicineType && values.medicineType.toString().trim() !== '') {
+      out.push({
+        columnName: 'TypeId',
+        valueType: ValueTypeEnum.Long,
+        value: values.medicineType.toString(),
+        comparison: RequestComparisonEnum.Equal
+      });
+    }
+
+    if (values.count && values.count.toString().trim() !== '') {
+      out.push({
+        columnName: 'Count',
+        valueType: ValueTypeEnum.Integer,
+        value: values.count.toString(),
+        comparison: RequestComparisonEnum.Equal
+      });
+    }
+
+    if (values.comment && values.comment.toString().trim() !== '') {
+      out.push({
+        columnName: 'Comment',
+        valueType: ValueTypeEnum.String,
+        value: values.comment.toString(),
         comparison: RequestComparisonEnum.TextStartsWith
       });
     }

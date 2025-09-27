@@ -49,8 +49,7 @@ namespace BreakingNewGround.Server
         public async Task<Models.PagedResult<T>> GetAllAsync(GetRequest request, string[] includes)
         {
             var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
-            var total = await query.CountAsync();
-
+            
             if (request.Filters is not null)
             {
                 foreach (var filter in request.Filters.Where(x => !string.IsNullOrWhiteSpace(x.Value)))
@@ -58,6 +57,8 @@ namespace BreakingNewGround.Server
                     query = query.Where(GetLambdaWithExtractByValue(filter.ColumnName, filter.ValueType, filter.Value, filter.Comparison));
                 }
             }
+
+            var total = await query.CountAsync();
 
             if (request.Order.HasValue)
             {
@@ -119,29 +120,30 @@ namespace BreakingNewGround.Server
             }
 
             var expressionParameter = Expression.Parameter(typeof(T), "x");
+            var expressionProperty = Expression.Property(expressionParameter, property);
 
             var expressionConstant = valueType switch
             {
                 ValueTypeEnum.Integer => Expression.Constant(Convert.ToInt32(value)),
                 ValueTypeEnum.Long => Expression.Constant(Convert.ToInt64(value)),
                 ValueTypeEnum.String => Expression.Constant(value.ToString()),
-                ValueTypeEnum.DateTime => Expression.Constant(Convert.ToDateTime(value)),
+                ValueTypeEnum.DateTime => Expression.Constant(DateOnly.FromDateTime(Convert.ToDateTime(value))),
                 ValueTypeEnum.Guid => Expression.Constant(Guid.Parse(value.ToString()!)),
                 _ => throw new ArgumentOutOfRangeException(nameof(valueType), valueType, null)
             };
-
-            var expressionProperty = Expression.Property(expressionParameter, property);
+            
+            var expressionConstantWithColumnType = Expression.Convert(expressionConstant, expressionProperty.Type);
 
             var body = comparison switch
             {
-                ComparisonEnum.Equal => Expression.Equal(expressionProperty, expressionConstant),
-                ComparisonEnum.NotEqual => Expression.NotEqual(expressionProperty, expressionConstant),
-                ComparisonEnum.LessThan => Expression.LessThan(expressionProperty, expressionConstant),
-                ComparisonEnum.LessThanOrEqual => Expression.LessThanOrEqual(expressionProperty, expressionConstant),
-                ComparisonEnum.GreaterThan => Expression.GreaterThan(expressionProperty, expressionConstant),
-                ComparisonEnum.GreaterThanOrEqual => Expression.GreaterThanOrEqual(expressionProperty, expressionConstant),
-                ComparisonEnum.TextStartsWith => (Expression)Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstant),
-                ComparisonEnum.FullTextSearch => Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstant),
+                ComparisonEnum.Equal => Expression.Equal(expressionProperty, expressionConstantWithColumnType),
+                ComparisonEnum.NotEqual => Expression.NotEqual(expressionProperty, expressionConstantWithColumnType),
+                ComparisonEnum.LessThan => Expression.LessThan(expressionProperty, expressionConstantWithColumnType),
+                ComparisonEnum.LessThanOrEqual => Expression.LessThanOrEqual(expressionProperty, expressionConstantWithColumnType),
+                ComparisonEnum.GreaterThan => Expression.GreaterThan(expressionProperty, expressionConstantWithColumnType),
+                ComparisonEnum.GreaterThanOrEqual => Expression.GreaterThanOrEqual(expressionProperty, expressionConstantWithColumnType),
+                ComparisonEnum.TextStartsWith => (Expression)Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstantWithColumnType),
+                ComparisonEnum.FullTextSearch => Expression.Call(expressionProperty, typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!, expressionConstantWithColumnType),
                 _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null)
             };
 

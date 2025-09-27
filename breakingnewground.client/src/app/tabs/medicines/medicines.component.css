@@ -131,7 +131,6 @@ mat-nav-list a {
 
 /* Фильтры в заголовках */
 .header-filter-wrapper {
-  margin-left: 8px;
   display: block;
 }
 
@@ -171,12 +170,6 @@ mat-nav-list a {
     padding: 0 !important;
     margin: 0 !important;
     overflow: hidden;
-}
-
-/* Сортировка в заголовках */
-.sortable-header {
-  cursor: pointer;
-  user-select: none;
 }
 
 /* Поля в ячейках */

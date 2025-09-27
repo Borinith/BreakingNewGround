@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
 import { BaseEntityComponent } from '../base-entity/base-entity.component';
@@ -27,14 +28,25 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   medicineTypes: MedicineType[] = [];
   override originalItems: Medicine[] = [];
 
-  override isLoading = true;
+  isLoadingMedicine = true;
 
   constructor(
     service: MedicineService,
     private medicineBodyTypeService: MedicineBodyTypeService,
     private medicineTypeService: MedicineTypeService,
     cdr: ChangeDetectorRef) {
-    super(service, 'Лекарства', cdr);
+    super(service,
+      'Лекарства',
+      new FormGroup({
+        id: new FormControl(''),
+        name: new FormControl(''),
+        expirationDate: new FormControl(''),
+        medicineBodyType: new FormControl(''),
+        medicineType: new FormControl(''),
+        count: new FormControl(''),
+        comment: new FormControl('')
+      }),
+      cdr);
   }
 
   override ngOnInit(): void {
@@ -49,7 +61,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
       take: null
     };
 
-    this.isLoading = true;
+    this.isLoadingMedicine = true;
 
     forkJoin({
       medicines: this.service.getAll(request),
@@ -61,12 +73,12 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
         this.originalItems = medicines.items.map(item => ({ ...item }));
         this.medicineBodyTypes = medicineBodyTypes.items;
         this.medicineTypes = medicineTypes.items;
-        this.isLoading = false;
+        this.isLoadingMedicine = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Ошибка загрузки данных', err);
-        this.isLoading = false;
+        this.isLoadingMedicine = false;
       }
     });
   }
@@ -79,14 +91,16 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
       take: null
     };
 
-    this.isLoading = true;
+    this.isLoadingMedicine = true;
 
-    this.service.getAll(request).subscribe(medicines => {
-      this.items = medicines.items;
-      this.originalItems = medicines.items.map(item => ({ ...item }));
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    });
+    this.service
+      .getAll(request)
+      .subscribe(medicines => {
+        this.items = medicines.items;
+        this.originalItems = medicines.items.map(item => ({ ...item }));
+        this.isLoadingMedicine = false;
+        this.cdr.detectChanges();
+      });
   }
 
   formatDate(e: any): void {

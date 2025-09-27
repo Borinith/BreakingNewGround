@@ -1,4 +1,5 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { BaseEntityComponent } from '../base-entity/base-entity.component';
 import { MedicineType } from './medicine-type.model';
 import { MedicineTypeService } from './medicine-type.service';
@@ -15,6 +16,12 @@ export class MedicineTypesComponent extends BaseEntityComponent<MedicineType> {
   displayedColumns: string[] = ['id', 'name', 'actions'];
 
   constructor(service: MedicineTypeService, cdr: ChangeDetectorRef) {
-    super(service, 'Типы лекарств', cdr);
+    super(service,
+      'Типы лекарств',
+      new FormGroup({
+        id: new FormControl(''),
+        name: new FormControl('')
+      }),
+      cdr);
   }
 }
