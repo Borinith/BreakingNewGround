@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, ViewChild } fro
 import { FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { BehaviorSubject, combineLatest, of, Subject } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, EMPTY, merge, of, Subject } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
 
@@ -27,6 +27,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   // subjects for streaming events
   private refresh$ = new BehaviorSubject<void>(undefined);
   private destroy$ = new Subject<void>();
+  private resetPage$ = new Subject<void>();
 
   @ViewChild(MatSort) private set matSort(ms: MatSort | null) {
     this.sort = ms ?? undefined;
@@ -70,13 +71,6 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       })
     );
 
-    const page$ = paginator.page.pipe(
-      startWith({
-        pageIndex: paginator.pageIndex || 0,
-        pageSize: paginator.pageSize || this.pageSize
-      })
-    );
-
     // поток фильтров — startWith нужен, чтобы сразу получить начальные значения
     const filters$ = this.filterForm.valueChanges.pipe(
       startWith(this.filterForm.value),
@@ -85,7 +79,23 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       tap(() => {
         if (this.paginator) {
           this.paginator.pageIndex = 0;
+          this.resetPage$.next();
         }
+      })
+    );
+
+    const page$ = merge(
+      this.paginator?.page.asObservable() || EMPTY,
+      this.resetPage$.pipe(
+        map(() => ({
+          pageIndex: 0,
+          pageSize: this.paginator?.pageSize || this.pageSize
+        }))
+      )
+    ).pipe(
+      startWith({
+        pageIndex: this.paginator?.pageIndex || 0,
+        pageSize: this.paginator?.pageSize || this.pageSize
       })
     );
 

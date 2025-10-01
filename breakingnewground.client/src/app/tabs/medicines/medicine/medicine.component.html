@@ -45,7 +45,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Количество</mat-label>
+        <mat-label>Число</mat-label>
         <input matInput
                type="number"
                [(ngModel)]="newItem.count"
@@ -212,7 +212,7 @@
                      [ngModelOptions]="{ standalone: true }"
                      name="count{{medicine.id}}"
                      (blur)="updateItem(medicine)"
-                     placeholder="Количество">
+                     placeholder="Число">
             </mat-form-field>
           </mat-cell>
         </ng-container>
