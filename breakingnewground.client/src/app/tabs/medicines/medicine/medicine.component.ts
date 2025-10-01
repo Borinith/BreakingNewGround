@@ -49,7 +49,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
       cdr);
   }
 
-  override ngOnInit(): void {
+  ngOnInit(): void {
     this.loadAllData();
   }
 

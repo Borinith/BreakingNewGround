@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -8,7 +8,7 @@ import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestO
 import { BaseEntityService } from './base-entity.service';
 
 @Directive()
-export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, OnDestroy {
+export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy {
 
   componentName: string;
   items: T[] = [];
@@ -119,8 +119,6 @@ export abstract class BaseEntityComponent<T> implements OnInit, AfterViewInit, O
         this.cdr.detectChanges();
       });
   }
-
-  ngOnInit() { }
 
   ngAfterViewInit() {
     this.getAllItems();

@@ -29,41 +29,87 @@ mat-table {
   overflow: hidden;
 }
 
+mat-header-cell ::ng-deep .mat-sort-header-container {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+mat-header-cell ::ng-deep .mat-sort-header-content {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.header-filter-wrapper {
+  width: 100%;
+  margin-top: 4px;
+  display: block;
+}
+
+mat-header-cell ::ng-deep .small {
+  width: 100% !important;
+}
+
+.mat-header-row, .mat-row {
+  display: flex;
+  align-items: stretch;
+}
+
 mat-header-cell, mat-cell {
   justify-content: center;
+  flex: 0 0 auto;
+}
+
+.mdc-data-table__cell, .mdc-data-table__header-cell {
+  padding: 0 11px;
+}
+
+mat-header-cell ::ng-deep .small ::ng-deep .mat-mdc-input-element::placeholder {
+  font-size: 13px !important;
+}
+
+mat-form-field.small ::ng-deep .mat-mdc-select-placeholder {
+  font-size: 13px !important;
 }
 
 .mat-column-id {
-  flex: 0 0 3%;
+  flex-basis: 6%;
 }
 
 .mat-column-name {
-  flex: 0 0 16%;
+  flex-basis: 16%;
 }
 
 .mat-column-expirationDate {
-  flex: 0 0 17%;
+  flex-basis: 17%;
 }
 
 .mat-column-medicineBodyType {
-  flex: 0 0 14%;
+  flex-basis: 14%;
 }
 
 .mat-column-medicineType {
-  flex: 0 0 16%;
+  flex-basis: 16%;
 }
 
 .mat-column-count {
-  flex: 0 0 9%;
+  flex-basis: 9%;
 }
 
 .mat-column-comment {
-  flex: 0 0 16%;
+  flex-basis: 16%;
 }
 
 .delete-cell {
   text-align: right;
   padding-right: 8px;
+  flex-basis: auto;
 }
 
 .delete-cell button {
