@@ -15,6 +15,9 @@ export interface RequestFilter {
 export interface RequestOrder {
   columnName: string;
   orderBy: OrderByEnum;
+  isComplexSort: boolean;
+  joinTableName?: string | null;
+  joinTableColumnName?: string | null;
 }
 
 export enum ValueTypeEnum {

@@ -2,5 +2,8 @@
 {
     public record struct RequestOrder(
         string ColumnName,
-        OrderByEnum OrderBy);
+        OrderByEnum OrderBy,
+        bool IsComplexSort,
+        string? JoinTableName,
+        string? JoinTableColumnName);
 }

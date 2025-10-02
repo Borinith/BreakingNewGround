@@ -165,7 +165,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
         columnName: 'ExpirationDate',
         valueType: ValueTypeEnum.DateTime,
         value: values.expirationDate,
-        comparison: RequestComparisonEnum.Equal
+        comparison: RequestComparisonEnum.Equal //todo
       });
     }
 
@@ -212,9 +212,26 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     if (!sort || !sort.active || sort.direction === '') {
       return null;
     }
+
+    const isComplexSort = sort.active === 'BodyTypeId' || sort.active === 'TypeId';
+    let joinTableName = null;
+    let joinTableColumnName = null;
+
+    if (sort.active === 'BodyTypeId') {
+      joinTableName = 'MedicineBodyTypes';
+      joinTableColumnName = 'Name';
+    }
+    else if (sort.active === 'TypeId') {
+      joinTableName = 'MedicineTypes';
+      joinTableColumnName = 'Name';
+    }
+
     return {
       columnName: sort.active,
-      orderBy: sort.direction === 'asc' ? OrderByEnum.Ascending : OrderByEnum.Descending
+      orderBy: sort.direction === 'asc' ? OrderByEnum.Ascending : OrderByEnum.Descending,
+      isComplexSort: isComplexSort,
+      joinTableName: joinTableName,
+      joinTableColumnName: joinTableColumnName
     };
   }
 

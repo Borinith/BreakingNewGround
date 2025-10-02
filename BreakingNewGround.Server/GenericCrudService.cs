@@ -14,6 +14,8 @@ namespace BreakingNewGround.Server
         where T : class
     {
         private const string ID = "Id";
+        private const string DESC = " desc";
+
         private readonly MedicinesContext _context;
         private readonly ILogger<GenericCrudService<T>> _logger;
 
@@ -48,8 +50,32 @@ namespace BreakingNewGround.Server
 
         public async Task<Models.PagedResult<T>> GetAllAsync(GetRequest request, string[] includes)
         {
-            var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
-            
+            var dbSet = _context.Set<T>();
+
+            IQueryable<T> query;
+
+            if (request.Order.HasValue
+                && request.Order.Value.IsComplexSort
+                && request.Order.Value.JoinTableName is not null
+                && request.Order.Value.JoinTableColumnName is not null)
+            {
+                var entityType = _context.Model.FindEntityType(typeof(T));
+                var tableName = entityType.GetTableName();
+
+                query = ApplyIncludes(
+                        dbSet.FromSqlRaw($"""
+                                          SELECT T.*, J.{request.Order.Value.JoinTableColumnName} AS J{request.Order.Value.JoinTableColumnName}
+                                          FROM {tableName} T
+                                          LEFT JOIN {request.Order.Value.JoinTableName} J ON J.{ID} = T.{request.Order.Value.ColumnName}
+                                          """),
+                        includes)
+                    .AsNoTracking();
+            }
+            else
+            {
+                query = ApplyIncludes(dbSet, includes).AsNoTracking();
+            }
+
             if (request.Filters is not null)
             {
                 foreach (var filter in request.Filters.Where(x => !string.IsNullOrWhiteSpace(x.Value)))
@@ -58,13 +84,28 @@ namespace BreakingNewGround.Server
                 }
             }
 
-            var total = await query.CountAsync();
+            var total = await query.Skip(0).CountAsync(); // Protection from SQL injection attacks
 
             if (request.Order.HasValue)
             {
-                query = request.Order.Value.OrderBy == OrderByEnum.Ascending
-                    ? query.OrderBy(request.Order.Value.ColumnName)
-                    : query.OrderBy(request.Order.Value.ColumnName + " desc");
+                var order = request.Order.Value.OrderBy == OrderByEnum.Ascending ? "" : DESC;
+
+                if (request.Order.Value.IsComplexSort
+                    && request.Order.Value.JoinTableName is not null
+                    && request.Order.Value.JoinTableColumnName is not null
+                   )
+                {
+                    var queryString = query.ToQueryString();
+
+                    var orderby = $"\nORDER BY J{request.Order.Value.JoinTableColumnName}" + order;
+                    const string offset = "\nOFFSET 0 ROWS";
+
+                    query = dbSet.FromSqlRaw(queryString + orderby + offset).Skip(0);
+                }
+                else
+                {
+                    query = query.OrderBy(request.Order.Value.ColumnName + order);
+                }
             }
 
             if (request.Skip.HasValue)
@@ -131,7 +172,7 @@ namespace BreakingNewGround.Server
                 ValueTypeEnum.Guid => Expression.Constant(Guid.Parse(value.ToString()!)),
                 _ => throw new ArgumentOutOfRangeException(nameof(valueType), valueType, null)
             };
-            
+
             var expressionConstantWithColumnType = Expression.Convert(expressionConstant, expressionProperty.Type);
 
             var body = comparison switch
