@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace BreakingNewGround.Server
@@ -15,6 +16,7 @@ namespace BreakingNewGround.Server
     {
         private const string ID = "Id";
         private const string DESC = " desc";
+        private const string JOIN_COLUMN = "JoinColumn";
 
         private readonly MedicinesContext _context;
         private readonly ILogger<GenericCrudService<T>> _logger;
@@ -60,16 +62,15 @@ namespace BreakingNewGround.Server
                 && request.Order.Value.JoinTableColumnName is not null)
             {
                 var entityType = _context.Model.FindEntityType(typeof(T));
-                var tableName = entityType.GetTableName();
+                var tableName = entityType?.GetTableName() ?? string.Empty;
 
-                query = ApplyIncludes(
-                        dbSet.FromSqlRaw($"""
-                                          SELECT T.*, J.{request.Order.Value.JoinTableColumnName} AS J{request.Order.Value.JoinTableColumnName}
-                                          FROM {tableName} T
-                                          LEFT JOIN {request.Order.Value.JoinTableName} J ON J.{ID} = T.{request.Order.Value.ColumnName}
-                                          """),
-                        includes)
-                    .AsNoTracking();
+                var sqlQuery = $"""
+                                SELECT [T].*, [J].{request.Order.Value.JoinTableColumnName.ToQuoted()} AS {JOIN_COLUMN}
+                                FROM {tableName.ToQuoted()} AS T
+                                LEFT JOIN {request.Order.Value.JoinTableName.ToQuoted()} J ON [J].[{ID}] = [T].{request.Order.Value.ColumnName.ToQuoted()}
+                                """;
+
+                query = ApplyIncludes(dbSet.FromSql(FormattableStringFactory.Create(sqlQuery)), includes).AsNoTracking();
             }
             else
             {
@@ -84,7 +85,7 @@ namespace BreakingNewGround.Server
                 }
             }
 
-            var total = await query.Skip(0).CountAsync(); // Protection from SQL injection attacks
+            var total = await query.CountAsync();
 
             if (request.Order.HasValue)
             {
@@ -97,10 +98,10 @@ namespace BreakingNewGround.Server
                 {
                     var queryString = query.ToQueryString();
 
-                    var orderby = $"\nORDER BY J{request.Order.Value.JoinTableColumnName}" + order;
+                    var orderby = $"\nORDER BY [{JOIN_COLUMN}]" + order;
                     const string offset = "\nOFFSET 0 ROWS";
 
-                    query = dbSet.FromSqlRaw(queryString + orderby + offset).Skip(0);
+                    query = dbSet.FromSql(FormattableStringFactory.Create(queryString + orderby + offset));
                 }
                 else
                 {
