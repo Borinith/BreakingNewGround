@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { afterNextRender, AfterViewInit, ChangeDetectorRef, Component, Injector } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { combineLatest } from 'rxjs';
 
 import { BaseEntityComponent } from '../base-entity/base-entity.component';
 
@@ -10,10 +10,9 @@ import { MedicineBodyTypeService } from '../medicine-body-type/medicine-body-typ
 import { MedicineType } from '../medicine-type/medicine-type.model';
 import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 
+import { formatISO } from 'date-fns/formatISO';
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
-import { formatISO } from 'date-fns/formatISO';
-import { GetRequest } from '../common-models/request.model';
 
 @Component({
   selector: 'app-medicine',
@@ -22,7 +21,7 @@ import { GetRequest } from '../common-models/request.model';
   styleUrls: ['./medicine.component.css', '../medicines.component.css']
 })
 
-export class MedicineComponent extends BaseEntityComponent<Medicine> implements OnInit {
+export class MedicineComponent extends BaseEntityComponent<Medicine> implements AfterViewInit {
 
   medicineBodyTypes: MedicineBodyType[] = [];
   medicineTypes: MedicineType[] = [];
@@ -34,7 +33,8 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     service: MedicineService,
     private medicineBodyTypeService: MedicineBodyTypeService,
     private medicineTypeService: MedicineTypeService,
-    cdr: ChangeDetectorRef) {
+    cdr: ChangeDetectorRef,
+    private injector: Injector) {
     super(service,
       'Лекарства',
       new FormGroup({
@@ -43,30 +43,23 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
         expirationDate: new FormControl(''),
         medicineBodyType: new FormControl(''),
         medicineType: new FormControl(''),
-        count: new FormControl(''),
+        count: new FormControl('', [Validators.min(0)]),
         comment: new FormControl('')
       }),
       cdr);
   }
 
-  ngOnInit(): void {
-    this.loadAllData();
+  override ngAfterViewInit() {
+    afterNextRender(() => this.loadAllData(), { injector: this.injector });
   }
 
   loadAllData() {
-    const request: GetRequest = {
-      filters: null,
-      order: null,
-      skip: null,
-      take: null
-    };
-
     this.isLoadingMedicine = true;
 
-    forkJoin({
-      medicines: this.service.getAll(request),
-      medicineBodyTypes: this.medicineBodyTypeService.getAll(request),
-      medicineTypes: this.medicineTypeService.getAll(request)
+    combineLatest({
+      medicines: this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!),
+      medicineBodyTypes: this.setupDataStreamAndGetData(this.medicineBodyTypeService, null, null, true),
+      medicineTypes: this.setupDataStreamAndGetData(this.medicineTypeService, null, null, true),
     }).subscribe({
       next: ({ medicines, medicineBodyTypes, medicineTypes }) => {
         this.items = medicines.items;
@@ -81,26 +74,6 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
         this.isLoadingMedicine = false;
       }
     });
-  }
-
-  loadMedicinesData() {
-    const request: GetRequest = {
-      filters: null,
-      order: null,
-      skip: null,
-      take: null
-    };
-
-    this.isLoadingMedicine = true;
-
-    this.service
-      .getAll(request)
-      .subscribe(medicines => {
-        this.items = medicines.items;
-        this.originalItems = medicines.items.map(item => ({ ...item }));
-        this.isLoadingMedicine = false;
-        this.cdr.detectChanges();
-      });
   }
 
   formatDate(e: any): void {
@@ -127,7 +100,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
             this.updatedId = null;
             this.cdr.detectChanges();
 
-            this.loadMedicinesData();
+            this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!)
           }, 1000);
         },
         error: err => {
@@ -144,7 +117,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
       this.showError(item);
       return false;
     }
-    
+
     item.count = item.count < 0 ? 0 : item.count;
     item.comment = (item.comment?.trim() === '') ? null : item.comment;
 

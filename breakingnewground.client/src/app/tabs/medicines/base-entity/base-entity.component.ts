@@ -2,8 +2,9 @@ import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, ViewChild } fro
 import { FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { BehaviorSubject, combineLatest, EMPTY, merge, of, Subject } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { combineLatest, EMPTY, merge, Observable, of, Subject, Subscription } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { PagedResult } from '../common-models/paged-result.model';
 import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
 
@@ -20,22 +21,20 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   total = 0;
   pageSize = 10;
 
-  private sort?: MatSort;
-  private paginator?: MatPaginator;
+  protected sort?: MatSort;
+  protected paginator?: MatPaginator;
   private initialized = false;
 
   // subjects for streaming events
-  private refresh$ = new BehaviorSubject<void>(undefined);
+  private dataSubscription?: Subscription;
   private destroy$ = new Subject<void>();
   private resetPage$ = new Subject<void>();
 
   @ViewChild(MatSort) private set matSort(ms: MatSort | null) {
     this.sort = ms ?? undefined;
-    this.getAllItems();
   }
   @ViewChild(MatPaginator) private set matPaginator(pg: MatPaginator | null) {
     this.paginator = pg ?? undefined;
-    this.getAllItems();
   }
 
   constructor(
@@ -48,8 +47,6 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   }
 
   private getAllItems() {
-    this.isLoading = true;
-
     if (this.initialized) {
       return;
     }
@@ -57,23 +54,37 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       return;
     }
 
+    this.isLoading = true;
     this.initialized = true;
     this.cdr.detectChanges();
 
-    this.setupDataStream(this.sort, this.paginator);
+    this.subscribeData(this.service, this.sort, this.paginator);
   }
 
-  private setupDataStream(sort: MatSort, paginator: MatPaginator) {
-    const sort$ = sort.sortChange.pipe(
-      startWith({
-        active: sort.active || 'Id',
-        direction: sort.direction || 'asc'
-      })
-    );
+  private subscribeData(service: BaseEntityService<T>, sort: MatSort, paginator: MatPaginator) {
+    if (this.dataSubscription) {
+      this.dataSubscription.unsubscribe();
+    }
 
-    // поток фильтров — startWith нужен, чтобы сразу получить начальные значения
+    this.dataSubscription = this.setupDataStreamAndGetData(service, sort, paginator)
+      .subscribe(data => {
+        this.items = data.items;
+        this.originalItems = data.items.map(item => ({ ...item }));
+        this.total = data.total;
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
+  }
+
+  protected setupDataStreamAndGetData<T>(
+    service: BaseEntityService<T>,
+    sort: MatSort | null,
+    paginator: MatPaginator | null,
+    getAllData = false): Observable<PagedResult<T>> {
+    const sort$ = sort?.sortChange.asObservable() || EMPTY;
+
     const filters$ = this.filterForm.valueChanges.pipe(
-      startWith(this.filterForm.value),
       debounceTime(100),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       tap(() => {
@@ -92,42 +103,39 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
           pageSize: this.paginator?.pageSize || this.pageSize
         }))
       )
-    ).pipe(
-      startWith({
-        pageIndex: this.paginator?.pageIndex || 0,
-        pageSize: this.paginator?.pageSize || this.pageSize
-      })
     );
 
-    // combineLatest of: all filter values, sort, page, refresh$
-    combineLatest([filters$, sort$, page$, this.refresh$])
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap(([filterValues, sort, page]) => {
-          const filtersArr: RequestFilter[] = this.buildFilters(filterValues);
-
-          const request: GetRequest = {
+    return combineLatest([
+      merge(of(this.filterForm.value), filters$),
+      merge(of({ active: sort?.active, direction: sort?.direction}), sort$),
+      merge(of({ pageIndex: paginator?.pageIndex || 0, pageSize: paginator?.pageSize || this.pageSize }), page$)
+    ]).pipe(
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+      takeUntil(this.destroy$),
+      switchMap(([filters, sort, page]) => {
+        const filtersArr: RequestFilter[] = this.buildFilters(filters);
+        const request: GetRequest = getAllData
+          ? {
+            filters: null,
+            order: null,
+            skip: null,
+            take: null
+          }
+          : {
             filters: filtersArr.length ? filtersArr : null,
             order: this.buildOrder(sort),
             skip: page.pageIndex * page.pageSize,
             take: page.pageSize
           };
 
-          return this.service.getAll(request).pipe(
-            catchError(err => {
-              console.error('Get all items error', err);
-              return of({ items: [], total: 0 });
-            })
-          );
-        })
-      ).subscribe(data => {
-        this.items = data.items;
-        this.originalItems = data.items.map(item => ({ ...item }));
-        this.total = data.total;
-
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      });
+        return service.getAll(request).pipe(
+          catchError(err => {
+            console.error('Get all items error', err);
+            return of({ items: [], total: 0 });
+          })
+        );
+      })
+    );
   }
 
   ngAfterViewInit() {
@@ -135,6 +143,10 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   }
 
   ngOnDestroy() {
+    if (this.dataSubscription) {
+      this.dataSubscription.unsubscribe();
+    }
+
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -239,6 +251,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     if (this.isValidAndNewItem(this.newItem)) {
       this.service.create(this.newItem).subscribe(() => {
         this.newItem = {} as T;
+        this.initialized = false;
         this.getAllItems();
       });
     }
@@ -256,6 +269,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
               this.updatedId = null;
               this.cdr.detectChanges();
 
+              this.initialized = false;
               this.getAllItems();
             }, 1000);
           },
@@ -270,6 +284,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   deleteItem(id: number) {
     this.service.delete(id).subscribe((isDeleted) => {
       if (isDeleted) {
+        this.initialized = false;
         this.getAllItems()
       }
     });
