@@ -4,33 +4,38 @@
   <mat-form-field appearance="outline">
     <mat-label>Имя пользователя</mat-label>
     <input matInput
-           [(ngModel)]="userName"
-           name="userName"
-           required>
-  </mat-form-field>
+      [(ngModel)]="userName"
+      name="userName"
+      required>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Пароль</mat-label>
-    <input matInput type="password"
-           [(ngModel)]="password"
-           name="password"
-           required>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Пароль</mat-label>
+      <input matInput type="password"
+        [(ngModel)]="password"
+        name="password"
+        required>
+      </mat-form-field>
 
-  <button mat-raised-button
-          *ngIf="!isLoading"
+      @if (!isLoading) {
+        <button mat-raised-button
           color="primary"
           type="submit"
           [disabled]="isLoading">
-    Войти
-  </button>
-  
-  <mat-progress-spinner *ngIf="isLoading"
-                        diameter="36"
-                        mode="indeterminate"
-                        class="spinner"
-                        style="margin: 0 auto">
-  </mat-progress-spinner>
+          Войти
+        </button>
+      }
 
-  <div class="error" *ngIf="error">{{ error }}</div>
-</form>
+      @if (isLoading) {
+        <mat-progress-spinner
+          diameter="36"
+          mode="indeterminate"
+          class="spinner"
+          style="margin: 0 auto">
+        </mat-progress-spinner>
+      }
+
+      @if (error) {
+        <div class="error">{{ error }}</div>
+      }
+    </form>

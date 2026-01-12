@@ -1,52 +1,83 @@
 <h2 id="tabLabel">{{componentName}}</h2>
 
-<div *ngIf="isLoading" class="loading-container">
-  <mat-spinner diameter="50"></mat-spinner>
-</div>
-
-<div *ngIf="!isLoading" class="content-container">
-  <div class="add-form-common">
-    <mat-form-field appearance="outline">
-      <mat-label>Название</mat-label>
-      <input matInput [(ngModel)]="newItem.name" />
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
-  </div>
-
-  <mat-table [dataSource]="items" class="mat-elevation-z2">
-    <ng-container matColumnDef="id">
-      <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
-      <mat-cell *matCellDef="let item"> {{item.id}} </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="name">
-      <mat-header-cell style="justify-content: center" *matHeaderCellDef> Название </mat-header-cell>
-      <mat-cell *matCellDef="let item">
-        <mat-form-field style="margin-bottom: -1.25em" appearance="outline" class="inline-field">
-          <input matInput
-                 [(ngModel)]="item.name"
-                 name="name{{item.id}}"
-                 (blur)="updateItem(item)"
-                 placeholder="Название">
+<div class="content-wrapper" [formGroup]="filterForm">
+  <div class="content-container" [class.loading]="isLoading">
+    <div class="add-form-common">
+      <mat-form-field appearance="outline">
+        <mat-label>Название</mat-label>
+        <input matInput
+          [(ngModel)]="newItem.name"
+          [ngModelOptions]="{ standalone: true }" />
         </mat-form-field>
-      </mat-cell>
-    </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef></mat-header-cell>
-      <mat-cell *matCellDef="let item" class="delete-cell">
-        <button mat-icon-button color="warn" (click)="deleteItem(item.id)">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-cell>
-    </ng-container>
+        <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
+      </div>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      [class.updated-row]="row.id === updatedId"
-      [class.error-row]="row.id === errorId">
-    </mat-row>
-  </mat-table>
-</div>
+      <div class="custom-table-wrapper">
+        <mat-table [dataSource]="items" matSort class="mat-elevation-z2">
+          <!-- ID -->
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="Id">
+              <div class="header-filter-wrapper">
+                <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
+                  <input matInput
+                    type="number"
+                    placeholder="ID"
+                    formControlName="id"/>
+                  </mat-form-field>
+                </div>
+              </mat-header-cell>
+              <mat-cell *matCellDef="let item" style="margin-left: 20px"> {{item.id}} </mat-cell>
+            </ng-container>
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell style="justify-content: center" *matHeaderCellDef mat-sort-header="Name">
+                <div class="header-filter-wrapper">
+                  <mat-form-field appearance="outline" placeholder="" class="small" style="margin-left: 40px;" (click)="$event.stopPropagation()">
+                    <input matInput
+                      placeholder="Название"
+                      formControlName="name" />
+                    </mat-form-field>
+                  </div>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let item">
+                  <div class="cell-flex-wrapper">
+                    <mat-form-field appearance="outline" class="inline-field">
+                      <input matInput
+                        [(ngModel)]="item.name"
+                        name="name{{item.id}}"
+                        [ngModelOptions]="{ standalone: true }"
+                        (blur)="updateItem(item)"
+                        placeholder="Название" />
+                      </mat-form-field>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                  <mat-cell *matCellDef="let item" class="delete-cell">
+                    <button mat-icon-button color="warn" (click)="deleteItem(item.id)">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns"
+                  [class.updated-row]="row.id === updatedId"
+                  [class.error-row]="row.id === errorId">
+                </mat-row>
+              </mat-table>
+            </div>
+
+            <mat-paginator [length]="total" [pageSize]="pageSize" [hidePageSize]="true"></mat-paginator>
+          </div>
+
+          @if (isLoading) {
+            <div class="loading-overlay">
+              <mat-spinner diameter="50"></mat-spinner>
+            </div>
+          }
+        </div>

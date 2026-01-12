@@ -20,9 +20,3 @@ p {
 .spacer {
   flex: 1 1 auto;
 }
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
