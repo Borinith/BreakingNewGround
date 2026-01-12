@@ -1,6 +1,6 @@
 import { afterNextRender, AfterViewInit, ChangeDetectorRef, Component, Injector } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { combineLatest } from 'rxjs';
+import { catchError, forkJoin, of, Subscription } from 'rxjs';
 
 import { BaseEntityComponent } from '../base-entity/base-entity.component';
 
@@ -11,6 +11,7 @@ import { MedicineType } from '../medicine-type/medicine-type.model';
 import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 
 import { formatISO } from 'date-fns/formatISO';
+import { BaseEntityService } from '../base-entity/base-entity.service';
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
 
@@ -28,6 +29,8 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   override originalItems: Medicine[] = [];
 
   isLoadingMedicine = true;
+
+  private medicineDataSubscription?: Subscription;
 
   constructor(
     service: MedicineService,
@@ -56,24 +59,48 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   loadAllData() {
     this.isLoadingMedicine = true;
 
-    combineLatest({
-      medicines: this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!),
-      medicineBodyTypes: this.setupDataStreamAndGetData(this.medicineBodyTypeService, null, null, true),
-      medicineTypes: this.setupDataStreamAndGetData(this.medicineTypeService, null, null, true),
+    forkJoin({
+      medicineBodyTypes: this.getDataOnce(this.medicineBodyTypeService),
+      medicineTypes: this.getDataOnce(this.medicineTypeService)
     }).subscribe({
-      next: ({ medicines, medicineBodyTypes, medicineTypes }) => {
-        this.items = medicines.items;
-        this.originalItems = medicines.items.map(item => ({ ...item }));
+      next: ({ medicineBodyTypes, medicineTypes }) => {
         this.medicineBodyTypes = medicineBodyTypes.items;
         this.medicineTypes = medicineTypes.items;
         this.isLoadingMedicine = false;
         this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Ошибка загрузки данных', err);
-        this.isLoadingMedicine = false;
       }
     });
+
+    this.subscribeToMedicinesData();
+  }
+
+  private getDataOnce<T>(service: BaseEntityService<T>) {
+    return service.getAll({
+      filters: null,
+      order: null,
+      skip: null,
+      take: null
+    }).pipe(
+      catchError(err => {
+        console.error('Get all items error', err);
+        return of({ items: [], total: 0 });
+      })
+    );
+  }
+
+  private subscribeToMedicinesData() {
+    if (this.medicineDataSubscription) {
+      this.medicineDataSubscription.unsubscribe();
+    }
+
+    this.medicineDataSubscription = this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!)
+      .subscribe(medicines => {
+        this.items = medicines.items;
+        this.originalItems = medicines.items.map(item => ({ ...item }));
+        this.total = medicines.total;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
   }
 
   formatDate(e: any): void {
@@ -100,7 +127,17 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
             this.updatedId = null;
             this.cdr.detectChanges();
 
-            this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!)
+            /*if (this.updateSubscription) {
+              this.updateSubscription.unsubscribe();
+            }
+
+            this.updateSubscription = this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!)
+              .subscribe(medicines => {
+                this.items = medicines.items;
+                this.originalItems = medicines.items.map(item => ({ ...item }));
+                this.total = medicines.total;
+                this.cdr.detectChanges();
+              });*/
           }, 1000);
         },
         error: err => {

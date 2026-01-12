@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, ViewChild } fro
 import { FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { combineLatest, EMPTY, merge, Observable, of, Subject, Subscription } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { EMPTY, Observable, Subject, Subscription, combineLatest, merge, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { PagedResult } from '../common-models/paged-result.model';
 import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
@@ -106,9 +106,9 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     );
 
     return combineLatest([
-      merge(of(this.filterForm.value), filters$),
-      merge(of({ active: sort?.active, direction: sort?.direction}), sort$),
-      merge(of({ pageIndex: paginator?.pageIndex || 0, pageSize: paginator?.pageSize || this.pageSize }), page$)
+      filters$.pipe(startWith(this.filterForm.value)),
+      sort$.pipe(startWith({ active: sort?.active, direction: sort?.direction })),
+      page$.pipe(startWith({ pageIndex: paginator?.pageIndex || 0, pageSize: paginator?.pageSize || this.pageSize }))
     ]).pipe(
       distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
       takeUntil(this.destroy$),
@@ -270,7 +270,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
               this.cdr.detectChanges();
 
               this.initialized = false;
-              this.getAllItems();
+              //this.getAllItems();
             }, 1000);
           },
           error: err => {

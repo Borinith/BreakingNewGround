@@ -1,8 +1,10 @@
 <mat-toolbar>
   <span class="spacer"></span>
-  <button mat-button *ngIf="auth.isAuthenticated" (click)="logout()">
-    <mat-icon>logout</mat-icon> Выход
-  </button>
+  @if (auth.isAuthenticated) {
+    <button mat-button (click)="logout()">
+      <mat-icon>logout</mat-icon> Выход
+    </button>
+  }
 </mat-toolbar>
 
 <router-outlet></router-outlet>
