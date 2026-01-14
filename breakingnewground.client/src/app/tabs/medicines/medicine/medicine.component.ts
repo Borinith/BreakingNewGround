@@ -64,14 +64,20 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
       medicineTypes: this.getDataOnce(this.medicineTypeService)
     }).subscribe({
       next: ({ medicineBodyTypes, medicineTypes }) => {
+        const all = 'Все';
         this.medicineBodyTypes = medicineBodyTypes.items;
+        this.medicineBodyTypes.unshift({ id: 0, name: all });
+        this.filterForm.patchValue({ medicineBodyType: this.medicineBodyTypes[0].id });
+
         this.medicineTypes = medicineTypes.items;
+        this.medicineTypes.unshift({ id: 0, name: all });
+        this.filterForm.patchValue({ medicineType: this.medicineTypes[0].id });
+
+        this.subscribeToMedicinesData();
         this.isLoadingMedicine = false;
         this.cdr.detectChanges();
       }
     });
-
-    this.subscribeToMedicinesData();
   }
 
   private getDataOnce<T>(service: BaseEntityService<T>) {

@@ -6,275 +6,269 @@
       <mat-form-field appearance="outline">
         <mat-label>Название</mat-label>
         <input matInput
-          [(ngModel)]="newItem.name"
-          [ngModelOptions]="{ standalone: true }" />
-        </mat-form-field>
+               [(ngModel)]="newItem.name"
+               [ngModelOptions]="{ standalone: true }" />
+      </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Срок годности</mat-label>
-          <input matInput
-            [matDatepicker]="picker"
-            [(ngModel)]="newItem.expirationDate"
-            [ngModelOptions]="{ standalone: true }"
-            (dateChange)="formatDate($event)" />
-            <mat-hint>DD.MM.YYYY</mat-hint>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Срок годности</mat-label>
+        <input matInput
+               [matDatepicker]="picker"
+               [(ngModel)]="newItem.expirationDate"
+               [ngModelOptions]="{ standalone: true }"
+               (dateChange)="formatDate($event)" />
+        <mat-hint>DD.MM.YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Категория</mat-label>
-            <mat-select
-              [(ngModel)]="newItem.bodyTypeId"
-              [ngModelOptions]="{ standalone: true }">
-              @for (mbt of medicineBodyTypes; track mbt) {
+      <mat-form-field appearance="outline">
+        <mat-label>Категория</mat-label>
+        <mat-select [(ngModel)]="newItem.bodyTypeId"
+                    [ngModelOptions]="{ standalone: true }">
+          @for (mbt of medicineBodyTypes; track mbt) {
+          <mat-option [value]="mbt.id">
+            {{ mbt.name }}
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Тип лекарства</mat-label>
+        <mat-select [(ngModel)]="newItem.typeId"
+                    [ngModelOptions]="{ standalone: true }">
+          @for (mt of medicineTypes; track mt) {
+          <mat-option [value]="mt.id">
+            {{ mt.name }}
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Число</mat-label>
+        <input matInput
+               type="number"
+               [(ngModel)]="newItem.count"
+               [ngModelOptions]="{ standalone: true }" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Комментарий</mat-label>
+        <input matInput
+               [(ngModel)]="newItem.comment"
+               [ngModelOptions]="{ standalone: true }" />
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
+    </div>
+
+    <div class="custom-table-wrapper">
+      <mat-table [dataSource]="items" matSort class="mat-elevation-z2">
+        <!-- ID -->
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="Id">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
+                <input matInput
+                       type="tel"
+                       placeholder="ID"
+                       formControlName="id" />
+              </mat-form-field>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine"> {{medicine.id}} </mat-cell>
+        </ng-container>
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="Name">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
+                <input matInput
+                       placeholder="Название"
+                       formControlName="name" />
+              </mat-form-field>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine">
+            <mat-form-field appearance="outline" class="inline-field">
+              <input matInput
+                     [(ngModel)]="medicine.name"
+                     name="name{{medicine.id}}"
+                     [ngModelOptions]="{ standalone: true }"
+                     (blur)="updateItem(medicine)"
+                     placeholder="Название">
+            </mat-form-field>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Medicine body type -->
+        <ng-container matColumnDef="medicineBodyType">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="BodyTypeId">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
+                <mat-label>Категория</mat-label>
+                <mat-select formControlName="medicineBodyType">
+                  @for (mbt of medicineBodyTypes; track mbt) {
+                  <mat-option [value]="mbt.id">
+                    {{ mbt.name }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine">
+            <mat-form-field appearance="outline" class="inline-field">
+              <mat-select [(ngModel)]="medicine.bodyTypeId"
+                          [ngModelOptions]="{ standalone: true }"
+                          name="medicineBodyType{{medicine.id}}"
+                          (selectionChange)="updateItem(medicine)">
+                @for (mbt of medicineBodyTypes; track mbt) {
                 <mat-option [value]="mbt.id">
                   {{ mbt.name }}
                 </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+                }
+              </mat-select>
+            </mat-form-field>
+          </mat-cell>
+        </ng-container>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Тип лекарства</mat-label>
-            <mat-select
-              [(ngModel)]="newItem.typeId"
-              [ngModelOptions]="{ standalone: true }">
-              @for (mt of medicineTypes; track mt) {
+        <!-- Medicine type -->
+        <ng-container matColumnDef="medicineType">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="TypeId">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
+                <mat-label>Тип лекарства</mat-label>
+                <mat-select formControlName="medicineType">
+                  @for (mt of medicineTypes; track mt) {
+                  <mat-option [value]="mt.id">
+                    {{ mt.name }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine">
+            <mat-form-field appearance="outline" class="inline-field">
+              <mat-select [(ngModel)]="medicine.typeId"
+                          [ngModelOptions]="{ standalone: true }"
+                          name="medicineType{{medicine.id}}"
+                          (selectionChange)="updateItem(medicine)">
+                @for (mt of medicineTypes; track mt) {
                 <mat-option [value]="mt.id">
                   {{ mt.name }}
                 </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Число</mat-label>
-            <input matInput
-              type="number"
-              [(ngModel)]="newItem.count"
-              [ngModelOptions]="{ standalone: true }" />
+                }
+              </mat-select>
             </mat-form-field>
+          </mat-cell>
+        </ng-container>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Комментарий</mat-label>
-              <input matInput
-                [(ngModel)]="newItem.comment"
-                [ngModelOptions]="{ standalone: true }" />
+        <!-- Expiration date -->
+        <ng-container matColumnDef="expirationDate">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="ExpirationDate">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
+                <input matInput
+                       [matDatepicker]="picker"
+                       placeholder="Срок годности"
+                       formControlName="expirationDate">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
               </mat-form-field>
-
-              <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
             </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine">
+            <mat-form-field appearance="outline" class="inline-field">
+              <input matInput
+                     [matDatepicker]="picker"
+                     [(ngModel)]="medicine.expirationDate"
+                     [ngModelOptions]="{ standalone: true }"
+                     (dateChange)="onDateChange(medicine, $event.value)"
+                     (blur)="onDateChange(medicine, medicine.expirationDate)"
+                     placeholder="DD.MM.YYYY"
+                     name="expirationDate{{medicine.id}}">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </mat-cell>
+        </ng-container>
 
-            <div class="custom-table-wrapper">
-              <mat-table [dataSource]="items" matSort class="mat-elevation-z2">
-                <!-- ID -->
-                <ng-container matColumnDef="id">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header="Id">
-                    <div class="header-filter-wrapper">
-                      <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
-                        <input matInput
-                          type="tel"
-                          placeholder="ID"
-                          formControlName="id" />
-                        </mat-form-field>
-                      </div>
-                    </mat-header-cell>
-                    <mat-cell *matCellDef="let medicine"> {{medicine.id}} </mat-cell>
-                  </ng-container>
+        <!-- Count -->
+        <ng-container matColumnDef="count">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="Count">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
+                <input matInput
+                       type="number"
+                       placeholder="Число"
+                       formControlName="count" />
+              </mat-form-field>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine">
+            <mat-form-field appearance="outline" class="inline-field">
+              <input matInput
+                     type="number"
+                     [(ngModel)]="medicine.count"
+                     [ngModelOptions]="{ standalone: true }"
+                     name="count{{medicine.id}}"
+                     (blur)="updateItem(medicine)"
+                     placeholder="Число">
+            </mat-form-field>
+          </mat-cell>
+        </ng-container>
 
-                  <!-- Name -->
-                  <ng-container matColumnDef="name">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header="Name">
-                      <div class="header-filter-wrapper">
-                        <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
-                          <input matInput
-                            placeholder="Название"
-                            formControlName="name" />
-                          </mat-form-field>
-                        </div>
-                      </mat-header-cell>
-                      <mat-cell *matCellDef="let medicine">
-                        <mat-form-field appearance="outline" class="inline-field">
-                          <input matInput
-                            [(ngModel)]="medicine.name"
-                            name="name{{medicine.id}}"
-                            [ngModelOptions]="{ standalone: true }"
-                            (blur)="updateItem(medicine)"
-                            placeholder="Название">
-                          </mat-form-field>
-                        </mat-cell>
-                      </ng-container>
+        <!-- Comment -->
+        <ng-container matColumnDef="comment">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="Comment">
+            <div class="header-filter-wrapper">
+              <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
+                <input matInput
+                       placeholder="Комментарий"
+                       formControlName="comment" />
+              </mat-form-field>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let medicine">
+            <mat-form-field appearance="outline" class="inline-field">
+              <input matInput
+                     [(ngModel)]="medicine.comment"
+                     [ngModelOptions]="{ standalone: true }"
+                     name="comment{{medicine.id}}"
+                     (blur)="updateItem(medicine)"
+                     placeholder="Комментарий">
+            </mat-form-field>
+          </mat-cell>
+        </ng-container>
 
-                      <!-- Expiration date -->
-                      <ng-container matColumnDef="expirationDate">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header="ExpirationDate">
-                          <div class="header-filter-wrapper">
-                            <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
-                              <input matInput
-                                [matDatepicker]="picker"
-                                placeholder="Срок годности"
-                                formControlName="expirationDate">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
-                              </mat-form-field>
-                            </div>
-                          </mat-header-cell>
-                          <mat-cell *matCellDef="let medicine">
-                            <mat-form-field appearance="outline" class="inline-field">
-                              <input matInput
-                                [matDatepicker]="picker"
-                                [(ngModel)]="medicine.expirationDate"
-                                [ngModelOptions]="{ standalone: true }"
-                                (dateChange)="onDateChange(medicine, $event.value)"
-                                (blur)="onDateChange(medicine, medicine.expirationDate)"
-                                placeholder="DD.MM.YYYY"
-                                name="expirationDate{{medicine.id}}">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
-                              </mat-form-field>
-                            </mat-cell>
-                          </ng-container>
+        <ng-container matColumnDef="delete">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let medicine" class="delete-cell">
+            <button mat-icon-button color="warn" (click)="deleteItem(medicine.id)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
 
-                          <!-- Medicine body type -->
-                          <ng-container matColumnDef="medicineBodyType">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header="BodyTypeId">
-                              <div class="header-filter-wrapper">
-                                <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
-                                  <mat-select
-                                    placeholder="Категория"
-                                    formControlName="medicineBodyType">
-                                    <mat-option [value]=""></mat-option>
-                                    @for (mbt of medicineBodyTypes; track mbt) {
-                                      <mat-option [value]="mbt.id">
-                                        {{ mbt.name }}
-                                      </mat-option>
-                                    }
-                                  </mat-select>
-                                </mat-form-field>
-                              </div>
-                            </mat-header-cell>
-                            <mat-cell *matCellDef="let medicine">
-                              <mat-form-field appearance="outline" class="inline-field">
-                                <mat-select [(ngModel)]="medicine.bodyTypeId"
-                                  [ngModelOptions]="{ standalone: true }"
-                                  name="medicineBodyType{{medicine.id}}"
-                                  (selectionChange)="updateItem(medicine)">
-                                  @for (mbt of medicineBodyTypes; track mbt) {
-                                    <mat-option [value]="mbt.id">
-                                      {{ mbt.name }}
-                                    </mat-option>
-                                  }
-                                </mat-select>
-                              </mat-form-field>
-                            </mat-cell>
-                          </ng-container>
+        <mat-header-row *matHeaderRowDef="['id', 'name', 'medicineBodyType', 'medicineType', 'expirationDate', 'count', 'comment', 'delete']"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: ['id', 'name', 'medicineBodyType', 'medicineType', 'expirationDate', 'count', 'comment', 'delete']"
+                 [class.updated-row]="row.id === updatedId"
+                 [class.error-row]="row.id === errorId">
+        </mat-row>
+      </mat-table>
+    </div>
 
-                          <!-- Medicine type -->
-                          <ng-container matColumnDef="medicineType">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header="TypeId">
-                              <div class="header-filter-wrapper">
-                                <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
-                                  <mat-select
-                                    placeholder="Тип лекарства"
-                                    formControlName="medicineType">
-                                    <mat-option [value]=""></mat-option>
-                                    @for (mt of medicineTypes; track mt) {
-                                      <mat-option [value]="mt.id">
-                                        {{ mt.name }}
-                                      </mat-option>
-                                    }
-                                  </mat-select>
-                                </mat-form-field>
-                              </div>
-                            </mat-header-cell>
-                            <mat-cell *matCellDef="let medicine">
-                              <mat-form-field appearance="outline" class="inline-field">
-                                <mat-select [(ngModel)]="medicine.typeId"
-                                  [ngModelOptions]="{ standalone: true }"
-                                  name="medicineType{{medicine.id}}"
-                                  (selectionChange)="updateItem(medicine)">
-                                  @for (mt of medicineTypes; track mt) {
-                                    <mat-option [value]="mt.id">
-                                      {{ mt.name }}
-                                    </mat-option>
-                                  }
-                                </mat-select>
-                              </mat-form-field>
-                            </mat-cell>
-                          </ng-container>
+    <mat-paginator [length]="total" [pageSize]="pageSize" [hidePageSize]="true"></mat-paginator>
+  </div>
 
-                          <!-- Count -->
-                          <ng-container matColumnDef="count">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header="Count">
-                              <div class="header-filter-wrapper">
-                                <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
-                                  <input matInput
-                                    type="number"
-                                    placeholder="Число"
-                                    formControlName="count" />
-                                  </mat-form-field>
-                                </div>
-                              </mat-header-cell>
-                              <mat-cell *matCellDef="let medicine">
-                                <mat-form-field appearance="outline" class="inline-field">
-                                  <input matInput
-                                    type="number"
-                                    [(ngModel)]="medicine.count"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    name="count{{medicine.id}}"
-                                    (blur)="updateItem(medicine)"
-                                    placeholder="Число">
-                                  </mat-form-field>
-                                </mat-cell>
-                              </ng-container>
-
-                              <!-- Comment -->
-                              <ng-container matColumnDef="comment">
-                                <mat-header-cell *matHeaderCellDef mat-sort-header="Comment">
-                                  <div class="header-filter-wrapper">
-                                    <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
-                                      <input matInput
-                                        placeholder="Комментарий"
-                                        formControlName="comment" />
-                                      </mat-form-field>
-                                    </div>
-                                  </mat-header-cell>
-                                  <mat-cell *matCellDef="let medicine">
-                                    <mat-form-field appearance="outline" class="inline-field">
-                                      <input matInput
-                                        [(ngModel)]="medicine.comment"
-                                        [ngModelOptions]="{ standalone: true }"
-                                        name="comment{{medicine.id}}"
-                                        (blur)="updateItem(medicine)"
-                                        placeholder="Комментарий">
-                                      </mat-form-field>
-                                    </mat-cell>
-                                  </ng-container>
-
-                                  <ng-container matColumnDef="delete">
-                                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
-                                    <mat-cell *matCellDef="let medicine" class="delete-cell">
-                                      <button mat-icon-button color="warn" (click)="deleteItem(medicine.id)">
-                                        <mat-icon>close</mat-icon>
-                                      </button>
-                                    </mat-cell>
-                                  </ng-container>
-
-                                  <mat-header-row *matHeaderRowDef="['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"></mat-header-row>
-                                  <mat-row *matRowDef="let row; columns: ['id', 'name', 'expirationDate', 'medicineBodyType', 'medicineType', 'count', 'comment', 'delete']"
-                                    [class.updated-row]="row.id === updatedId"
-                                    [class.error-row]="row.id === errorId">
-                                  </mat-row>
-                                </mat-table>
-                              </div>
-
-                              <mat-paginator [length]="total" [pageSize]="pageSize" [hidePageSize]="true"></mat-paginator>
-                            </div>
-
-                            @if (isLoadingMedicine) {
-                              <div class="loading-overlay">
-                                <mat-spinner diameter="50"></mat-spinner>
-                              </div>
-                            }
-                          </div>
+  @if (isLoadingMedicine) {
+  <div class="loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+  }
+</div>
