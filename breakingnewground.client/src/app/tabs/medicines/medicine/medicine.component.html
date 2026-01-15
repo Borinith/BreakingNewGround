@@ -2,67 +2,76 @@
 
 <div class="content-wrapper" [formGroup]="filterForm">
   <div class="content-container" [class.loading]="isLoadingMedicine">
-    <div class="add-form">
-      <mat-form-field appearance="outline">
-        <mat-label>Название</mat-label>
-        <input matInput
-               [(ngModel)]="newItem.name"
-               [ngModelOptions]="{ standalone: true }" />
-      </mat-form-field>
+    <mat-expansion-panel class="add-form-panel" #expansionPanel>
+      <mat-expansion-panel-header class="add-form-header">
+        <mat-panel-title class="add-form-title">
+          Добавить новую запись
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Срок годности</mat-label>
-        <input matInput
-               [matDatepicker]="picker"
-               [(ngModel)]="newItem.expirationDate"
-               [ngModelOptions]="{ standalone: true }"
-               (dateChange)="formatDate($event)" />
-        <mat-hint>DD.MM.YYYY</mat-hint>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+      <div class="add-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Название</mat-label>
+          <input matInput
+                 [(ngModel)]="newItem.name"
+                 [ngModelOptions]="{ standalone: true }" />
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Категория</mat-label>
-        <mat-select [(ngModel)]="newItem.bodyTypeId"
-                    [ngModelOptions]="{ standalone: true }">
-          @for (mbt of medicineBodyTypes; track mbt) {
-          <mat-option [value]="mbt.id">
-            {{ mbt.name }}
-          </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Срок годности</mat-label>
+          <input matInput
+                 [matDatepicker]="picker"
+                 [(ngModel)]="newItem.expirationDate"
+                 [ngModelOptions]="{ standalone: true }"
+                 (dateChange)="formatDate($event)" />
+          <mat-hint>DD.MM.YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Тип лекарства</mat-label>
-        <mat-select [(ngModel)]="newItem.typeId"
-                    [ngModelOptions]="{ standalone: true }">
-          @for (mt of medicineTypes; track mt) {
-          <mat-option [value]="mt.id">
-            {{ mt.name }}
-          </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Категория</mat-label>
+          <mat-select [(ngModel)]="newItem.bodyTypeId"
+                      [ngModelOptions]="{ standalone: true }">
+            @for (mbt of medicineBodyTypes; track mbt) {
+            <mat-option [value]="mbt.id">
+              {{ mbt.name }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Число</mat-label>
-        <input matInput
-               type="number"
-               [(ngModel)]="newItem.count"
-               [ngModelOptions]="{ standalone: true }" />
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Тип лекарства</mat-label>
+          <mat-select [(ngModel)]="newItem.typeId"
+                      [ngModelOptions]="{ standalone: true }">
+            @for (mt of medicineTypes; track mt) {
+            <mat-option [value]="mt.id">
+              {{ mt.name }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Комментарий</mat-label>
-        <input matInput
-               [(ngModel)]="newItem.comment"
-               [ngModelOptions]="{ standalone: true }" />
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Число</mat-label>
+          <input matInput
+                 type="number"
+                 min="0"
+                 [(ngModel)]="newItem.count"
+                 [ngModelOptions]="{ standalone: true }" />
+        </mat-form-field>
 
-      <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
-    </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Комментарий</mat-label>
+          <input matInput
+                 [(ngModel)]="newItem.comment"
+                 [ngModelOptions]="{ standalone: true }" />
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="addItem()">Добавить</button>
+      </div>
+    </mat-expansion-panel>
 
     <div class="custom-table-wrapper">
       <mat-table [dataSource]="items" matSort class="mat-elevation-z2">
@@ -205,6 +214,7 @@
               <mat-form-field appearance="outline" placeholder="" class="small" (click)="$event.stopPropagation()">
                 <input matInput
                        type="number"
+                       min="0"
                        placeholder="Число"
                        formControlName="count" />
               </mat-form-field>
@@ -214,6 +224,7 @@
             <mat-form-field appearance="outline" class="inline-field">
               <input matInput
                      type="number"
+                     min="0"
                      [(ngModel)]="medicine.count"
                      [ngModelOptions]="{ standalone: true }"
                      name="count{{medicine.id}}"
@@ -263,7 +274,11 @@
       </mat-table>
     </div>
 
-    <mat-paginator [length]="total" [pageSize]="pageSize" [hidePageSize]="true"></mat-paginator>
+    <mat-paginator [length]="total"
+                   [pageSize]="pageSize"
+                   [showFirstLastButtons]="true"
+                   [hidePageSize]="true">
+    </mat-paginator>
   </div>
 
   @if (isLoadingMedicine) {

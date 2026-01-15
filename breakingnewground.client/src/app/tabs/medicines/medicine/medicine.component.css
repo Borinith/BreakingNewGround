@@ -1,6 +1,6 @@
 .content-container {
   min-width: 1100px;
-  padding: 24px;
+  position: relative;
 }
 
 .add-form {
@@ -20,14 +20,6 @@
   .add-form mat-form-field {
     flex: 1;
   }
-
-mat-table {
-  width: 100%;
-  margin-top: 24px;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-}
 
 mat-header-cell ::ng-deep .mat-sort-header-container {
   width: 100% !important;
