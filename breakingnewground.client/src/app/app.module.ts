@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -19,6 +20,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { TabsComponent } from './tabs/tabs.component';
@@ -33,6 +35,7 @@ export function tokenGetter() {
   bootstrap: [AppComponent],
   declarations: [
     AppComponent,
+    ConfirmDialogComponent,
     LoginComponent,
     RegisterComponent,
     TabsComponent,
@@ -43,6 +46,7 @@ export function tokenGetter() {
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatToolbarModule,

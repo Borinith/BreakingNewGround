@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { EMPTY, Observable, Subject, Subscription, combineLatest, merge, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { PagedResult } from '../common-models/paged-result.model';
 import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
@@ -41,7 +42,8 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     protected service: BaseEntityService<T>,
     protected name: string,
     protected filterForm: FormGroup,
-    protected cdr: ChangeDetectorRef) {
+    protected cdr: ChangeDetectorRef,
+    protected confirmDialogService: ConfirmDialogService) {
     this.componentName = name;
     this.newItem = {} as T;
   }
@@ -279,6 +281,14 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
           }
         });
     }
+  }
+
+  openDeleteConfirm(id: number) {
+    this.confirmDialogService.openConfirmDialog().afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteItem(id);
+      }
+    });
   }
 
   deleteItem(id: number) {

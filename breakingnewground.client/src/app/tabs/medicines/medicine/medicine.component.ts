@@ -11,6 +11,7 @@ import { MedicineType } from '../medicine-type/medicine-type.model';
 import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 
 import { formatISO } from 'date-fns/formatISO';
+import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { BaseEntityService } from '../base-entity/base-entity.service';
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
@@ -37,6 +38,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     private medicineBodyTypeService: MedicineBodyTypeService,
     private medicineTypeService: MedicineTypeService,
     cdr: ChangeDetectorRef,
+    confirmDialogService: ConfirmDialogService,
     private injector: Injector) {
     super(service,
       'Лекарства',
@@ -49,7 +51,8 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
         count: new FormControl('', [Validators.min(0)]),
         comment: new FormControl('')
       }),
-      cdr);
+      cdr,
+      confirmDialogService);
   }
 
   override ngAfterViewInit() {

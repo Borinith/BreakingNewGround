@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { BaseEntityService } from '../base-entity/base-entity.service';
 import { MedicineBodyType } from './medicine-body-type.model';
 

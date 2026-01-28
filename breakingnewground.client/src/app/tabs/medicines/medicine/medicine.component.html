@@ -260,7 +260,7 @@
         <ng-container matColumnDef="delete">
           <mat-header-cell *matHeaderCellDef></mat-header-cell>
           <mat-cell *matCellDef="let medicine" class="delete-cell">
-            <button mat-icon-button color="warn" (click)="deleteItem(medicine.id)">
+            <button mat-icon-button color="warn" (click)="openDeleteConfirm(medicine.id)">
               <mat-icon>close</mat-icon>
             </button>
           </mat-cell>
