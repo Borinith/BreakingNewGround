@@ -153,10 +153,18 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     this.destroy$.complete();
   }
 
+  private hasValue(v: unknown): boolean {
+    return v !== null && v !== undefined && String(v).trim() !== '';
+  }
+
+  private isSpecificSelection(v: unknown): boolean {
+    return this.hasValue(v) && v !== 0;
+  }
+
   private buildFilters(values: any): RequestFilter[] {
     const out: RequestFilter[] = [];
 
-    if (values.id && values.id.toString().trim() !== '') {
+    if (this.hasValue(values.id)) {
       out.push({
         columnName: 'Id',
         valueType: ValueTypeEnum.Long,
@@ -165,7 +173,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (values.name && values.name.toString().trim() !== '') {
+    if (this.hasValue(values.name)) {
       out.push({
         columnName: 'Name',
         valueType: ValueTypeEnum.String,
@@ -174,7 +182,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (values.expirationDate && values.expirationDate.toString().trim() !== '') {
+    if (this.hasValue(values.expirationDate)) {
       out.push({
         columnName: 'ExpirationDate',
         valueType: ValueTypeEnum.DateTime,
@@ -183,7 +191,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (values.medicineBodyType && values.medicineBodyType.toString().trim() !== '') {
+    if (this.isSpecificSelection(values.medicineBodyType)) {
       out.push({
         columnName: 'BodyTypeId',
         valueType: ValueTypeEnum.Long,
@@ -192,7 +200,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (values.medicineType && values.medicineType.toString().trim() !== '') {
+    if (this.isSpecificSelection(values.medicineType)) {
       out.push({
         columnName: 'TypeId',
         valueType: ValueTypeEnum.Long,
@@ -201,7 +209,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (values.count && values.count.toString().trim() !== '') {
+    if (this.hasValue(values.count)) {
       out.push({
         columnName: 'Count',
         valueType: ValueTypeEnum.Integer,
@@ -210,7 +218,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (values.comment && values.comment.toString().trim() !== '') {
+    if (this.hasValue(values.comment)) {
       out.push({
         columnName: 'Comment',
         valueType: ValueTypeEnum.String,
