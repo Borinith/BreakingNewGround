@@ -1,6 +1,7 @@
 import { afterNextRender, AfterViewInit, ChangeDetectorRef, Component, Injector } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { catchError, forkJoin, of, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { BaseEntityComponent } from '../base-entity/base-entity.component';
 
@@ -64,17 +65,14 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
 
   loadAllData() {
     this.isLoadingMedicine = true;
-
-    // Форма уже инициализирована значением "Все" (id=0), а массивы типов уже
-    // содержат эту опцию-заглушку. Поэтому стрим лекарств можно запустить
-    // немедленно — он пошлёт запрос без фильтра по типам параллельно со
-    // справочниками, а не после них.
     this.subscribeToMedicinesData();
 
     forkJoin({
       medicineBodyTypes: this.getDataOnce(this.medicineBodyTypeService),
       medicineTypes: this.getDataOnce(this.medicineTypeService)
-    }).subscribe({
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
       next: ({ medicineBodyTypes, medicineTypes }) => {
         const allBodyType: MedicineBodyType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
         const allType: MedicineType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };

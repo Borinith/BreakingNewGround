@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { EMPTY } from 'rxjs';
 import { filter, switchMap } from 'rxjs/operators';
@@ -29,7 +30,8 @@ export class AppComponent {
           }
 
           return EMPTY;
-        })
+        }),
+        takeUntilDestroyed()
       )
       .subscribe();
   }

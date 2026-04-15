@@ -28,7 +28,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
 
   // subjects for streaming events
   private dataSubscription?: Subscription;
-  private destroy$ = new Subject<void>();
+  protected destroy$ = new Subject<void>();
   private resetPage$ = new Subject<void>();
 
   @ViewChild(MatSort) private set matSort(ms: MatSort | null) {
@@ -284,11 +284,14 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   }
 
   openDeleteConfirm(id: number) {
-    this.confirmDialogService.openConfirmDialog().afterClosed().subscribe(result => {
-      if (result) {
-        this.deleteItem(id);
-      }
-    });
+    this.confirmDialogService.openConfirmDialog()
+      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(result => {
+        if (result) {
+          this.deleteItem(id);
+        }
+      });
   }
 
   deleteItem(id: number) {
