@@ -25,8 +25,11 @@ import { MedicineService } from './medicine.service';
 
 export class MedicineComponent extends BaseEntityComponent<Medicine> implements AfterViewInit {
 
-  medicineBodyTypes: MedicineBodyType[] = [];
-  medicineTypes: MedicineType[] = [];
+  private static readonly ALL_OPTION_ID = 0;
+  private static readonly ALL_OPTION_NAME = 'Все';
+
+  medicineBodyTypes: MedicineBodyType[] = [{ id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME }];
+  medicineTypes: MedicineType[] = [{ id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME }];
   override originalItems: Medicine[] = [];
 
   isLoadingMedicine = true;
@@ -46,8 +49,8 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
         id: new FormControl(''),
         name: new FormControl(''),
         expirationDate: new FormControl(''),
-        medicineBodyType: new FormControl(''),
-        medicineType: new FormControl(''),
+        medicineBodyType: new FormControl<number>(MedicineComponent.ALL_OPTION_ID),
+        medicineType: new FormControl<number>(MedicineComponent.ALL_OPTION_ID),
         count: new FormControl('', [Validators.min(0)]),
         comment: new FormControl('')
       }),
@@ -62,21 +65,22 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   loadAllData() {
     this.isLoadingMedicine = true;
 
+    // Форма уже инициализирована значением "Все" (id=0), а массивы типов уже
+    // содержат эту опцию-заглушку. Поэтому стрим лекарств можно запустить
+    // немедленно — он пошлёт запрос без фильтра по типам параллельно со
+    // справочниками, а не после них.
+    this.subscribeToMedicinesData();
+
     forkJoin({
       medicineBodyTypes: this.getDataOnce(this.medicineBodyTypeService),
       medicineTypes: this.getDataOnce(this.medicineTypeService)
     }).subscribe({
       next: ({ medicineBodyTypes, medicineTypes }) => {
-        const all = 'Все';
-        this.medicineBodyTypes = medicineBodyTypes.items;
-        this.medicineBodyTypes.unshift({ id: 0, name: all });
-        this.filterForm.patchValue({ medicineBodyType: this.medicineBodyTypes[0].id });
+        const allBodyType: MedicineBodyType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
+        const allType: MedicineType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
+        this.medicineBodyTypes = [allBodyType, ...medicineBodyTypes.items];
+        this.medicineTypes = [allType, ...medicineTypes.items];
 
-        this.medicineTypes = medicineTypes.items;
-        this.medicineTypes.unshift({ id: 0, name: all });
-        this.filterForm.patchValue({ medicineType: this.medicineTypes[0].id });
-
-        this.subscribeToMedicinesData();
         this.isLoadingMedicine = false;
         this.cdr.detectChanges();
       }
