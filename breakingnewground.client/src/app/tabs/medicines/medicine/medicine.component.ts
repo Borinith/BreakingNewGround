@@ -131,6 +131,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     if (this.isValidItem(item)) {
       this.service.update(item).subscribe({
         next: () => {
+          this.refreshOriginal(item);
           this.flashUpdatedId(item.id);
         },
         error: err => {

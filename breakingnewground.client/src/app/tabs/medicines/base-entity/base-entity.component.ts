@@ -280,6 +280,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       this.service.update(item)
         .subscribe({
           next: () => {
+            this.refreshOriginal(item);
             this.flashUpdatedId((item as any).id);
           },
           error: err => {
@@ -287,6 +288,14 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
             this.flashErrorId((item as any).id);
           }
         });
+    }
+  }
+
+  protected refreshOriginal(item: T): void {
+    const id = (item as any).id;
+    const idx = this.originalItems.findIndex(x => x.id === id);
+    if (idx !== -1) {
+      this.originalItems[idx] = { ...item };
     }
   }
 
