@@ -73,16 +73,16 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-      next: ({ medicineBodyTypes, medicineTypes }) => {
-        const allBodyType: MedicineBodyType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
-        const allType: MedicineType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
-        this.medicineBodyTypes = [allBodyType, ...medicineBodyTypes.items];
-        this.medicineTypes = [allType, ...medicineTypes.items];
+        next: ({ medicineBodyTypes, medicineTypes }) => {
+          const allBodyType: MedicineBodyType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
+          const allType: MedicineType = { id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME };
+          this.medicineBodyTypes = [allBodyType, ...medicineBodyTypes.items];
+          this.medicineTypes = [allType, ...medicineTypes.items];
 
-        this.isLoadingMedicine = false;
-        this.cdr.detectChanges();
-      }
-    });
+          this.isLoadingMedicine = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   private getDataOnce<T>(service: BaseEntityService<T>) {
@@ -131,29 +131,11 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
     if (this.isValidItem(item)) {
       this.service.update(item).subscribe({
         next: () => {
-          this.updatedId = item.id;
-          this.cdr.detectChanges();
-
-          setTimeout(() => {
-            this.updatedId = null;
-            this.cdr.detectChanges();
-
-            /*if (this.updateSubscription) {
-              this.updateSubscription.unsubscribe();
-            }
-
-            this.updateSubscription = this.setupDataStreamAndGetData(this.service, this.sort!, this.paginator!)
-              .subscribe(medicines => {
-                this.items = medicines.items;
-                this.originalItems = medicines.items.map(item => ({ ...item }));
-                this.total = medicines.total;
-                this.cdr.detectChanges();
-              });*/
-          }, 1000);
+          this.flashUpdatedId(item.id);
         },
         error: err => {
           console.error('Update error', err);
-          this.showError(item);
+          this.flashErrorId(item.id);
         }
       });
     }
@@ -162,7 +144,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
   private isValidItem(item: Medicine): boolean {
     if (!item || !item.name || item.name.trim() === '') {
       console.warn('Invalid data');
-      this.showError(item);
+      this.flashErrorId(item.id);
       return false;
     }
 

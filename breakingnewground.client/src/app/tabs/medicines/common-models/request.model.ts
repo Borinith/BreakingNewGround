@@ -20,6 +20,16 @@ export interface RequestOrder {
   joinTableColumnName?: string | null;
 }
 
+export interface FilterFormValues {
+  id?: unknown;
+  name?: unknown;
+  expirationDate?: unknown;
+  medicineBodyType?: unknown;
+  medicineType?: unknown;
+  count?: unknown;
+  comment?: unknown;
+}
+
 export enum ValueTypeEnum {
   Integer = 0,
   Long = 1,

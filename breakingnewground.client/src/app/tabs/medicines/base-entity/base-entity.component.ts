@@ -2,12 +2,12 @@ import { AfterViewInit, ChangeDetectorRef, Directive, OnDestroy, ViewChild } fro
 import { FormGroup } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { EMPTY, Observable, Subject, Subscription, combineLatest, merge, of } from 'rxjs';
+import { MatSort, Sort } from '@angular/material/sort';
+import { EMPTY, Observable, Subject, Subscription, combineLatest, merge, of, timer } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { PagedResult } from '../common-models/paged-result.model';
-import { GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
+import { FilterFormValues, GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
 
 @Directive()
@@ -163,14 +163,14 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     return this.hasValue(v) && v !== 0;
   }
 
-  private buildFilters(values: any): RequestFilter[] {
+  private buildFilters(values: FilterFormValues): RequestFilter[] {
     const out: RequestFilter[] = [];
 
     if (this.hasValue(values.id)) {
       out.push({
         columnName: 'Id',
         valueType: ValueTypeEnum.Long,
-        value: values.id.toString(),
+        value: String(values.id),
         comparison: RequestComparisonEnum.Equal
       });
     }
@@ -179,7 +179,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       out.push({
         columnName: 'Name',
         valueType: ValueTypeEnum.String,
-        value: values.name.toString(),
+        value: String(values.name),
         comparison: RequestComparisonEnum.TextStartsWith
       });
     }
@@ -188,7 +188,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       out.push({
         columnName: 'ExpirationDate',
         valueType: ValueTypeEnum.DateTime,
-        value: values.expirationDate,
+        value: String(values.expirationDate),
         comparison: RequestComparisonEnum.Equal //todo
       });
     }
@@ -197,7 +197,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       out.push({
         columnName: 'BodyTypeId',
         valueType: ValueTypeEnum.Long,
-        value: values.medicineBodyType.toString(),
+        value: String(values.medicineBodyType),
         comparison: RequestComparisonEnum.Equal
       });
     }
@@ -206,7 +206,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       out.push({
         columnName: 'TypeId',
         valueType: ValueTypeEnum.Long,
-        value: values.medicineType.toString(),
+        value: String(values.medicineType),
         comparison: RequestComparisonEnum.Equal
       });
     }
@@ -215,7 +215,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       out.push({
         columnName: 'Count',
         valueType: ValueTypeEnum.Integer,
-        value: values.count.toString(),
+        value: String(values.count),
         comparison: RequestComparisonEnum.Equal
       });
     }
@@ -224,7 +224,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       out.push({
         columnName: 'Comment',
         valueType: ValueTypeEnum.String,
-        value: values.comment.toString(),
+        value: String(values.comment),
         comparison: RequestComparisonEnum.TextStartsWith
       });
     }
@@ -232,7 +232,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     return out;
   }
 
-  private buildOrder(sort: any): RequestOrder | null {
+  private buildOrder(sort: Partial<Sort> | null): RequestOrder | null {
     if (!sort || !sort.active || sort.direction === '') {
       return null;
     }
@@ -280,20 +280,11 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       this.service.update(item)
         .subscribe({
           next: () => {
-            this.updatedId = (item as any).id;
-            this.cdr.detectChanges();
-
-            setTimeout(() => {
-              this.updatedId = null;
-              this.cdr.detectChanges();
-
-              this.initialized = false;
-              //this.getAllItems();
-            }, 1000);
+            this.flashUpdatedId((item as any).id);
           },
           error: err => {
             console.error('Update error', err);
-            this.showError(item);
+            this.flashErrorId((item as any).id);
           }
         });
     }
@@ -327,7 +318,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   private isValidAndNewItem(item: any): boolean {
     if (!item || !item.name || item.name.trim() === '') {
       console.warn('Invalid data');
-      this.showError(item);
+      this.flashErrorId(item.id);
       return false;
     }
 
@@ -339,13 +330,23 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     return true;
   }
 
-  protected showError(item: any): void {
-    this.errorId = item.id;
+  protected flashUpdatedId(id: number): void {
+    this.updatedId = id;
     this.cdr.detectChanges();
 
-    setTimeout(() => {
+    timer(1000).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updatedId = null;
+      this.cdr.detectChanges();
+    });
+  }
+
+  protected flashErrorId(id: number): void {
+    this.errorId = id;
+    this.cdr.detectChanges();
+
+    timer(1000).pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.errorId = null;
       this.cdr.detectChanges();
-    }, 1000);
+    });
   }
 }
