@@ -181,14 +181,14 @@
         <ng-container matColumnDef="expirationDate">
           <mat-header-cell *matHeaderCellDef mat-sort-header="ExpirationDate">
             <div class="header-filter-wrapper">
-              <mat-form-field appearance="outline" class="small" (click)="$event.stopPropagation()">
-                <input matInput
-                       [matDatepicker]="picker"
-                       placeholder="Срок годности"
-                       formControlName="expirationDate">
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
+              <mat-checkbox #freshnessCb
+                            class="freshness-checkbox"
+                            color="primary"
+                            [checked]="filterForm.get('expirationDate')?.value === FreshnessFilterEnum.Fresh"
+                            [indeterminate]="filterForm.get('expirationDate')?.value === FreshnessFilterEnum.Expired"
+                            (click)="cycleFreshness($event, freshnessCb)">
+                Свежие
+              </mat-checkbox>
             </div>
           </mat-header-cell>
           <mat-cell *matCellDef="let medicine">

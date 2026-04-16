@@ -1,5 +1,6 @@
 import { afterNextRender, AfterViewInit, ChangeDetectorRef, Component, Injector } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { catchError, forkJoin, of, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -14,6 +15,7 @@ import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 import { formatISO } from 'date-fns/formatISO';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { BaseEntityService } from '../base-entity/base-entity.service';
+import { FreshnessFilterEnum } from '../common-models/request.model';
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
 
@@ -28,6 +30,8 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
 
   private static readonly ALL_OPTION_ID = 0;
   private static readonly ALL_OPTION_NAME = 'Все';
+
+  readonly FreshnessFilterEnum = FreshnessFilterEnum;
 
   medicineBodyTypes: MedicineBodyType[] = [{ id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME }];
   medicineTypes: MedicineType[] = [{ id: MedicineComponent.ALL_OPTION_ID, name: MedicineComponent.ALL_OPTION_NAME }];
@@ -49,7 +53,7 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
       new FormGroup({
         id: new FormControl(''),
         name: new FormControl(''),
-        expirationDate: new FormControl(''),
+        expirationDate: new FormControl<FreshnessFilterEnum>(FreshnessFilterEnum.All),
         medicineBodyType: new FormControl<number>(MedicineComponent.ALL_OPTION_ID),
         medicineType: new FormControl<number>(MedicineComponent.ALL_OPTION_ID),
         count: new FormControl('', [Validators.min(0)]),
@@ -116,6 +120,20 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
 
   formatDate(e: any): void {
     this.newItem.expirationDate = formatISO(e.target.value, { representation: 'date' });
+  }
+
+  cycleFreshness(event: MouseEvent, cb: MatCheckbox): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const ctrl = this.filterForm.get('expirationDate')!;
+    const current = ctrl.value as FreshnessFilterEnum;
+    const next =
+      current === FreshnessFilterEnum.All ? FreshnessFilterEnum.Fresh :
+      current === FreshnessFilterEnum.Fresh ? FreshnessFilterEnum.Expired :
+      FreshnessFilterEnum.All;
+    ctrl.setValue(next);
+    cb.checked = next === FreshnessFilterEnum.Fresh;
+    cb.indeterminate = next === FreshnessFilterEnum.Expired;
   }
 
   onDateChange(medicine: Medicine, date: Date | null) {

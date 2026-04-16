@@ -53,3 +53,9 @@ export enum OrderByEnum {
   Ascending = 0,
   Descending = 1
 }
+
+export enum FreshnessFilterEnum {
+  All = 0,
+  Fresh = 1,
+  Expired = 2
+}

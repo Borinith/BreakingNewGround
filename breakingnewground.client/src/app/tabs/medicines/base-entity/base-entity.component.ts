@@ -3,11 +3,12 @@ import { FormGroup } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
+import { formatISO } from 'date-fns/formatISO';
 import { EMPTY, Observable, Subject, Subscription, combineLatest, merge, of, timer } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { PagedResult } from '../common-models/paged-result.model';
-import { FilterFormValues, GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
+import { FilterFormValues, FreshnessFilterEnum, GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
 import { BaseEntityService } from './base-entity.service';
 
 @Directive()
@@ -184,12 +185,16 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
       });
     }
 
-    if (this.hasValue(values.expirationDate)) {
+    if (values.expirationDate === FreshnessFilterEnum.Fresh
+      || values.expirationDate === FreshnessFilterEnum.Expired) {
+      const today = formatISO(new Date(), { representation: 'date' });
       out.push({
         columnName: 'ExpirationDate',
         valueType: ValueTypeEnum.DateTime,
-        value: String(values.expirationDate),
-        comparison: RequestComparisonEnum.Equal //todo
+        value: today,
+        comparison: values.expirationDate === FreshnessFilterEnum.Fresh
+          ? RequestComparisonEnum.GreaterThanOrEqual
+          : RequestComparisonEnum.LessThan
       });
     }
 

@@ -108,6 +108,10 @@ mat-form-field.small ::ng-deep .mat-mdc-select-placeholder {
   flex-basis: auto;
 }
 
+.mat-column-expirationDate .header-filter-wrapper {
+  text-align: center;
+}
+
 .delete-cell button {
   display: flex;
   align-items: center;
