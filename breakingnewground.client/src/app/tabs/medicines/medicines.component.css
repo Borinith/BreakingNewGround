@@ -133,13 +133,17 @@ mat-table {
   margin-top: 24px;
   background: #fff;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: clip;
 }
 
 /* Заголовки таблицы */
 .mat-header-row {
   background-color: #f5f5f5;
   font-weight: 500;
+}
+
+.mat-mdc-header-cell {
+  background-color: #f5f5f5;
 }
 
 .mat-header-cell {

@@ -98,6 +98,10 @@ mat-form-field.small ::ng-deep .mat-mdc-select-placeholder {
   flex-basis: 16%;
 }
 
+.mat-column-delete {
+  flex-basis: 6%;
+}
+
 .delete-cell {
   text-align: right;
   padding-right: 8px;

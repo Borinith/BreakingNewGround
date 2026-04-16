@@ -266,7 +266,7 @@
           </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="['id', 'name', 'medicineBodyType', 'medicineType', 'expirationDate', 'count', 'comment', 'delete']"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="['id', 'name', 'medicineBodyType', 'medicineType', 'expirationDate', 'count', 'comment', 'delete']; sticky: true"></mat-header-row>
         <mat-row *matRowDef="let row; columns: ['id', 'name', 'medicineBodyType', 'medicineType', 'expirationDate', 'count', 'comment', 'delete']"
                  [class.updated-row]="row.id === updatedId"
                  [class.error-row]="row.id === errorId">
