@@ -147,17 +147,26 @@ export class MedicineComponent extends BaseEntityComponent<Medicine> implements 
 
   override updateItem(item: Medicine) {
     if (this.isValidItem(item)) {
-      this.service.update(item).subscribe({
-        next: () => {
-          this.refreshOriginal(item);
-          this.flashUpdatedId(item.id);
-        },
-        error: err => {
-          console.error('Update error', err);
-          this.flashErrorId(item.id);
-        }
-      });
+      this.service.update(item)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.refreshOriginal(item);
+            this.flashUpdatedId(item.id);
+          },
+          error: err => {
+            console.error('Update error', err);
+            this.flashErrorId(item.id);
+          }
+        });
     }
+  }
+
+  override ngOnDestroy() {
+    if (this.medicineDataSubscription) {
+      this.medicineDataSubscription.unsubscribe();
+    }
+    super.ngOnDestroy();
   }
 
   private isValidItem(item: Medicine): boolean {

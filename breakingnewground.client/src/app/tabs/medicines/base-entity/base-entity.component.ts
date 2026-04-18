@@ -154,6 +154,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
 
     this.destroy$.next();
     this.destroy$.complete();
+    this.resetPage$.complete();
   }
 
   private hasValue(v: unknown): boolean {
@@ -266,23 +267,26 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
 
   addItem() {
     if (this.isValidAndNewItem(this.newItem)) {
-      this.service.create(this.newItem).subscribe({
-        next: () => {
-          this.newItem = {} as T;
-          this.expansionPanel?.close();
-          this.initialized = false;
-          this.getAllItems();
-        },
-        error: err => {
-          console.error('Create error', err);
-        }
-      });
+      this.service.create(this.newItem)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.newItem = {} as T;
+            this.expansionPanel?.close();
+            this.initialized = false;
+            this.getAllItems();
+          },
+          error: err => {
+            console.error('Create error', err);
+          }
+        });
     }
   }
 
   updateItem(item: T) {
     if (this.isValidAndNewItem(item)) {
       this.service.update(item)
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.refreshOriginal(item);
@@ -316,17 +320,19 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   }
 
   deleteItem(id: number) {
-    this.service.delete(id).subscribe({
-      next: isDeleted => {
-        if (isDeleted) {
-          this.initialized = false;
-          this.getAllItems();
+    this.service.delete(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: isDeleted => {
+          if (isDeleted) {
+            this.initialized = false;
+            this.getAllItems();
+          }
+        },
+        error: err => {
+          console.error('Delete error', err);
         }
-      },
-      error: err => {
-        console.error('Delete error', err);
-      }
-    });
+      });
   }
 
   private isValidAndNewItem(item: any): boolean {
