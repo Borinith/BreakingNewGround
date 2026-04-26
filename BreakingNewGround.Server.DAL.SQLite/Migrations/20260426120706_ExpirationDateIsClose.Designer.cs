@@ -3,6 +3,7 @@ using System;
 using BreakingNewGround.Server.DAL.SQLite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BreakingNewGround.Server.DAL.SQLite.Migrations
 {
     [DbContext(typeof(MedicinesContext))]
-    partial class MedicinesContextModelSnapshot : ModelSnapshot
+    [Migration("20260426120706_ExpirationDateIsClose")]
+    partial class ExpirationDateIsClose
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
