@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace BreakingNewGround.Server
+namespace BreakingNewGround.Server.Services
 {
     public class GenericCrudService<T> : IGenericCrudService<T>
         where T : class

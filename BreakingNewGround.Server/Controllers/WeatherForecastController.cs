@@ -1,9 +1,10 @@
-using BreakingNewGround.Server.Models;
+using BreakingNewGround.Server.Models.Weather;
+using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BreakingNewGround.Server.Controllers
 {
@@ -12,41 +13,29 @@ namespace BreakingNewGround.Server.Controllers
     [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries =
-        [
-            "Freezing",
-            "Bracing",
-            "Chilly",
-            "Cool",
-            "Mild",
-            "Warm",
-            "Balmy",
-            "Hot",
-            "Sweltering",
-            "Scorching"
-        ];
-
+        private readonly IWeatherForecastService _service;
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(
+            IWeatherForecastService service,
+            ILogger<WeatherForecastController> logger)
         {
+            _service = service;
             _logger = logger;
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetWeatherForecast()
+        public Task<WeatherForecast> GetWeatherForecast([FromQuery] string? city, CancellationToken cancellationToken)
         {
-            return Ok(Enumerable
-                .Range(1, 5)
-                .Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-                    })
-                .ToArray());
+            return _service.GetWeatherForecastAsync(city, cancellationToken);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult GetCities()
+        {
+            return Ok(_service.GetCities());
         }
     }
 }

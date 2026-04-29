@@ -1,6 +1,7 @@
-using BreakingNewGround.Server;
 using BreakingNewGround.Server.DAL.AzureSQL.Data;
 using BreakingNewGround.Server.Models;
+using BreakingNewGround.Server.Models.Weather;
+using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +27,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<MedicinesContext>(options =>
     options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL"), o => o.EnableRetryOnFailure(3)));
 
+builder.Services.AddHttpClient<IWeatherForecastService, WeatherForecastService>();
 builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(x =>
@@ -38,6 +40,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(x =>
     })
     .AddEntityFrameworkStores<MedicinesContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<WeatherSettings>(builder.Configuration.GetSection("Weather"));
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 builder.Services.Configure<JwtSettings>(jwtSection);

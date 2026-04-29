@@ -19,6 +19,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
+      { path: 'weatherforecast', component: WeatherForecastComponent },
       {
         path: 'medicines',
         component: MedicinesComponent,
@@ -30,8 +31,7 @@ const routes: Routes = [
           { path: '**', redirectTo: 'medicines' }
         ]
       },
-      { path: 'weatherforecast', component: WeatherForecastComponent },
-      { path: '', redirectTo: 'medicines', pathMatch: 'full' },
+      { path: '', redirectTo: 'weatherforecast', pathMatch: 'full' },
     ]
   },
   { path: '', redirectTo: '/tabs', pathMatch: 'full' },

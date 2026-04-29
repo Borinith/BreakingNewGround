@@ -4,7 +4,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 interface WeatherForecast {
   date: string;
   temperatureC: number;
-  temperatureF: number;
   summary: string;
 }
 
@@ -25,7 +24,8 @@ export class WeatherForecastComponent implements OnInit {
   }
 
   getForecasts() {
-    this.http.get<WeatherForecast[]>('/api/WeatherForecast/GetWeatherForecast').subscribe(
+    this.http.get<WeatherForecast[]>('/api/WeatherForecast/GetWeatherForecast')
+    .subscribe(
       (result) => {
         this.forecasts = result;
         this.cdr.detectChanges();
