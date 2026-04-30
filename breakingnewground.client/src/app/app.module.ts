@@ -24,8 +24,8 @@ import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.c
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { TabsComponent } from './tabs/tabs.component';
-import { WeatherForecastComponent } from './tabs/weatherforecast/weatherforecast.component';
 import { MedicinesModule } from './tabs/medicines/medicines.module'
+import { WeatherForecastModule } from './tabs/weatherforecast/weatherforecast.module'
 
 export function tokenGetter() {
   return localStorage.getItem('jwt');
@@ -38,8 +38,7 @@ export function tokenGetter() {
     ConfirmDialogComponent,
     LoginComponent,
     RegisterComponent,
-    TabsComponent,
-    WeatherForecastComponent
+    TabsComponent
   ],
   imports: [
     BrowserModule,
@@ -56,6 +55,7 @@ export function tokenGetter() {
     MatTabsModule,
     AppRoutingModule,
     MedicinesModule,
+    WeatherForecastModule,
     JwtModule.forRoot({ config: { tokenGetter } })
   ],
   providers: [

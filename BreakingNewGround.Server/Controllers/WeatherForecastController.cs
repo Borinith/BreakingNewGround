@@ -1,4 +1,4 @@
-using BreakingNewGround.Server.Models.Weather;
+﻿using BreakingNewGround.Server.Models.Weather;
 using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +26,9 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public Task<WeatherForecast> GetWeatherForecast([FromQuery] string? city, CancellationToken cancellationToken)
+        public Task<WeatherForecast> GetWeatherForecast([FromQuery] string? city, [FromQuery] bool forceRefresh, CancellationToken cancellationToken)
         {
-            return _service.GetWeatherForecastAsync(city, cancellationToken);
+            return _service.GetWeatherForecastAsync(city, forceRefresh, cancellationToken);
         }
 
         [HttpGet]

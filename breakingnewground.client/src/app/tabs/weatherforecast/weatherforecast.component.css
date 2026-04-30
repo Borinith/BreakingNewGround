@@ -1,0 +1,136 @@
+.weather-wrapper {
+  position: relative;
+  padding: 20px;
+}
+
+.weather-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.city-select {
+  width: 240px;
+}
+
+.city-select ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.last-updated {
+  margin-left: auto;
+  color: #666;
+  font-size: 14px;
+}
+
+.error-card {
+  margin-bottom: 16px;
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.weather-content.loading {
+  filter: blur(0.5px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.current-card {
+  margin-bottom: 24px;
+}
+
+.current-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+}
+
+.current-temp {
+  font-size: 48px;
+  font-weight: 300;
+  margin-right: 16px;
+}
+
+.current-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.current-detail mat-icon {
+  color: #555;
+}
+
+.daily-title {
+  margin: 16px 0 12px;
+  font-weight: 500;
+}
+
+.daily-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.daily-card {
+  padding: 8px;
+}
+
+.daily-date {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.daily-date-num {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.daily-temp {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.temp-max {
+  font-weight: 500;
+}
+
+.temp-min {
+  color: #888;
+}
+
+.daily-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.daily-row mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #666;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 50;
+}

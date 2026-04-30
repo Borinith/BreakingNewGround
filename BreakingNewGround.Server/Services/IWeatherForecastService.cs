@@ -1,4 +1,4 @@
-using BreakingNewGround.Server.Models.Weather;
+﻿using BreakingNewGround.Server.Models.Weather;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +9,6 @@ namespace BreakingNewGround.Server.Services
     {
         IReadOnlyList<string> GetCities();
 
-        Task<WeatherForecast> GetWeatherForecastAsync(string? city, CancellationToken cancellationToken);
+        Task<WeatherForecast> GetWeatherForecastAsync(string? city, bool forceRefresh, CancellationToken cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-using BreakingNewGround.Server.DAL.AzureSQL.Data;
+﻿using BreakingNewGround.Server.DAL.AzureSQL.Data;
 using BreakingNewGround.Server.Models;
 using BreakingNewGround.Server.Models.Weather;
 using BreakingNewGround.Server.Services;

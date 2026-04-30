@@ -1,8 +1,9 @@
-using BreakingNewGround.Server.Models.Weather;
+﻿using BreakingNewGround.Server.Models.Weather;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -24,6 +25,13 @@ namespace BreakingNewGround.Server.Services
             "&wind_speed_unit=ms" +
             "&forecast_days=7" +
             "&timezone=auto";
+
+        private static readonly FrozenDictionary<string, string> UnitTranslations = new Dictionary<string, string>()
+        {
+            ["m/s"] = "м/с",
+            ["hPa"] = "гПа",
+            ["mm"] = "мм"
+        }.ToFrozenDictionary();
 
         private readonly HybridCache _cache;
         private readonly HttpClient _httpClient;
@@ -47,12 +55,18 @@ namespace BreakingNewGround.Server.Services
             return _settings.Cities.Select(c => c.Name).ToList();
         }
 
-        public async Task<WeatherForecast> GetWeatherForecastAsync(string? cityName, CancellationToken cancellationToken)
+        public async Task<WeatherForecast> GetWeatherForecastAsync(string? cityName, bool forceRefresh, CancellationToken cancellationToken)
         {
             var city = GetCityByName(cityName);
+            var cacheKey = $"weather_{city.Name}";
+
+            if (forceRefresh)
+            {
+                await _cache.RemoveAsync(cacheKey, cancellationToken);
+            }
 
             return await _cache.GetOrCreateAsync(
-                $"weather_{city.Name}",
+                cacheKey,
                 city,
                 GetDataAsync,
                 new HybridCacheEntryOptions
@@ -104,12 +118,12 @@ namespace BreakingNewGround.Server.Services
 
                 daily[d] = new DailyWeather(
                     DateOnly.Parse(r.Daily.Time[d], CultureInfo.InvariantCulture),
-                    r.Daily.Temperature2mMin[d],
-                    r.Daily.Temperature2mMax[d],
-                    r.Daily.PrecipitationSum[d],
-                    r.Daily.WindSpeed10mMax[d],
-                    r.Daily.UvIndexMax[d],
-                    pressure,
+                    Round(r.Daily.Temperature2mMin[d]),
+                    Round(r.Daily.Temperature2mMax[d]),
+                    Round(r.Daily.PrecipitationSum[d]),
+                    Round(r.Daily.WindSpeed10mMax[d]),
+                    Round(r.Daily.UvIndexMax[d]),
+                    Round(pressure),
                     DateTime.Parse(r.Daily.Sunrise[d], CultureInfo.InvariantCulture),
                     DateTime.Parse(r.Daily.Sunset[d], CultureInfo.InvariantCulture));
             }
@@ -118,18 +132,28 @@ namespace BreakingNewGround.Server.Services
                 cityName,
                 DateTime.UtcNow,
                 new WeatherUnits(
-                    r.CurrentUnits.Temperature2m,
-                    r.CurrentUnits.WindSpeed10m,
-                    r.CurrentUnits.Precipitation,
-                    r.CurrentUnits.PressureMsl),
+                    Translate(r.CurrentUnits.Temperature2m),
+                    Translate(r.CurrentUnits.WindSpeed10m),
+                    Translate(r.CurrentUnits.Precipitation),
+                    Translate(r.CurrentUnits.PressureMsl)),
                 new CurrentWeather(
-                    r.Current.Temperature2m,
-                    r.Current.WindSpeed10m,
-                    r.Current.Precipitation,
-                    r.Current.PressureMsl,
+                    Round(r.Current.Temperature2m),
+                    Round(r.Current.WindSpeed10m),
+                    Round(r.Current.Precipitation),
+                    Round(r.Current.PressureMsl),
                     daily.Length > 0 ? daily[0].Sunrise : default,
                     daily.Length > 0 ? daily[0].Sunset : default),
                 daily);
+        }
+
+        private static int Round(double value)
+        {
+            return (int)Math.Round(value, MidpointRounding.AwayFromZero);
+        }
+
+        private static string Translate(string unit)
+        {
+            return UnitTranslations.TryGetValue(unit, out var translated) ? translated : unit;
         }
     }
 }

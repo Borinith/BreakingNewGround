@@ -1,4 +1,4 @@
-namespace BreakingNewGround.Server.Models.Weather
+﻿namespace BreakingNewGround.Server.Models.Weather
 {
     public class WeatherSettings
     {

@@ -3,10 +3,10 @@
 namespace BreakingNewGround.Server.Models.Weather
 {
     public record struct CurrentWeather(
-        double Temperature,
-        double WindSpeed,
-        double Precipitation,
-        double Pressure,
+        int Temperature,
+        int WindSpeed,
+        int Precipitation,
+        int Pressure,
         DateTime Sunrise,
         DateTime Sunset);
 }
