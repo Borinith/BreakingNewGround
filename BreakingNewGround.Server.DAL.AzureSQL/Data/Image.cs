@@ -19,6 +19,8 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         [StringLength(50)]
         public required string ContentType { get; set; }
 
+        public bool IsFavorite { get; set; }
+
         public int Width { get; set; }
 
         public int Height { get; set; }

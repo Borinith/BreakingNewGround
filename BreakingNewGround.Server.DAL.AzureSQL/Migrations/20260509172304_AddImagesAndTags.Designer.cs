@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260509121255_AddImagesAndTags")]
+    [Migration("20260509172304_AddImagesAndTags")]
     partial class AddImagesAndTags
     {
         /// <inheritdoc />
@@ -108,6 +108,9 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
 
                     b.Property<int>("Height")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsFavorite")
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("Original")
                         .IsRequired()

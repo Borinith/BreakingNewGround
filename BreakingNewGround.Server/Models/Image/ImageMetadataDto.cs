@@ -6,6 +6,7 @@ namespace BreakingNewGround.Server.Models.Image
         Guid Id,
         string OriginalFileName,
         string ContentType,
+        bool IsFavorite,
         int Width,
         int Height,
         int SizeBytes,

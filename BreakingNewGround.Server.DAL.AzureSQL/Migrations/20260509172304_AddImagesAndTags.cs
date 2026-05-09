@@ -18,6 +18,7 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OriginalFileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     ContentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsFavorite = table.Column<bool>(type: "bit", nullable: false),
                     Width = table.Column<int>(type: "int", nullable: false),
                     Height = table.Column<int>(type: "int", nullable: false),
                     SizeBytes = table.Column<int>(type: "int", nullable: false),

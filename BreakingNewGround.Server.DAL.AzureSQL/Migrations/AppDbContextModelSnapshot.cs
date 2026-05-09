@@ -106,6 +106,9 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsFavorite")
+                        .HasColumnType("bit");
+
                     b.Property<byte[]>("Original")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
