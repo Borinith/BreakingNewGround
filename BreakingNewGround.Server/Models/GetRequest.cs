@@ -1,6 +1,6 @@
 ﻿namespace BreakingNewGround.Server.Models
 {
-    public record struct GetRequest(
+    public readonly record struct GetRequest(
         RequestFilter[]? Filters = null,
         RequestOrder? Order = null,
         int? Skip = null,

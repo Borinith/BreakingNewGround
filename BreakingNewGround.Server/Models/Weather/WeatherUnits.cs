@@ -1,6 +1,6 @@
 ﻿namespace BreakingNewGround.Server.Models.Weather
 {
-    public record struct WeatherUnits(
+    public readonly record struct WeatherUnits(
         string Temperature,
         string WindSpeed,
         string Precipitation,

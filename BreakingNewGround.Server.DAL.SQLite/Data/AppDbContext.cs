@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BreakingNewGround.Server.DAL.SQLite.Data
 {
-    public class MedicinesContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public MedicinesContext(DbContextOptions<MedicinesContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 

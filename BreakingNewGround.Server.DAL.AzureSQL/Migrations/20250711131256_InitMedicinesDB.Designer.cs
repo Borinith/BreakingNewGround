@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
 {
-    [DbContext(typeof(MedicinesContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20250711131256_InitMedicinesDB")]
     partial class InitMedicinesDB
     {

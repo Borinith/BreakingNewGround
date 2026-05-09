@@ -2,7 +2,7 @@
 
 namespace BreakingNewGround.Server.Models.Weather
 {
-    public record struct WeatherForecast(
+    public readonly record struct WeatherForecast(
         string City,
         DateTime LastUpdatedUtc,
         WeatherUnits Units,

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Data
 {
-    public class MedicinesContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
-        public MedicinesContext(DbContextOptions<MedicinesContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -17,6 +17,10 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         public DbSet<Medicine> Medicines { get; set; }
 
         public DbSet<ExpirationDateIsClose> ExpirationDateIsClose { get; set; }
+
+        public DbSet<Image> Images { get; set; }
+
+        public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

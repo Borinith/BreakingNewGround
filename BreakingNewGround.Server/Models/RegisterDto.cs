@@ -1,4 +1,4 @@
 ﻿namespace BreakingNewGround.Server.Models
 {
-    public record struct RegisterDto(string UserName, string Password);
+    public readonly record struct RegisterDto(string UserName, string Password);
 }
