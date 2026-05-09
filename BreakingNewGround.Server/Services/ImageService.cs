@@ -50,7 +50,6 @@ namespace BreakingNewGround.Server.Services
 
             var image = new ImageEntity
             {
-                Id = Guid.NewGuid(),
                 OriginalFileName = file.FileName,
                 ContentType = file.ContentType,
                 IsFavorite = false,
