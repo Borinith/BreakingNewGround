@@ -26,6 +26,10 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<ExpirationDateIsClose>().ToView("ExpirationDateIsClose");
+
+            modelBuilder.Entity<Image>()
+                .Property(i => i.Id)
+                .HasDefaultValueSql("NEWSEQUENTIALID()");
         }
     }
 }

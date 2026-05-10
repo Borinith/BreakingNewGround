@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260509172304_AddImagesAndTags")]
+    [Migration("20260510104643_AddImagesAndTags")]
     partial class AddImagesAndTags
     {
         /// <inheritdoc />
@@ -94,7 +94,8 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
