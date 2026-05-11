@@ -190,7 +190,7 @@ namespace BreakingNewGround.Server.Services
             _context.Images.Remove(image);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var orphanTags = await _context.Tags
+            /*var orphanTags = await _context.Tags
                 .Where(t => !t.Images.Any())
                 .ToListAsync(cancellationToken);
 
@@ -198,7 +198,7 @@ namespace BreakingNewGround.Server.Services
             {
                 _context.Tags.RemoveRange(orphanTags);
                 await _context.SaveChangesAsync(cancellationToken);
-            }
+            }*/
 
             return true;
         }

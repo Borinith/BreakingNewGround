@@ -26,7 +26,10 @@ namespace BreakingNewGround.Server.Services
 
             var (encoder, contentType) = SelectThumbnailEncoder(image.Metadata.DecodedImageFormat);
 
-            int targetWidth = image.Width <= ThumbnailMaxWidth ? image.Width : ThumbnailMaxWidth;
+            int originalWidth = image.Width;
+            int originalHeight = image.Height;
+
+            int targetWidth = originalWidth <= ThumbnailMaxWidth ? originalWidth : ThumbnailMaxWidth;
 
             image.Mutate(x => x.Resize(new ResizeOptions
             {
@@ -40,8 +43,8 @@ namespace BreakingNewGround.Server.Services
 
             return new ImageProcessingResult
             {
-                Width = image.Width,
-                Height = image.Height,
+                Width = originalWidth,
+                Height = originalHeight,
                 Thumbnail = outputStream.ToArray(),
                 ThumbnailContentType = contentType
             };
