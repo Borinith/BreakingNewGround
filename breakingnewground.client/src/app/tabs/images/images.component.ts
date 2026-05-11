@@ -7,6 +7,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { ConfirmDialogService } from '../../dialog/confirm-dialog/confirm-dialog.service';
 import { ImageMetadata, UploadResult } from './images.model';
@@ -45,6 +46,8 @@ export class ImagesComponent implements OnInit {
     private service: ImagesService,
     private confirmDialogService: ConfirmDialogService,
     private snackBar: MatSnackBar,
+    private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private destroyRef: DestroyRef) { }
 
@@ -53,7 +56,12 @@ export class ImagesComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(() => {
+    ).subscribe(value => {
+      const trimmed = value.trim();
+      this.router.navigate(['/tabs/images'], {
+        queryParams: trimmed ? { tag: trimmed } : {},
+        replaceUrl: true
+      });
       if (this.paginator) {
         this.paginator.pageIndex = 0;
       }
@@ -77,7 +85,12 @@ export class ImagesComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
-    this.loadImages();
+    this.route.queryParamMap.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(params => {
+      const tag = params.get('tag') ?? '';
+      this.searchControl.setValue(tag);
+    });
   }
 
   onPageChange(event: PageEvent): void {

@@ -14,16 +14,22 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
+import { ImageDetailComponent } from './image-detail/image-detail.component';
 import { ImagesComponent } from './images.component';
+import { TagsListComponent } from './tags-list/tags-list.component';
 
 @NgModule({
   declarations: [
-    ImagesComponent
+    ImagesComponent,
+    ImageDetailComponent,
+    TagsListComponent
   ],
   imports: [
     CommonModule,
     HttpClientModule,
     ReactiveFormsModule,
+    RouterModule,
     MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
@@ -38,7 +44,9 @@ import { ImagesComponent } from './images.component';
     MatTooltipModule
   ],
   exports: [
-    ImagesComponent
+    ImagesComponent,
+    ImageDetailComponent,
+    TagsListComponent
   ]
 })
 export class ImagesModule { }

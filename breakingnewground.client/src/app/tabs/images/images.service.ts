@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PagedResult } from '../paged-result.model';
-import { ImageMetadata, UploadResult } from './images.model';
+import { ImageMetadata, Tag, UploadResult } from './images.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +38,14 @@ export class ImagesService {
 
   delete(id: string): Observable<boolean> {
     return this.http.delete<boolean>(`${this.baseUrl}/Delete/${id}`);
+  }
+
+  getById(id: string): Observable<ImageMetadata> {
+    return this.http.get<ImageMetadata>(`${this.baseUrl}/GetById/${id}`);
+  }
+
+  getAllTags(): Observable<Tag[]> {
+    return this.http.get<Tag[]>(`${this.baseUrl}/GetAllTags`);
   }
 
   suggestTags(query: string): Observable<string[]> {

@@ -62,15 +62,22 @@
     </div>
   </mat-expansion-panel>
 
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>Поиск по тегу</mat-label>
-    <input matInput [formControl]="searchControl" placeholder="Введите тег..." />
-    @if (searchControl.value) {
-      <button mat-icon-button matSuffix (click)="searchControl.setValue('')">
-        <mat-icon>close</mat-icon>
-      </button>
-    }
-  </mat-form-field>
+  <div class="search-row">
+    <a mat-stroked-button [routerLink]="['/tabs/images/tags']" class="all-tags-button">
+      <mat-icon>label</mat-icon>
+      Все теги
+    </a>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Поиск по тегу</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Введите тег..." />
+      @if (searchControl.value) {
+        <button mat-icon-button matSuffix (click)="searchControl.setValue('')">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
 
   @if (errorMessage) {
     <mat-card class="error-card">
@@ -86,23 +93,21 @@
     <div class="images-grid">
       @for (image of images; track trackById($index, image)) {
         <mat-card class="image-card">
-          <img class="image-thumb"
-               [src]="thumbnailUrl(image.id)"
-               [alt]="image.originalFileName" />
+          <a class="image-link" [routerLink]="['/tabs/images', image.id]">
+            <img class="image-thumb"
+                 [src]="thumbnailUrl(image.id)"
+                 [alt]="image.originalFileName" />
+          </a>
           <mat-card-content class="image-card-content">
             @if (image.tags.length > 0) {
               <mat-chip-set class="image-tags">
                 @for (tag of image.tags; track tag) {
                   <mat-chip>{{ tag }}</mat-chip>
+                  <!-- <a mat-chip [routerLink]="['/tabs/images']" [queryParams]="{ tag: tag }">{{ tag }}</a> -->
                 }
               </mat-chip-set>
             }
           </mat-card-content>
-          <mat-card-actions class="image-card-actions">
-            <button mat-icon-button color="warn" (click)="delete(image.id)" matTooltip="Удалить">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </mat-card-actions>
         </mat-card>
       }
     </div>

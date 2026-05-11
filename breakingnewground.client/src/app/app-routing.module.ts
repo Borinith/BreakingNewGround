@@ -3,7 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { ImageDetailComponent } from './tabs/images/image-detail/image-detail.component';
 import { ImagesComponent } from './tabs/images/images.component';
+import { TagsListComponent } from './tabs/images/tags-list/tags-list.component';
 import { MedicineBodyTypesComponent } from './tabs/medicines/medicine-body-type/medicine-body-types.component';
 import { MedicineTypesComponent } from './tabs/medicines/medicine-type/medicine-types.component';
 import { MedicineComponent } from './tabs/medicines/medicine/medicine.component';
@@ -33,6 +35,8 @@ const routes: Routes = [
         ]
       },
       { path: 'images', component: ImagesComponent },
+      { path: 'images/tags', component: TagsListComponent },
+      { path: 'images/:id', component: ImageDetailComponent },
       { path: '', redirectTo: 'weatherforecast', pathMatch: 'full' },
     ]
   },

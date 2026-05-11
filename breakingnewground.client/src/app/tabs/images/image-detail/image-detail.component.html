@@ -1,0 +1,74 @@
+<div class="detail-wrapper">
+  <div class="detail-toolbar">
+    <a mat-icon-button [routerLink]="['/tabs/images']" matTooltip="Назад к картинкам">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+  </div>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (image) {
+    <div class="detail-content">
+      <div class="image-container">
+        <img class="detail-image" [src]="originalUrl(image.id)" [alt]="image.originalFileName" />
+      </div>
+
+      <div class="detail-info">
+        @if (image.tags.length > 0) {
+          <div class="info-block">
+            <h3>Теги</h3>
+            <mat-chip-set>
+              @for (tag of image.tags; track tag) {
+                <mat-chip>{{ tag }}</mat-chip>
+                <!-- <a mat-chip [routerLink]="['/tabs/images']" [queryParams]="{ tag: tag }">{{ tag }}</a> -->
+              }
+            </mat-chip-set>
+          </div>
+        }
+
+        <div class="info-block">
+          <h3>Информация</h3>
+          <table class="info-table">
+            <tr>
+              <td>Название:</td>
+              <td>{{ image.originalFileName }}</td>
+            </tr>
+            <tr>
+              <td>Разрешение:</td>
+              <td>{{ image.width }} × {{ image.height }} px</td>
+            </tr>
+            <tr>
+              <td>Размер:</td>
+              <td>{{ (image.sizeBytes / 1024) | number:'1.0-1' }} КБ</td>
+            </tr>
+            <tr>
+              <td>Формат:</td>
+              <td>{{ image.contentType }}</td>
+            </tr>
+            <tr>
+              <td>Загружено:</td>
+              <td>{{ image.uploadedAt | date:'dd.MM.yyyy HH:mm' }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="delete-block">
+          <button mat-stroked-button color="warn" (click)="delete()">
+            <mat-icon>delete</mat-icon>
+            Удалить
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+</div>

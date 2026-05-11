@@ -15,3 +15,9 @@ export interface UploadResult {
   wasDuplicate: boolean;
   addedTags: string[];
 }
+
+export interface Tag {
+  id: number;
+  name: string;
+  imageCount: number;
+}
