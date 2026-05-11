@@ -15,7 +15,7 @@ import { MedicineTypeService } from '../medicine-type/medicine-type.service';
 import { formatISO } from 'date-fns/formatISO';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { BaseEntityService } from '../base-entity/base-entity.service';
-import { FreshnessFilterEnum } from '../common-models/request.model';
+import { FreshnessFilterEnum } from '../request.model';
 import { Medicine } from './medicine.model';
 import { MedicineService } from './medicine.service';
 

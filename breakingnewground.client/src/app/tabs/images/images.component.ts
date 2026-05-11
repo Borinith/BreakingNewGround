@@ -1,0 +1,214 @@
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatExpansionPanel } from '@angular/material/expansion';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { ConfirmDialogService } from '../../dialog/confirm-dialog/confirm-dialog.service';
+import { ImageMetadata, UploadResult } from './images.model';
+import { ImagesService } from './images.service';
+
+@Component({
+  selector: 'app-images',
+  templateUrl: './images.component.html',
+  standalone: false,
+  styleUrls: ['./images.component.css']
+})
+export class ImagesComponent implements OnInit {
+
+  readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
+  readonly pageSize = 20;
+
+  @ViewChild(MatPaginator) paginator?: MatPaginator;
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('uploadPanel') uploadPanel?: MatExpansionPanel;
+
+  images: ImageMetadata[] = [];
+  total = 0;
+  isLoading = false;
+  errorMessage: string | null = null;
+
+  searchControl = new FormControl<string>('', { nonNullable: true });
+
+  selectedFile: File | null = null;
+  uploadTags: string[] = [];
+  tagInputControl = new FormControl<string>('', { nonNullable: true });
+  tagSuggestions: string[] = [];
+  isUploading = false;
+
+  constructor(
+    private service: ImagesService,
+    private confirmDialogService: ConfirmDialogService,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
+    private destroyRef: DestroyRef) { }
+
+  ngOnInit(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      if (this.paginator) {
+        this.paginator.pageIndex = 0;
+      }
+      this.loadImages();
+    });
+
+    this.tagInputControl.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (!query || !query.trim()) {
+          return of([] as string[]);
+        }
+        return this.service.suggestTags(query.trim()).pipe(
+          catchError(() => of([] as string[]))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(suggestions => {
+      this.tagSuggestions = suggestions.filter(s => !this.uploadTags.includes(s));
+      this.cdr.detectChanges();
+    });
+
+    this.loadImages();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.loadImages(event.pageIndex);
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files && input.files.length > 0 ? input.files[0] : null;
+  }
+
+  addTagFromInput(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+    if (value && !this.uploadTags.includes(value)) {
+      this.uploadTags.push(value);
+    }
+    event.chipInput?.clear();
+    this.tagInputControl.setValue('');
+  }
+
+  addTagFromAutocomplete(event: MatAutocompleteSelectedEvent): void {
+    const value = event.option.value as string;
+    if (value && !this.uploadTags.includes(value)) {
+      this.uploadTags.push(value);
+    }
+    if (this.tagInput) {
+      this.tagInput.nativeElement.value = '';
+    }
+    this.tagInputControl.setValue('');
+  }
+
+  removeTag(tag: string): void {
+    this.uploadTags = this.uploadTags.filter(t => t !== tag);
+  }
+
+  upload(): void {
+    if (!this.selectedFile || this.isUploading) {
+      return;
+    }
+
+    this.isUploading = true;
+    this.cdr.detectChanges();
+
+    this.service.upload(this.selectedFile, this.uploadTags).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: result => {
+        this.isUploading = false;
+        this.showUploadFeedback(result);
+        this.resetUploadForm();
+        this.uploadPanel?.close();
+        this.loadImages();
+      },
+      error: err => {
+        console.error('Upload error', err);
+        this.isUploading = false;
+        this.snackBar.open('Не удалось загрузить картинку', 'OK', { duration: 5000 });
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  delete(id: string): void {
+    this.confirmDialogService.openConfirmDialog()
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(id).pipe(
+            takeUntilDestroyed(this.destroyRef)
+          ).subscribe({
+            next: () => this.loadImages(),
+            error: err => {
+              console.error('Delete error', err);
+              this.snackBar.open('Не удалось удалить картинку', 'OK', { duration: 5000 });
+            }
+          });
+        }
+      });
+  }
+
+  thumbnailUrl(id: string): string {
+    return this.service.thumbnailUrl(id);
+  }
+
+  trackById(_index: number, image: ImageMetadata): string {
+    return image.id;
+  }
+
+  private loadImages(pageIndex: number = this.paginator?.pageIndex ?? 0): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.cdr.detectChanges();
+
+    this.service.getAll(this.searchControl.value.trim(), pageIndex, this.pageSize).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: result => {
+        this.images = result.items;
+        this.total = result.total;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Load images error', err);
+        this.errorMessage = 'Не удалось загрузить картинки';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private showUploadFeedback(result: UploadResult): void {
+    let message: string;
+    if (!result.wasDuplicate) {
+      message = 'Картинка загружена';
+    } else if (result.addedTags.length > 0) {
+      message = `Эта картинка уже была загружена. Добавлены теги: ${result.addedTags.join(', ')}`;
+    } else {
+      message = 'Эта картинка уже загружена';
+    }
+    this.snackBar.open(message, 'OK', { duration: 5000 });
+  }
+
+  private resetUploadForm(): void {
+    this.selectedFile = null;
+    this.uploadTags = [];
+    this.tagInputControl.setValue('');
+    this.tagSuggestions = [];
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+}

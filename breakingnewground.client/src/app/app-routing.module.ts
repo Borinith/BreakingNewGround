@@ -1,14 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { ImagesComponent } from './tabs/images/images.component';
 import { MedicineBodyTypesComponent } from './tabs/medicines/medicine-body-type/medicine-body-types.component';
 import { MedicineTypesComponent } from './tabs/medicines/medicine-type/medicine-types.component';
 import { MedicineComponent } from './tabs/medicines/medicine/medicine.component';
 import { MedicinesComponent } from './tabs/medicines/medicines.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { WeatherForecastComponent } from './tabs/weatherforecast/weatherforecast.component';
-import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -31,6 +32,7 @@ const routes: Routes = [
           { path: '**', redirectTo: 'medicines' }
         ]
       },
+      { path: 'images', component: ImagesComponent },
       { path: '', redirectTo: 'weatherforecast', pathMatch: 'full' },
     ]
   },

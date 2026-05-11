@@ -12,5 +12,6 @@ export class TabsComponent {
   navLinks = [
     { path: 'weatherforecast', label: 'Прогноз погоды' },
     { path: 'medicines', label: 'Лекарства' },
+    { path: 'images', label: 'Картинки' },
   ];
 }
