@@ -95,7 +95,7 @@ namespace BreakingNewGround.Server.Services
                     i.Height,
                     i.SizeBytes,
                     i.UploadedAt,
-                    i.Tags.Select(t => t.Name).ToArray()))
+                    i.Tags.Select(t => t.Name).OrderBy(t => t).ToArray()))
                 .ToArrayAsync(cancellationToken);
 
             return new PagedResult<ImageMetadataDto>(items, total);
@@ -115,7 +115,7 @@ namespace BreakingNewGround.Server.Services
                     i.Height,
                     i.SizeBytes,
                     i.UploadedAt,
-                    i.Tags.Select(t => t.Name).ToArray()))
+                    i.Tags.Select(t => t.Name).OrderBy(t => t).ToArray()))
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
@@ -170,10 +170,47 @@ namespace BreakingNewGround.Server.Services
             return await _context.Tags
                 .AsNoTracking()
                 .Where(t => t.Name.StartsWith(query.Trim()))
-                .OrderBy(t => t.Name)
                 .Select(t => t.Name)
+                .OrderBy(t => t)
                 .Take(10)
                 .ToArrayAsync(cancellationToken);
+        }
+
+        public async Task<ImageMetadataDto?> SetTagsAsync(Guid id, string[] tags, CancellationToken cancellationToken)
+        {
+            var image = await _context.Images
+                .Include(i => i.Tags)
+                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+
+            if (image is null)
+            {
+                return null;
+            }
+
+            var normalized = NormalizeTags(tags);
+
+            var toRemove = image.Tags
+                .ExceptBy(normalized, t => t.Name, StringComparer.InvariantCultureIgnoreCase)
+                .ToList();
+
+            foreach (var tag in toRemove)
+            {
+                image.Tags.Remove(tag);
+            }
+
+            await AddMissingTagsAsync(image, normalized, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return new ImageMetadataDto(
+                image.Id,
+                image.OriginalFileName,
+                image.ContentType,
+                image.IsFavorite,
+                image.Width,
+                image.Height,
+                image.SizeBytes,
+                image.UploadedAt,
+                image.Tags.Select(t => t.Name).OrderBy(t => t).ToArray());
         }
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -227,55 +264,55 @@ namespace BreakingNewGround.Server.Services
                 return [];
             }
 
-            var existing = await _context.Tags
+            var existingInDb = await _context.Tags
                 .Where(t => normalizedNames.Contains(t.Name))
                 .ToListAsync(cancellationToken);
 
-            var existingNames = existing.Select(t => t.Name).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
-
             var newTags = normalizedNames
-                .Where(n => !existingNames.Contains(n))
+                .Except(existingInDb.Select(t => t.Name), StringComparer.InvariantCultureIgnoreCase)
                 .Select(n => new Tag { Name = n })
                 .ToList();
 
             if (newTags.Count > 0)
             {
                 _context.Tags.AddRange(newTags);
+                existingInDb.AddRange(newTags);
             }
 
-            existing.AddRange(newTags);
+            return existingInDb;
+        }
 
-            return existing;
+        private async Task<string[]> AddMissingTagsAsync(ImageEntity image, string[] normalizedNames, CancellationToken cancellationToken)
+        {
+            var toAddNames = normalizedNames
+                .Except(image.Tags.Select(t => t.Name), StringComparer.InvariantCultureIgnoreCase)
+                .ToArray();
+
+            if (toAddNames.Length == 0)
+            {
+                return [];
+            }
+
+            var resolved = await ResolveTagsAsync(toAddNames, cancellationToken);
+
+            foreach (var tag in resolved)
+            {
+                image.Tags.Add(tag);
+            }
+
+            return toAddNames;
         }
 
         private async Task<string[]> MergeTagsAsync(ImageEntity image, string[] normalizedNames, CancellationToken cancellationToken)
         {
-            if (normalizedNames.Length == 0)
+            var added = await AddMissingTagsAsync(image, normalizedNames, cancellationToken);
+
+            if (added.Length > 0)
             {
-                return [];
+                await _context.SaveChangesAsync(cancellationToken);
             }
 
-            var existingTagNames = image.Tags.Select(t => t.Name).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
-            var newTagNames = normalizedNames.Where(n => !existingTagNames.Contains(n)).ToArray();
-
-            if (newTagNames.Length == 0)
-            {
-                return [];
-            }
-
-            var newTags = await ResolveTagsAsync(newTagNames, cancellationToken);
-
-            foreach (var tag in newTags)
-            {
-                if (!existingTagNames.Contains(tag.Name))
-                {
-                    image.Tags.Add(tag);
-                }
-            }
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return newTagNames;
+            return added;
         }
     }
 }

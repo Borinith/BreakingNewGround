@@ -18,17 +18,34 @@
       </div>
 
       <div class="detail-info">
-        @if (image.tags.length > 0) {
-          <div class="info-block">
-            <h3>Теги</h3>
-            <mat-chip-set>
+        <div class="info-block">
+          <h3>Теги</h3>
+          <mat-form-field appearance="outline" class="tag-field">
+            <mat-chip-grid #chipGrid>
               @for (tag of image.tags; track tag) {
-                <mat-chip>{{ tag }}</mat-chip>
                 <!-- <a mat-chip [routerLink]="['/tabs/images']" [queryParams]="{ tag: tag }">{{ tag }}</a> -->
+                <mat-chip-row (removed)="removeTag(tag)">
+                  {{ tag }}
+                  <button matChipRemove [attr.aria-label]="'Удалить ' + tag">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
               }
-            </mat-chip-set>
-          </div>
-        }
+            </mat-chip-grid>
+            <input #tagInput
+                   [formControl]="tagInputControl"
+                   [matAutocomplete]="auto"
+                   [matChipInputFor]="chipGrid"
+                   [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+                   (matChipInputTokenEnd)="addTagFromInput($event)"
+                   placeholder="Добавить тег..." />
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addTagFromAutocomplete($event)">
+              @for (suggestion of tagSuggestions; track suggestion) {
+                <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
 
         <div class="info-block">
           <h3>Информация</h3>

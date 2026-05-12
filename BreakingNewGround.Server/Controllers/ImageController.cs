@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BreakingNewGround.Server.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ImageController : ControllerBase
@@ -132,6 +132,23 @@ namespace BreakingNewGround.Server.Controllers
         public async Task<bool> Delete(Guid id, CancellationToken cancellationToken)
         {
             return await _service.DeleteAsync(id, cancellationToken);
+        }
+
+        [HttpPut]
+        [Route("[action]/{id:guid}")]
+        public async Task<ActionResult<ImageMetadataDto>> SetTags(
+            Guid id,
+            [FromBody] string[] tags,
+            CancellationToken cancellationToken)
+        {
+            var result = await _service.SetTagsAsync(id, tags ?? [], cancellationToken);
+
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
         }
     }
 }

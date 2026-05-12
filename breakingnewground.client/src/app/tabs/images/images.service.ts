@@ -48,6 +48,10 @@ export class ImagesService {
     return this.http.get<Tag[]>(`${this.baseUrl}/GetAllTags`);
   }
 
+  setTags(id: string, tags: string[]): Observable<ImageMetadata> {
+    return this.http.put<ImageMetadata>(`${this.baseUrl}/SetTags/${id}`, tags);
+  }
+
   suggestTags(query: string): Observable<string[]> {
     const params = new HttpParams().set('query', query);
     return this.http.get<string[]>(`${this.baseUrl}/SuggestTags`, { params });

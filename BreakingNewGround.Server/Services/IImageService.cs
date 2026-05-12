@@ -24,5 +24,7 @@ namespace BreakingNewGround.Server.Services
         Task<string[]> SuggestTagsAsync(string query, CancellationToken cancellationToken);
 
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken);
+
+        Task<ImageMetadataDto?> SetTagsAsync(Guid id, string[] tags, CancellationToken cancellationToken);
     }
 }

@@ -88,6 +88,10 @@
   margin-top: auto;
 }
 
+.tag-field {
+  width: 100%;
+}
+
 .loading-overlay {
   position: absolute;
   inset: 0;
