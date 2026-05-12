@@ -14,7 +14,11 @@
   @if (image) {
     <div class="detail-content">
       <div class="image-container">
-        <img class="detail-image" [src]="originalUrl(image.id)" [alt]="image.originalFileName" />
+        @if (originalObjectUrl) {
+          <img class="detail-image" [src]="originalObjectUrl" [alt]="image.originalFileName" />
+        } @else {
+          <mat-spinner diameter="40"></mat-spinner>
+        }
       </div>
 
       <div class="detail-info">

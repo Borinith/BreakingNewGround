@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -8,7 +8,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ConfirmDialogService } from '../../dialog/confirm-dialog/confirm-dialog.service';
 import { ImageMetadata, UploadResult } from './images.model';
 import { ImagesService } from './images.service';
@@ -19,7 +19,7 @@ import { ImagesService } from './images.service';
   standalone: false,
   styleUrls: ['./images.component.css']
 })
-export class ImagesComponent implements OnInit {
+export class ImagesComponent implements OnInit, OnDestroy {
 
   readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
   readonly pageSize = 20;
@@ -30,9 +30,12 @@ export class ImagesComponent implements OnInit {
   @ViewChild('uploadPanel') uploadPanel?: MatExpansionPanel;
 
   images: ImageMetadata[] = [];
+  thumbnailUrls = new Map<string, string>();
   total = 0;
   isLoading = false;
   errorMessage: string | null = null;
+
+  private readonly pageReset$ = new Subject<void>();
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 
@@ -172,17 +175,21 @@ export class ImagesComponent implements OnInit {
       });
   }
 
-  thumbnailUrl(id: string): string {
-    return this.service.thumbnailUrl(id);
-  }
-
   trackById(_index: number, image: ImageMetadata): string {
     return image.id;
+  }
+
+  ngOnDestroy(): void {
+    this.pageReset$.next();
+    this.pageReset$.complete();
+    this.revokeAllThumbnails();
   }
 
   private loadImages(pageIndex: number = this.paginator?.pageIndex ?? 0): void {
     this.isLoading = true;
     this.errorMessage = null;
+    this.pageReset$.next();
+    this.revokeAllThumbnails();
     this.cdr.detectChanges();
 
     this.service.getAll(this.searchControl.value.trim(), pageIndex, this.pageSize).pipe(
@@ -193,6 +200,7 @@ export class ImagesComponent implements OnInit {
         this.total = result.total;
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.images.forEach(img => this.fetchThumbnail(img.id));
       },
       error: err => {
         console.error('Load images error', err);
@@ -201,6 +209,27 @@ export class ImagesComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private fetchThumbnail(id: string): void {
+    this.service.getThumbnailBlob(id).pipe(
+      takeUntil(this.pageReset$),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        this.thumbnailUrls.set(id, url);
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Thumbnail load error', err);
+      }
+    });
+  }
+
+  private revokeAllThumbnails(): void {
+    this.thumbnailUrls.forEach(url => URL.revokeObjectURL(url));
+    this.thumbnailUrls.clear();
   }
 
   private showUploadFeedback(result: UploadResult): void {

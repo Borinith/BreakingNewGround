@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -17,13 +17,14 @@ import { ImagesService } from '../images.service';
   standalone: false,
   styleUrls: ['./image-detail.component.css']
 })
-export class ImageDetailComponent implements OnInit {
+export class ImageDetailComponent implements OnInit, OnDestroy {
 
   readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
 
   @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
 
   image: ImageMetadata | null = null;
+  originalObjectUrl: string | null = null;
   isLoading = false;
   errorMessage: string | null = null;
 
@@ -68,8 +69,8 @@ export class ImageDetailComponent implements OnInit {
     this.loadImage(id);
   }
 
-  originalUrl(id: string): string {
-    return this.service.originalUrl(id);
+  ngOnDestroy(): void {
+    this.revokeOriginal();
   }
 
   addTagFromInput(event: MatChipInputEvent): void {
@@ -163,6 +164,7 @@ export class ImageDetailComponent implements OnInit {
         this.image = image;
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.fetchOriginal(id);
       },
       error: err => {
         console.error('Load image error', err);
@@ -173,5 +175,27 @@ export class ImageDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private fetchOriginal(id: string): void {
+    this.service.getOriginalBlob(id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: blob => {
+        this.revokeOriginal();
+        this.originalObjectUrl = URL.createObjectURL(blob);
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Original load error', err);
+      }
+    });
+  }
+
+  private revokeOriginal(): void {
+    if (this.originalObjectUrl) {
+      URL.revokeObjectURL(this.originalObjectUrl);
+      this.originalObjectUrl = null;
+    }
   }
 }

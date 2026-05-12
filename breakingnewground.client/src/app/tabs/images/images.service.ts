@@ -57,11 +57,11 @@ export class ImagesService {
     return this.http.get<string[]>(`${this.baseUrl}/SuggestTags`, { params });
   }
 
-  thumbnailUrl(id: string): string {
-    return `${this.baseUrl}/GetThumbnail/${id}`;
+  getThumbnailBlob(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/GetThumbnail/${id}`, { responseType: 'blob' });
   }
 
-  originalUrl(id: string): string {
-    return `${this.baseUrl}/GetOriginal/${id}`;
+  getOriginalBlob(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/GetOriginal/${id}`, { responseType: 'blob' });
   }
 }

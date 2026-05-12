@@ -68,7 +68,7 @@ namespace BreakingNewGround.Server.Controllers
                 return NotFound();
             }
 
-            Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+            Response.Headers.CacheControl = "private, max-age=31536000, immutable";
 
             return File(result.Value.Bytes, result.Value.ContentType);
         }
@@ -84,7 +84,7 @@ namespace BreakingNewGround.Server.Controllers
                 return NotFound();
             }
 
-            Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+            Response.Headers.CacheControl = "private, max-age=31536000, immutable";
 
             return File(result.Value.Bytes, result.Value.ContentType, result.Value.FileName);
         }
