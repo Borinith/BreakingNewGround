@@ -60,7 +60,7 @@ namespace BreakingNewGround.Server.Services
                 Thumbnail = processed.Thumbnail,
                 ThumbnailContentType = processed.ThumbnailContentType,
                 Hash = hash,
-                UploadedAt = DateTime.UtcNow,
+                UploadedAtUtc = DateTime.UtcNow,
                 Tags = resolvedTags
             };
 
@@ -83,7 +83,7 @@ namespace BreakingNewGround.Server.Services
             var total = await images.CountAsync(cancellationToken);
 
             var items = await images
-                .OrderByDescending(i => i.UploadedAt)
+                .OrderByDescending(i => i.UploadedAtUtc)
                 .Skip(page * pageSize)
                 .Take(pageSize)
                 .Select(i => new ImageMetadataDto(
@@ -94,7 +94,7 @@ namespace BreakingNewGround.Server.Services
                     i.Width,
                     i.Height,
                     i.SizeBytes,
-                    i.UploadedAt,
+                    i.UploadedAtUtc,
                     i.Tags.Select(t => t.Name).OrderBy(t => t).ToArray()))
                 .ToArrayAsync(cancellationToken);
 
@@ -114,7 +114,7 @@ namespace BreakingNewGround.Server.Services
                     i.Width,
                     i.Height,
                     i.SizeBytes,
-                    i.UploadedAt,
+                    i.UploadedAtUtc,
                     i.Tags.Select(t => t.Name).OrderBy(t => t).ToArray()))
                 .FirstOrDefaultAsync(cancellationToken);
         }
@@ -209,7 +209,7 @@ namespace BreakingNewGround.Server.Services
                 image.Width,
                 image.Height,
                 image.SizeBytes,
-                image.UploadedAt,
+                image.UploadedAtUtc,
                 image.Tags.Select(t => t.Name).OrderBy(t => t).ToArray());
         }
 

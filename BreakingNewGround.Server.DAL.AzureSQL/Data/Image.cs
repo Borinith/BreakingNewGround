@@ -41,7 +41,7 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         [MaxLength(32)]
         public required byte[] Hash { get; set; }
 
-        public DateTime UploadedAt { get; set; }
+        public DateTime UploadedAtUtc { get; set; }
 
         public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
     }

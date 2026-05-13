@@ -131,7 +131,7 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("UploadedAt")
+                    b.Property<DateTime>("UploadedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Width")

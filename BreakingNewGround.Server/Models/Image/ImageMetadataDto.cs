@@ -10,6 +10,6 @@ namespace BreakingNewGround.Server.Models.Image
         int Width,
         int Height,
         int SizeBytes,
-        DateTime UploadedAt,
+        DateTime UploadedAtUtc,
         string[] Tags);
 }

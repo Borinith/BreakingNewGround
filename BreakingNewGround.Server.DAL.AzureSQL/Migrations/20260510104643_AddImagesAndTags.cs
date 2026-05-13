@@ -26,7 +26,7 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                     Thumbnail = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     ThumbnailContentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Hash = table.Column<byte[]>(type: "varbinary(32)", maxLength: 32, nullable: false),
-                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UploadedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

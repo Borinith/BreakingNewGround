@@ -6,7 +6,7 @@ export interface ImageMetadata {
   width: number;
   height: number;
   sizeBytes: number;
-  uploadedAt: string;
+  uploadedAtUtc: string;
   tags: string[];
 }
 
