@@ -220,43 +220,23 @@ namespace BreakingNewGround.Server.Services
 
         public async Task<ImageMetadataDto?> SetFavoriteAsync(Guid id, bool isFavorite, CancellationToken cancellationToken)
         {
-            var image = await _context.Images
-                .Include(i => i.Tags)
-                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+            var affected = await _context.Images
+                .Where(i => i.Id == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(i => i.IsFavorite, isFavorite), cancellationToken);
 
-            if (image is null)
+            if (affected == 0)
             {
                 return null;
             }
 
-            image.IsFavorite = isFavorite;
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new ImageMetadataDto(
-                image.Id,
-                image.OriginalFileName,
-                image.ContentType,
-                image.IsFavorite,
-                image.Width,
-                image.Height,
-                image.SizeBytes,
-                image.UploadedAtUtc,
-                image.Tags.Select(t => t.Name).OrderBy(t => t).ToArray());
+            return await GetByIdAsync(id, cancellationToken);
         }
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
-            var image = await _context.Images
-                .Include(i => i.Tags)
-                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
-
-            if (image is null)
-            {
-                return false;
-            }
-
-            _context.Images.Remove(image);
-            await _context.SaveChangesAsync(cancellationToken);
+            var affected = await _context.Images
+                .Where(i => i.Id == id)
+                .ExecuteDeleteAsync(cancellationToken);
 
             /*var orphanTags = await _context.Tags
                 .Where(t => !t.Images.Any())
@@ -268,7 +248,7 @@ namespace BreakingNewGround.Server.Services
                 await _context.SaveChangesAsync(cancellationToken);
             }*/
 
-            return true;
+            return affected > 0;
         }
 
         private static async Task<byte[]> ReadAllBytesAsync(IFormFile file, CancellationToken cancellationToken)
