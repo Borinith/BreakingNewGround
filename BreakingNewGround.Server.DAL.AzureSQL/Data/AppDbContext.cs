@@ -1,6 +1,7 @@
 ﻿using BreakingNewGround.Server.DAL.AzureSQL.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Data
 {
@@ -30,6 +31,12 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
             modelBuilder.Entity<Image>()
                 .Property(i => i.Id)
                 .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+            modelBuilder.Entity<Image>()
+                .Property(i => i.UploadedAtUtc)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         }
     }
 }

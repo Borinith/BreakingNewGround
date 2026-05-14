@@ -38,6 +38,7 @@
 }
 
 .image-container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -45,6 +46,18 @@
   border-radius: 8px;
   padding: 16px;
   overflow: hidden;
+}
+
+.favorite-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: #e53935;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
 }
 
 .detail-image {
@@ -77,6 +90,7 @@
   padding: 4px 8px 4px 0;
   vertical-align: top;
   font-size: 14px;
+  text-align: left;
 }
 
 .info-table td:first-child {
@@ -90,6 +104,14 @@
 
 .tag-field {
   width: 100%;
+}
+
+.favorite-button.is-favorite {
+  color: #e53935;
+}
+
+.favorite-button.is-favorite mat-icon {
+  color: #e53935;
 }
 
 .loading-overlay {

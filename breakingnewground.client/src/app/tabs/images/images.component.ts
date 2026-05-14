@@ -8,7 +8,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, debounceTime, distinctUntilChanged, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, combineLatest, debounceTime, distinctUntilChanged, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { ConfirmDialogService } from '../../dialog/confirm-dialog/confirm-dialog.service';
 import { ImageMetadata, UploadResult } from './images.model';
 import { ImagesService } from './images.service';
@@ -38,6 +38,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
   private readonly pageReset$ = new Subject<void>();
 
   searchControl = new FormControl<string>('', { nonNullable: true });
+  favoritesControl = new FormControl<boolean>(false, { nonNullable: true });
 
   selectedFile: File | null = null;
   uploadTags: string[] = [];
@@ -55,19 +56,18 @@ export class ImagesComponent implements OnInit, OnDestroy {
     private destroyRef: DestroyRef) { }
 
   ngOnInit(): void {
-    this.searchControl.valueChanges.pipe(
+    combineLatest([
+      this.searchControl.valueChanges.pipe(startWith(this.searchControl.value)),
+      this.favoritesControl.valueChanges.pipe(startWith(this.favoritesControl.value))
+    ]).pipe(
       debounceTime(200),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a[0] === b[0] && a[1] === b[1]),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(value => {
-      const trimmed = value.trim();
-      this.router.navigate(['/tabs/images'], {
-        queryParams: trimmed ? { tag: trimmed } : {},
-        replaceUrl: true
-      });
+    ).subscribe(() => {
       if (this.paginator) {
         this.paginator.pageIndex = 0;
       }
+      this.syncUrl();
       this.loadImages();
     });
 
@@ -92,7 +92,9 @@ export class ImagesComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(params => {
       const tag = params.get('tag') ?? '';
+      const favorites = params.get('favorites') === 'true';
       this.searchControl.setValue(tag);
+      this.favoritesControl.setValue(favorites);
     });
   }
 
@@ -185,6 +187,22 @@ export class ImagesComponent implements OnInit, OnDestroy {
     this.revokeAllThumbnails();
   }
 
+  private syncUrl(): void {
+    const trimmed = this.searchControl.value.trim();
+    const onlyFavorites = this.favoritesControl.value;
+    const queryParams: Record<string, string> = {};
+    if (trimmed) {
+      queryParams['tag'] = trimmed;
+    }
+    if (onlyFavorites) {
+      queryParams['favorites'] = 'true';
+    }
+    this.router.navigate(['/tabs/images'], {
+      queryParams,
+      replaceUrl: true
+    });
+  }
+
   private loadImages(pageIndex: number = this.paginator?.pageIndex ?? 0): void {
     this.isLoading = true;
     this.errorMessage = null;
@@ -192,7 +210,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
     this.revokeAllThumbnails();
     this.cdr.detectChanges();
 
-    this.service.getAll(this.searchControl.value.trim(), pageIndex, this.pageSize).pipe(
+    this.service.getAll(this.searchControl.value.trim(), this.favoritesControl.value, pageIndex, this.pageSize).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: result => {

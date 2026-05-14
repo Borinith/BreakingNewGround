@@ -13,13 +13,17 @@ export class ImagesService {
 
   constructor(private http: HttpClient) { }
 
-  getAll(query: string, page: number, pageSize: number): Observable<PagedResult<ImageMetadata>> {
+  getAll(query: string, onlyFavorites: boolean, page: number, pageSize: number): Observable<PagedResult<ImageMetadata>> {
     let params = new HttpParams()
       .set('page', page)
       .set('pageSize', pageSize);
 
     if (query) {
       params = params.set('query', query);
+    }
+
+    if (onlyFavorites) {
+      params = params.set('onlyFavorites', 'true');
     }
 
     return this.http.get<PagedResult<ImageMetadata>>(`${this.baseUrl}/GetAll`, { params });
@@ -50,6 +54,11 @@ export class ImagesService {
 
   setTags(id: string, tags: string[]): Observable<ImageMetadata> {
     return this.http.put<ImageMetadata>(`${this.baseUrl}/SetTags/${id}`, tags);
+  }
+
+  setFavorite(id: string, isFavorite: boolean): Observable<ImageMetadata> {
+    const params = new HttpParams().set('isFavorite', isFavorite);
+    return this.http.put<ImageMetadata>(`${this.baseUrl}/SetFavorite/${id}`, null, { params });
   }
 
   suggestTags(query: string): Observable<string[]> {

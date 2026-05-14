@@ -70,7 +70,7 @@ namespace BreakingNewGround.Server.Services
             return new UploadResultDto(image.Id, false, []);
         }
 
-        public async Task<PagedResult<ImageMetadataDto>> GetAllAsync(string? query, int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<ImageMetadataDto>> GetAllAsync(string? query, bool onlyFavorites, int page, int pageSize, CancellationToken cancellationToken)
         {
             var images = _context.Images.AsNoTracking();
 
@@ -78,6 +78,11 @@ namespace BreakingNewGround.Server.Services
             {
                 var normalized = query.Trim();
                 images = images.Where(i => i.Tags.Any(t => t.Name.StartsWith(normalized)));
+            }
+
+            if (onlyFavorites)
+            {
+                images = images.Where(i => i.IsFavorite);
             }
 
             var total = await images.CountAsync(cancellationToken);
@@ -199,6 +204,32 @@ namespace BreakingNewGround.Server.Services
             }
 
             await AddMissingTagsAsync(image, normalized, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return new ImageMetadataDto(
+                image.Id,
+                image.OriginalFileName,
+                image.ContentType,
+                image.IsFavorite,
+                image.Width,
+                image.Height,
+                image.SizeBytes,
+                image.UploadedAtUtc,
+                image.Tags.Select(t => t.Name).OrderBy(t => t).ToArray());
+        }
+
+        public async Task<ImageMetadataDto?> SetFavoriteAsync(Guid id, bool isFavorite, CancellationToken cancellationToken)
+        {
+            var image = await _context.Images
+                .Include(i => i.Tags)
+                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+
+            if (image is null)
+            {
+                return null;
+            }
+
+            image.IsFavorite = isFavorite;
             await _context.SaveChangesAsync(cancellationToken);
 
             return new ImageMetadataDto(

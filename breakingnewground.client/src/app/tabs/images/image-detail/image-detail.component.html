@@ -19,6 +19,9 @@
         } @else {
           <mat-spinner diameter="40"></mat-spinner>
         }
+        @if (image.isFavorite) {
+          <mat-icon class="favorite-overlay">favorite</mat-icon>
+        }
       </div>
 
       <div class="detail-info">
@@ -75,6 +78,13 @@
               <td>{{ image.uploadedAtUtc | date:'dd.MM.yyyy HH:mm' }}</td>
             </tr>
           </table>
+        </div>
+
+        <div class="info-block">
+          <button mat-stroked-button class="favorite-button" [class.is-favorite]="image.isFavorite" (click)="toggleFavorite()">
+            <mat-icon>{{ image.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            {{ image.isFavorite ? 'В избранном' : 'Добавить в избранное' }}
+          </button>
         </div>
 
         <div class="delete-block">

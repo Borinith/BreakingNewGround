@@ -11,7 +11,7 @@ namespace BreakingNewGround.Server.Services
     {
         Task<UploadResultDto> UploadAsync(IFormFile file, string[] tags, CancellationToken cancellationToken);
 
-        Task<PagedResult<ImageMetadataDto>> GetAllAsync(string? query, int page, int pageSize, CancellationToken cancellationToken);
+        Task<PagedResult<ImageMetadataDto>> GetAllAsync(string? query, bool onlyFavorites, int page, int pageSize, CancellationToken cancellationToken);
 
         Task<ImageMetadataDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
@@ -26,5 +26,7 @@ namespace BreakingNewGround.Server.Services
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken);
 
         Task<ImageMetadataDto?> SetTagsAsync(Guid id, string[] tags, CancellationToken cancellationToken);
+
+        Task<ImageMetadataDto?> SetFavoriteAsync(Guid id, bool isFavorite, CancellationToken cancellationToken);
     }
 }

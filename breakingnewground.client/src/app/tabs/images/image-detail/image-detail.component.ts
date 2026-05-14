@@ -97,6 +97,29 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
     this.commitTags(newTags);
   }
 
+  toggleFavorite(): void {
+    if (!this.image) {
+      return;
+    }
+
+    const id = this.image.id;
+    const newValue = !this.image.isFavorite;
+
+    this.service.setFavorite(id, newValue).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: updated => {
+        this.image = updated;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Set favorite error', err);
+        this.snackBar.open('Не удалось обновить избранное', 'OK', { duration: 5000 });
+        this.loadImage(id);
+      }
+    });
+  }
+
   delete(): void {
     if (!this.image) {
       return;

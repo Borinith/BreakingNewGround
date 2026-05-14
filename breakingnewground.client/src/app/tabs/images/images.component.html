@@ -77,6 +77,10 @@
         </button>
       }
     </mat-form-field>
+
+    <mat-checkbox class="favorites-checkbox" [formControl]="favoritesControl">
+      Только избранное
+    </mat-checkbox>
   </div>
 
   @if (errorMessage) {
@@ -102,6 +106,9 @@
               <div class="image-thumb image-thumb-placeholder">
                 <mat-spinner diameter="30"></mat-spinner>
               </div>
+            }
+            @if (image.isFavorite) {
+              <mat-icon class="favorite-overlay">favorite</mat-icon>
             }
           </a>
           <mat-card-content class="image-card-content">

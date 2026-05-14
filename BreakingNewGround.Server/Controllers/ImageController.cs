@@ -31,6 +31,7 @@ namespace BreakingNewGround.Server.Controllers
         [Route("[action]")]
         public Task<PagedResult<ImageMetadataDto>> GetAll(
             [FromQuery] string? query,
+            [FromQuery] bool onlyFavorites,
             [FromQuery] int page,
             [FromQuery] int pageSize,
             CancellationToken cancellationToken)
@@ -40,7 +41,7 @@ namespace BreakingNewGround.Server.Controllers
                 pageSize = 20;
             }
 
-            return _service.GetAllAsync(query, page, pageSize, cancellationToken);
+            return _service.GetAllAsync(query, onlyFavorites, page, pageSize, cancellationToken);
         }
 
         [HttpGet]
@@ -142,6 +143,23 @@ namespace BreakingNewGround.Server.Controllers
             CancellationToken cancellationToken)
         {
             var result = await _service.SetTagsAsync(id, tags ?? [], cancellationToken);
+
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut]
+        [Route("[action]/{id:guid}")]
+        public async Task<ActionResult<ImageMetadataDto>> SetFavorite(
+            Guid id,
+            [FromQuery] bool isFavorite,
+            CancellationToken cancellationToken)
+        {
+            var result = await _service.SetFavoriteAsync(id, isFavorite, cancellationToken);
 
             if (result is null)
             {
