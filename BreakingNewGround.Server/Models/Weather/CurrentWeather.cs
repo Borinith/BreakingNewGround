@@ -2,7 +2,7 @@
 
 namespace BreakingNewGround.Server.Models.Weather
 {
-    public record struct CurrentWeather(
+    public readonly record struct CurrentWeather(
         int Temperature,
         int WindSpeed,
         int Precipitation,

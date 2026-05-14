@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PagedResult } from '../common-models/paged-result.model';
-import { GetRequest } from '../common-models/request.model';
+import { PagedResult } from '../../paged-result.model';
+import { GetRequest } from '../request.model';
 
 export class BaseEntityService<T> {
 

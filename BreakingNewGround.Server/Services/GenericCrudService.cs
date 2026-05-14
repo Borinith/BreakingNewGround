@@ -18,10 +18,10 @@ namespace BreakingNewGround.Server.Services
         private const string DESC = " desc";
         private const string JOIN_COLUMN = "JoinColumn";
 
-        private readonly MedicinesContext _context;
+        private readonly AppDbContext _context;
         private readonly ILogger<GenericCrudService<T>> _logger;
 
-        public GenericCrudService(MedicinesContext context, ILogger<GenericCrudService<T>> logger)
+        public GenericCrudService(AppDbContext context, ILogger<GenericCrudService<T>> logger)
         {
             _context = context;
             _logger = logger;

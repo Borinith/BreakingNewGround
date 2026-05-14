@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BreakingNewGround.Server.DAL.SQLite.Migrations
 {
-    [DbContext(typeof(MedicinesContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20260426120706_ExpirationDateIsClose")]
     partial class ExpirationDateIsClose
     {

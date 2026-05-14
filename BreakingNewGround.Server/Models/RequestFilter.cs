@@ -1,6 +1,6 @@
 ﻿namespace BreakingNewGround.Server.Models
 {
-    public record struct RequestFilter(
+    public readonly record struct RequestFilter(
         string ColumnName,
         ValueTypeEnum ValueType,
         string Value,

@@ -21,14 +21,18 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-/*builder.Services.AddDbContext<MedicinesContext>(options =>
+/*builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnectionSQLite")));*/
 
-builder.Services.AddDbContext<MedicinesContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL"), o => o.EnableRetryOnFailure(3)));
 
 builder.Services.AddHttpClient<IWeatherForecastService, WeatherForecastService>();
+
 builder.Services.AddScoped(typeof(IGenericCrudService<>), typeof(GenericCrudService<>));
+
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddSingleton<IImageProcessor, ImageProcessor>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(x =>
     {
@@ -38,7 +42,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(x =>
         x.Password.RequireNonAlphanumeric = false;
         x.Password.RequiredLength = 3;
     })
-    .AddEntityFrameworkStores<MedicinesContext>()
+    .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.Configure<WeatherSettings>(builder.Configuration.GetSection("Weather"));

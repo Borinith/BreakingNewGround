@@ -1,0 +1,114 @@
+<div class="detail-wrapper">
+  <div class="detail-toolbar">
+    <a mat-icon-button [routerLink]="['/tabs/images']" matTooltip="Назад к картинкам">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+  </div>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (image) {
+    <div class="detail-content">
+      <div class="image-container">
+        @if (originalObjectUrl) {
+          <img class="detail-image" [src]="originalObjectUrl" [alt]="image.originalFileName" />
+        } @else {
+          <mat-spinner diameter="40"></mat-spinner>
+        }
+        @if (image.isFavorite) {
+          <mat-icon class="favorite-overlay">favorite</mat-icon>
+        }
+      </div>
+
+      <div class="detail-info">
+        <div class="info-block">
+          <h3>Теги</h3>
+          <mat-form-field appearance="outline" class="tag-field">
+            <mat-chip-grid #chipGrid>
+              @for (tag of image.tags; track tag) {
+                <!-- <a mat-chip [routerLink]="['/tabs/images']" [queryParams]="{ tag: tag }">{{ tag }}</a> -->
+                <mat-chip-row (removed)="removeTag(tag)">
+                  {{ tag }}
+                  <button matChipRemove [attr.aria-label]="'Удалить ' + tag">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input #tagInput
+                   [formControl]="tagInputControl"
+                   [matAutocomplete]="auto"
+                   [matChipInputFor]="chipGrid"
+                   [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+                   (matChipInputTokenEnd)="addTagFromInput($event)"
+                   placeholder="Добавить тег..." />
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addTagFromAutocomplete($event)">
+              @for (suggestion of tagSuggestions; track suggestion) {
+                <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+
+        <div class="info-block">
+          <h3>Информация</h3>
+          <table class="info-table">
+            <tr>
+              <td>Название:</td>
+              <td>
+                @if (originalObjectUrl) {
+                  <a [href]="originalObjectUrl"
+                     [download]="image.originalFileName"
+                     matTooltip="Скачать оригинал"
+                     class="download-link">{{ image.originalFileName }}</a>
+                } @else {
+                  {{ image.originalFileName }}
+                }
+              </td>
+            </tr>
+            <tr>
+              <td>Разрешение:</td>
+              <td>{{ image.width }} × {{ image.height }} px</td>
+            </tr>
+            <tr>
+              <td>Размер:</td>
+              <td>{{ (image.sizeBytes / 1024) | number:'1.0-1' }} КБ</td>
+            </tr>
+            <tr>
+              <td>Формат:</td>
+              <td>{{ image.contentType }}</td>
+            </tr>
+            <tr>
+              <td>Загружено:</td>
+              <td>{{ image.uploadedAtUtc | date:'dd.MM.yyyy HH:mm' }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="info-block">
+          <button mat-stroked-button class="favorite-button" [class.is-favorite]="image.isFavorite" (click)="toggleFavorite()">
+            <mat-icon>{{ image.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            {{ image.isFavorite ? 'В избранном' : 'Добавить в избранное' }}
+          </button>
+        </div>
+
+        <div class="delete-block">
+          <button mat-stroked-button color="warn" (click)="delete()">
+            <mat-icon>delete</mat-icon>
+            Удалить
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+</div>

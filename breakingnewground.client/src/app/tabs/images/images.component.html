@@ -1,0 +1,141 @@
+<div class="images-wrapper">
+  <h2>Картинки</h2>
+
+  <mat-expansion-panel class="upload-panel" #uploadPanel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Загрузить картинку</mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <div class="upload-form">
+      <input type="file"
+             #fileInput
+             hidden
+             accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff"
+             (change)="onFileSelected($event)" />
+
+      <div class="upload-row">
+        <button mat-stroked-button (click)="fileInput.click()" [disabled]="isUploading">
+          <mat-icon>attach_file</mat-icon>
+          Выбрать файл
+        </button>
+        @if (selectedFile) {
+          <span class="file-name">{{ selectedFile.name }}</span>
+        }
+      </div>
+
+      <mat-form-field appearance="outline" class="tag-field">
+        <mat-label>Теги</mat-label>
+        <mat-chip-grid #chipGrid>
+          @for (tag of uploadTags; track tag) {
+            <mat-chip-row (removed)="removeTag(tag)">
+              {{ tag }}
+              <button matChipRemove [attr.aria-label]="'Удалить ' + tag">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+          }
+        </mat-chip-grid>
+        <input #tagInput
+               [formControl]="tagInputControl"
+               [matAutocomplete]="auto"
+               [matChipInputFor]="chipGrid"
+               [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+               (matChipInputTokenEnd)="addTagFromInput($event)"
+               placeholder="Добавить тег..." />
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addTagFromAutocomplete($event)">
+          @for (suggestion of tagSuggestions; track suggestion) {
+            <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <button mat-raised-button
+              color="primary"
+              [disabled]="!selectedFile || isUploading"
+              (click)="upload()">
+        @if (isUploading) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          Загрузить
+        }
+      </button>
+    </div>
+  </mat-expansion-panel>
+
+  <div class="search-row">
+    <a mat-stroked-button [routerLink]="['/tabs/images/tags']" class="all-tags-button">
+      <mat-icon>label</mat-icon>
+      Все теги
+    </a>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Поиск по тегу</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Введите тег..." />
+      @if (searchControl.value) {
+        <button mat-icon-button matSuffix (click)="searchControl.setValue('')">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <mat-checkbox class="favorites-checkbox" [formControl]="favoritesControl">
+      Только избранное
+    </mat-checkbox>
+  </div>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  <div class="images-content" [class.loading]="isLoading">
+    @if (images.length === 0 && !isLoading) {
+      <div class="empty-state">Нет картинок</div>
+    }
+
+    <div class="images-grid">
+      @for (image of images; track trackById($index, image)) {
+        <mat-card class="image-card">
+          <a class="image-link" [routerLink]="['/tabs/images', image.id]">
+            @if (thumbnailUrls.get(image.id); as url) {
+              <img class="image-thumb"
+                   [src]="url"
+                   [alt]="image.originalFileName" />
+            } @else {
+              <div class="image-thumb image-thumb-placeholder">
+                <mat-spinner diameter="30"></mat-spinner>
+              </div>
+            }
+            @if (image.isFavorite) {
+              <mat-icon class="favorite-overlay">favorite</mat-icon>
+            }
+          </a>
+          <mat-card-content class="image-card-content">
+            @if (image.tags.length > 0) {
+              <mat-chip-set class="image-tags">
+                @for (tag of image.tags; track tag) {
+                  <mat-chip>{{ tag }}</mat-chip>
+                  <!-- <a mat-chip [routerLink]="['/tabs/images']" [queryParams]="{ tag: tag }">{{ tag }}</a> -->
+                }
+              </mat-chip-set>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <mat-paginator [length]="total"
+                   [pageSize]="pageSize"
+                   [showFirstLastButtons]="true"
+                   [hidePageSize]="true"
+                   (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+</div>

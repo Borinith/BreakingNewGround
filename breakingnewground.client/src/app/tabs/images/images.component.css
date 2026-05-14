@@ -1,0 +1,157 @@
+.images-wrapper {
+  position: relative;
+  padding: 20px;
+}
+
+.upload-panel {
+  margin-bottom: 16px;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-name {
+  color: #555;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.tag-field {
+  width: 100%;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.all-tags-button {
+  height: 40px;
+  text-decoration: none;
+  justify-self: start;
+}
+
+.search-field {
+  grid-column: 2;
+  width: 600px;
+}
+
+.favorites-checkbox {
+  grid-column: 3;
+  justify-self: center;
+}
+
+.search-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.error-card {
+  margin-bottom: 16px;
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.images-content.loading {
+  filter: blur(0.5px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.empty-state {
+  text-align: center;
+  color: #888;
+  padding: 40px 0;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.image-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.image-link {
+  display: block;
+  cursor: pointer;
+  position: relative;
+}
+
+.favorite-overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  color: #e53935;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+
+.image-thumb {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  background: #f5f5f5;
+}
+
+.image-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-card-content {
+  flex: 1;
+  padding: 12px !important;
+}
+
+.image-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.image-tags mat-chip {
+  font-size: 12px;
+  min-height: 24px;
+  padding: 0 8px;
+}
+
+.image-card-actions {
+  padding: 0 8px 8px !important;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 50;
+}

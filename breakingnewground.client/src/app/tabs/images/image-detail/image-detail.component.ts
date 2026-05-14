@@ -1,0 +1,224 @@
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
+import { ImageMetadata } from '../images.model';
+import { ImagesService } from '../images.service';
+
+@Component({
+  selector: 'app-image-detail',
+  templateUrl: './image-detail.component.html',
+  standalone: false,
+  styleUrls: ['./image-detail.component.css']
+})
+export class ImageDetailComponent implements OnInit, OnDestroy {
+
+  readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
+
+  @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
+
+  image: ImageMetadata | null = null;
+  originalObjectUrl: string | null = null;
+  isLoading = false;
+  errorMessage: string | null = null;
+
+  tagInputControl = new FormControl<string>('', { nonNullable: true });
+  tagSuggestions: string[] = [];
+
+  constructor(
+    private service: ImagesService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private confirmDialogService: ConfirmDialogService,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
+    private destroyRef: DestroyRef) { }
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.errorMessage = 'Картинка не найдена';
+      return;
+    }
+
+    this.tagInputControl.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (!query || !query.trim()) {
+          return of([] as string[]);
+        }
+        return this.service.suggestTags(query.trim()).pipe(
+          catchError(() => of([] as string[]))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(suggestions => {
+      const currentTags = this.image?.tags ?? [];
+      this.tagSuggestions = suggestions.filter(s =>
+        !currentTags.some(t => t.toLowerCase() === s.toLowerCase()));
+      this.cdr.detectChanges();
+    });
+
+    this.loadImage(id);
+  }
+
+  ngOnDestroy(): void {
+    this.revokeOriginal();
+  }
+
+  addTagFromInput(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+    this.addTag(value);
+    event.chipInput?.clear();
+    this.tagInputControl.setValue('');
+  }
+
+  addTagFromAutocomplete(event: MatAutocompleteSelectedEvent): void {
+    const value = event.option.value as string;
+    this.addTag(value);
+    if (this.tagInput) {
+      this.tagInput.nativeElement.value = '';
+    }
+    this.tagInputControl.setValue('');
+  }
+
+  removeTag(tag: string): void {
+    if (!this.image) {
+      return;
+    }
+    const newTags = this.image.tags.filter(t => t !== tag);
+    this.commitTags(newTags);
+  }
+
+  toggleFavorite(): void {
+    if (!this.image) {
+      return;
+    }
+
+    const id = this.image.id;
+    const newValue = !this.image.isFavorite;
+
+    this.service.setFavorite(id, newValue).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: updated => {
+        this.image = updated;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Set favorite error', err);
+        this.snackBar.open('Не удалось обновить избранное', 'OK', { duration: 5000 });
+        this.loadImage(id);
+      }
+    });
+  }
+
+  delete(): void {
+    if (!this.image) {
+      return;
+    }
+
+    const id = this.image.id;
+
+    this.confirmDialogService.openConfirmDialog()
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(id).pipe(
+            takeUntilDestroyed(this.destroyRef)
+          ).subscribe({
+            next: () => this.router.navigate(['/tabs/images']),
+            error: err => {
+              console.error('Delete error', err);
+              this.snackBar.open('Не удалось удалить картинку', 'OK', { duration: 5000 });
+            }
+          });
+        }
+      });
+  }
+
+  private addTag(value: string): void {
+    if (!value || !this.image) {
+      return;
+    }
+    if (this.image.tags.some(t => t.toLowerCase() === value.toLowerCase())) {
+      return;
+    }
+    const newTags = [...this.image.tags, value];
+    this.commitTags(newTags);
+  }
+
+  private commitTags(newTags: string[]): void {
+    if (!this.image) {
+      return;
+    }
+    const id = this.image.id;
+
+    this.service.setTags(id, newTags).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: updated => {
+        this.image = updated;
+        this.tagSuggestions = [];
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Set tags error', err);
+        this.snackBar.open('Не удалось обновить теги', 'OK', { duration: 5000 });
+        this.loadImage(id);
+      }
+    });
+  }
+
+  private loadImage(id: string): void {
+    this.isLoading = true;
+    this.service.getById(id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: image => {
+        this.image = image;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        this.fetchOriginal(id);
+      },
+      error: err => {
+        console.error('Load image error', err);
+        this.errorMessage = err.status === 404
+          ? 'Картинка не найдена'
+          : 'Не удалось загрузить картинку';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private fetchOriginal(id: string): void {
+    this.service.getOriginalBlob(id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: blob => {
+        this.revokeOriginal();
+        this.originalObjectUrl = URL.createObjectURL(blob);
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Original load error', err);
+      }
+    });
+  }
+
+  private revokeOriginal(): void {
+    if (this.originalObjectUrl) {
+      URL.revokeObjectURL(this.originalObjectUrl);
+      this.originalObjectUrl = null;
+    }
+  }
+}

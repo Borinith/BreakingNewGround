@@ -12,23 +12,24 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="10.7.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.7">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.5.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.6.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
-		<PackageReference Include="Scalar.AspNetCore" Version="2.14.6" />
+		<PackageReference Include="Scalar.AspNetCore" Version="2.14.11" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
 	</ItemGroup>
 
 	<ItemGroup>

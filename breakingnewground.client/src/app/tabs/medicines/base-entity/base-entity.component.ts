@@ -7,8 +7,8 @@ import { formatISO } from 'date-fns/formatISO';
 import { EMPTY, Observable, Subject, Subscription, combineLatest, merge, of, timer } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
-import { PagedResult } from '../common-models/paged-result.model';
-import { FilterFormValues, FreshnessFilterEnum, GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../common-models/request.model';
+import { PagedResult } from '../../paged-result.model';
+import { FilterFormValues, FreshnessFilterEnum, GetRequest, OrderByEnum, RequestComparisonEnum, RequestFilter, RequestOrder, ValueTypeEnum } from '../request.model';
 import { BaseEntityService } from './base-entity.service';
 
 @Directive()
@@ -22,7 +22,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   updatedId: number | null = null;
   errorId: number | null = null;
   total = 0;
-  pageSize = 10;
+  pageSize = 20;
 
   protected sort?: MatSort;
   protected paginator?: MatPaginator;
@@ -90,7 +90,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
     const sort$ = sort?.sortChange.asObservable() || EMPTY;
 
     const filters$ = this.filterForm.valueChanges.pipe(
-      debounceTime(100),
+      debounceTime(200),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       tap(() => {
         if (this.paginator) {

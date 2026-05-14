@@ -100,9 +100,7 @@ namespace BreakingNewGround.Server.Controllers
                 signingCredentials: creds
             );
 
-            var refreshToken = GenerateRefreshToken();
-            refreshToken.UserName = user.UserName!;
-
+            var refreshToken = GenerateRefreshToken(user.UserName!);
             await SaveRefreshToken(refreshToken);
 
             Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
@@ -170,7 +168,7 @@ namespace BreakingNewGround.Server.Controllers
             });
         }
 
-        private static RefreshToken GenerateRefreshToken()
+        private static RefreshToken GenerateRefreshToken(string userName)
         {
             var randomBytes = new byte[64];
 
@@ -181,12 +179,11 @@ namespace BreakingNewGround.Server.Controllers
 
             var token = WebEncoders.Base64UrlEncode(randomBytes);
 
-            return new RefreshToken
-            {
-                Token = token,
-                Created = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddDays(REFRESH_TOKEN_LIFETIME_IN_DAYS)
-            };
+            return new RefreshToken(
+                token,
+                userName,
+                DateTime.UtcNow,
+                DateTime.UtcNow.AddDays(REFRESH_TOKEN_LIFETIME_IN_DAYS));
         }
 
         private async Task SaveRefreshToken(RefreshToken refreshToken)

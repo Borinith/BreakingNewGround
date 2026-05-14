@@ -1,12 +1,11 @@
-﻿using BreakingNewGround.Server.DAL.AzureSQL.Views;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BreakingNewGround.Server.DAL.SQLite.Views;
 using Microsoft.EntityFrameworkCore;
 
-namespace BreakingNewGround.Server.DAL.AzureSQL.Data
+namespace BreakingNewGround.Server.DAL.SQLite.Data
 {
-    public class MedicinesContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext : DbContext
     {
-        public MedicinesContext(DbContextOptions<MedicinesContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -21,7 +20,7 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<ExpirationDateIsClose>().ToView("ExpirationDateIsClose");
+            modelBuilder.Entity<ExpirationDateIsClose>().ToView("expiration_date_is_close");
         }
     }
 }

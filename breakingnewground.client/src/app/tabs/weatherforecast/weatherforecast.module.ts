@@ -1,6 +1,6 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
-import localeRu from '@angular/common/locales/ru';
 import { HttpClientModule } from '@angular/common/http';
+import localeRu from '@angular/common/locales/ru';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';

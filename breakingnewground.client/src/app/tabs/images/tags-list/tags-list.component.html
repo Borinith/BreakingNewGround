@@ -1,0 +1,39 @@
+<div class="tags-wrapper">
+  <div class="tags-toolbar">
+    <a mat-icon-button [routerLink]="['/tabs/images']" matTooltip="Назад к картинкам">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <h2 class="tags-title">Все теги</h2>
+  </div>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (!isLoading && tags.length === 0) {
+    <div class="empty-state">Тегов пока нет</div>
+  }
+
+  <div class="tags-grid">
+    @for (tag of tags; track tag.id) {
+      <a class="tag-card-link"
+         [routerLink]="['/tabs/images']"
+         [queryParams]="{ tag: tag.name }">
+        <mat-card class="tag-card">
+          <mat-card-content>
+            <div class="tag-name">{{ tag.name }}</div>
+            <div class="tag-count">{{ tag.imageCount }} картинок</div>
+          </mat-card-content>
+        </mat-card>
+      </a>
+    }
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+</div>

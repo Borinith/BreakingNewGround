@@ -2,7 +2,7 @@
 
 namespace BreakingNewGround.Server.Models.Weather
 {
-    public record struct DailyWeather(
+    public readonly record struct DailyWeather(
         DateOnly Date,
         int TemperatureMin,
         int TemperatureMax,

@@ -4,16 +4,19 @@ using BreakingNewGround.Server.DAL.AzureSQL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
 {
-    [DbContext(typeof(MedicinesContext))]
-    partial class MedicinesContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20260510104643_AddImagesAndTags")]
+    partial class AddImagesAndTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,6 +88,64 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("BreakingNewGround.Server.DAL.AzureSQL.Data.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte[]>("Hash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<int>("Height")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFavorite")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("Original")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("SizeBytes")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ThumbnailContentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UploadedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Width")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("BreakingNewGround.Server.DAL.AzureSQL.Data.Medicine", b =>
@@ -161,6 +222,27 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                     b.ToTable("MedicineTypes");
                 });
 
+            modelBuilder.Entity("BreakingNewGround.Server.DAL.AzureSQL.Data.Tag", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("BreakingNewGround.Server.DAL.AzureSQL.Views.ExpirationDateIsClose", b =>
                 {
                     b.Property<string>("Comment")
@@ -194,6 +276,21 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                     b.ToTable((string)null);
 
                     b.ToView("ExpirationDateIsClose", (string)null);
+                });
+
+            modelBuilder.Entity("ImageTag", b =>
+                {
+                    b.Property<Guid>("ImagesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("TagsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ImagesId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("ImageTag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -344,6 +441,21 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Migrations
                     b.Navigation("BodyType");
 
                     b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("ImageTag", b =>
+                {
+                    b.HasOne("BreakingNewGround.Server.DAL.AzureSQL.Data.Image", null)
+                        .WithMany()
+                        .HasForeignKey("ImagesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BreakingNewGround.Server.DAL.AzureSQL.Data.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
