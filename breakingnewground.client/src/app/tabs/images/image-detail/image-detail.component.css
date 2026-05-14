@@ -106,6 +106,15 @@
   width: 100%;
 }
 
+.download-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.download-link:hover {
+  text-decoration: underline;
+}
+
 .favorite-button.is-favorite {
   color: #e53935;
 }

@@ -59,7 +59,16 @@
           <table class="info-table">
             <tr>
               <td>Название:</td>
-              <td>{{ image.originalFileName }}</td>
+              <td>
+                @if (originalObjectUrl) {
+                  <a [href]="originalObjectUrl"
+                     [download]="image.originalFileName"
+                     matTooltip="Скачать оригинал"
+                     class="download-link">{{ image.originalFileName }}</a>
+                } @else {
+                  {{ image.originalFileName }}
+                }
+              </td>
             </tr>
             <tr>
               <td>Разрешение:</td>
