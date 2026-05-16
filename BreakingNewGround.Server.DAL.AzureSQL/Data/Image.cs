@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Data
 {
     [Index(nameof(Hash), IsUnique = true)]
+    [Table("Images")]
     public class Image
     {
         [Key]
@@ -28,12 +30,6 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         public int SizeBytes { get; set; }
 
         [Required]
-        public required byte[] Original { get; set; }
-
-        [Required]
-        public required byte[] Thumbnail { get; set; }
-
-        [Required]
         [StringLength(50)]
         public required string ThumbnailContentType { get; set; }
 
@@ -42,6 +38,8 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
         public required byte[] Hash { get; set; }
 
         public DateTime UploadedAtUtc { get; set; }
+
+        public virtual ImageBytes Bytes { get; set; } = null!;
 
         public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
     }

@@ -21,6 +21,8 @@ namespace BreakingNewGround.Server.DAL.AzureSQL.Data
 
         public DbSet<Image> Images { get; set; }
 
+        public DbSet<ImageBytes> ImageBytes { get; set; }
+
         public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

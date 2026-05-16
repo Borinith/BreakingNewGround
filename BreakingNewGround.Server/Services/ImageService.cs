@@ -56,12 +56,15 @@ namespace BreakingNewGround.Server.Services
                 Width = processed.Width,
                 Height = processed.Height,
                 SizeBytes = bytes.Length,
-                Original = bytes,
-                Thumbnail = processed.Thumbnail,
                 ThumbnailContentType = processed.ThumbnailContentType,
                 Hash = hash,
                 UploadedAtUtc = DateTime.UtcNow,
-                Tags = resolvedTags
+                Tags = resolvedTags,
+                Bytes = new ImageBytes
+                {
+                    Original = bytes,
+                    Thumbnail = processed.Thumbnail
+                }
             };
 
             _context.Images.Add(image);
@@ -129,7 +132,7 @@ namespace BreakingNewGround.Server.Services
             var result = await _context.Images
                 .AsNoTracking()
                 .Where(i => i.Id == id)
-                .Select(i => new { i.Thumbnail, i.ThumbnailContentType })
+                .Select(i => new { i.Bytes.Thumbnail, i.ThumbnailContentType })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (result is null)
@@ -145,7 +148,7 @@ namespace BreakingNewGround.Server.Services
             var result = await _context.Images
                 .AsNoTracking()
                 .Where(i => i.Id == id)
-                .Select(i => new { i.Original, i.ContentType, i.OriginalFileName })
+                .Select(i => new { i.Bytes.Original, i.ContentType, i.OriginalFileName })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (result is null)

@@ -89,7 +89,7 @@ namespace BreakingNewGround.Server.Services
 
             if (request.Order.HasValue)
             {
-                var order = request.Order.Value.OrderBy == OrderByEnum.Ascending ? "" : DESC;
+                var order = request.Order.Value.OrderBy == OrderByEnum.Ascending ? string.Empty : DESC;
 
                 if (request.Order.Value.IsComplexSort
                     && request.Order.Value.JoinTableName is not null
