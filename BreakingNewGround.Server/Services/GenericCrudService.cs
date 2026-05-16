@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BreakingNewGround.Server.Services
@@ -27,20 +28,20 @@ namespace BreakingNewGround.Server.Services
             _logger = logger;
         }
 
-        public async Task<T> CreateAsync(T model)
+        public async Task<T> CreateAsync(T model, CancellationToken cancellationToken)
         {
-            await _context.Set<T>().AddAsync(model);
-            await _context.SaveChangesAsync();
+            await _context.Set<T>().AddAsync(model, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return model;
         }
 
-        public async Task<T> GetByIdAsync(long id, string[] includes)
+        public async Task<T> GetByIdAsync(long id, string[] includes, CancellationToken cancellationToken)
         {
             var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
             var lambda = GetLambdaWithExtractByValue(ID, ValueTypeEnum.Long, id, ComparisonEnum.Equal);
 
-            var entity = await query.FirstOrDefaultAsync(lambda);
+            var entity = await query.FirstOrDefaultAsync(lambda, cancellationToken);
 
             if (entity is null)
             {
@@ -50,7 +51,7 @@ namespace BreakingNewGround.Server.Services
             return entity;
         }
 
-        public async Task<Models.PagedResult<T>> GetAllAsync(GetRequest request, string[] includes)
+        public async Task<Models.PagedResult<T>> GetAllAsync(GetRequest request, string[] includes, CancellationToken cancellationToken)
         {
             var dbSet = _context.Set<T>();
 
@@ -85,7 +86,7 @@ namespace BreakingNewGround.Server.Services
                 }
             }
 
-            var total = await query.CountAsync();
+            var total = await query.CountAsync(cancellationToken);
 
             if (request.Order.HasValue)
             {
@@ -119,22 +120,22 @@ namespace BreakingNewGround.Server.Services
                 query = query.Take(request.Take.Value);
             }
 
-            var items = await query.ToArrayAsync();
+            var items = await query.ToArrayAsync(cancellationToken);
 
             return new Models.PagedResult<T>(items, total);
         }
 
-        public async Task<T> UpdateAsync(T model)
+        public async Task<T> UpdateAsync(T model, CancellationToken cancellationToken)
         {
             _context.Set<T>().Update(model);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return model;
         }
 
-        public async Task<bool> DeleteAsync(long id)
+        public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken)
         {
-            var entity = await _context.Set<T>().FindAsync(id);
+            var entity = await _context.Set<T>().FindAsync([id], cancellationToken);
 
             if (entity is null)
             {
@@ -142,7 +143,7 @@ namespace BreakingNewGround.Server.Services
             }
 
             _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }

@@ -1,13 +1,12 @@
 ﻿using BreakingNewGround.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BreakingNewGround.Server.Controllers
 {
-    [SuppressMessage("ReSharper", "RouteTemplates.ActionRoutePrefixCanBeExtractedToControllerRoute")]
-    public abstract class GenericCrudController<T> : Controller
+    public abstract class GenericCrudController<T> : ControllerBase
         where T : class
     {
         private readonly IGenericCrudService<T> _genericCrudService;
@@ -26,37 +25,37 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<T> CreateAsync(T model)
+        public async Task<T> CreateAsync(T model, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.CreateAsync(model);
+            return await _genericCrudService.CreateAsync(model, cancellationToken);
         }
 
         [HttpGet]
         [Route("[action]/{id:long}")]
-        public async Task<T> GetByIdAsync(long id)
+        public async Task<T> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.GetByIdAsync(id, _includes);
+            return await _genericCrudService.GetByIdAsync(id, _includes, cancellationToken);
         }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<PagedResult<T>> GetAllAsync([FromBody] GetRequest request)
+        public async Task<PagedResult<T>> GetAllAsync([FromBody] GetRequest request, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.GetAllAsync(request, _includes);
+            return await _genericCrudService.GetAllAsync(request, _includes, cancellationToken);
         }
 
         [HttpPut]
         [Route("[action]")]
-        public async Task<T> UpdateAsync(T model)
+        public async Task<T> UpdateAsync(T model, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.UpdateAsync(model);
+            return await _genericCrudService.UpdateAsync(model, cancellationToken);
         }
 
         [HttpDelete]
         [Route("[action]/{id:long}")]
-        public async Task<bool> DeleteAsync(long id)
+        public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.DeleteAsync(id);
+            return await _genericCrudService.DeleteAsync(id, cancellationToken);
         }
     }
 }
