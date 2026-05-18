@@ -34,18 +34,27 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\breakingnewground.client\breakingnewground.client.esproj">
+		<ProjectReference Include="..\breakingnewground.client\breakingnewground.client.esproj" Condition="'$(DeployOnBuild)' != 'true'">
 			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 		</ProjectReference>
 		<ProjectReference Include="..\BreakingNewGround.Server.DAL.AzureSQL\BreakingNewGround.Server.DAL.AzureSQL.csproj" />
 		<ProjectReference Include="..\BreakingNewGround.ServiceDefaults\BreakingNewGround.ServiceDefaults.csproj" />
 	</ItemGroup>
 
-	<Target Name="PrepublishAngular" BeforeTargets="PrepareForPublish;CopyFilesToPublishDirectory">
+	<Target Name="ForceCleanBeforePublish" BeforeTargets="BeforeBuild" Condition="'$(DeployOnBuild)' == 'true'">
+		<RemoveDir Directories="$(ProjectDir)bin\$(Configuration);$(ProjectDir)obj\$(Configuration)" />
+	</Target>
+
+	<Target Name="PublishAngular" BeforeTargets="ComputeFilesToPublish">
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --configuration production" />
-		<RemoveDir Directories="$(ProjectDir)wwwroot" />
-		<MakeDir Directories="$(ProjectDir)wwwroot" />
-		<Exec Command="xcopy &quot;$(SpaRoot)\dist\breakingnewground.client\browser\*&quot; &quot;$(ProjectDir)\wwwroot\&quot; /E /I /Y" />
+
+		<ItemGroup>
+			<_AngularDist Include="$(SpaRoot)\dist\breakingnewground.client\browser\**\*" />
+			<ResolvedFileToPublish Include="@(_AngularDist)">
+				<RelativePath>wwwroot\%(RecursiveDir)%(Filename)%(Extension)</RelativePath>
+				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			</ResolvedFileToPublish>
+		</ItemGroup>
 	</Target>
 </Project>

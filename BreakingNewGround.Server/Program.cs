@@ -87,7 +87,6 @@ app.MapDefaultEndpoints();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.MapStaticAssets();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
