@@ -1,6 +1,8 @@
 .login-form {
   max-width: 360px;
   margin: 24px auto;
+  padding: 0 16px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 16px;

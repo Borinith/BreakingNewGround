@@ -103,7 +103,7 @@ namespace BreakingNewGround.Server.Services
                     i.Height,
                     i.SizeBytes,
                     i.UploadedAtUtc,
-                    i.Tags.Select(t => t.Name).OrderBy(t => t).ToArray()))
+                    i.Tags.Select(t => t.Name).Order().ToArray()))
                 .ToArrayAsync(cancellationToken);
 
             return new PagedResult<ImageMetadataDto>(items, total);
@@ -123,7 +123,7 @@ namespace BreakingNewGround.Server.Services
                     i.Height,
                     i.SizeBytes,
                     i.UploadedAtUtc,
-                    i.Tags.Select(t => t.Name).OrderBy(t => t).ToArray()))
+                    i.Tags.Select(t => t.Name).Order().ToArray()))
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
@@ -179,7 +179,7 @@ namespace BreakingNewGround.Server.Services
                 .AsNoTracking()
                 .Where(t => t.Name.StartsWith(query.Trim()))
                 .Select(t => t.Name)
-                .OrderBy(t => t)
+                .Order()
                 .Take(10)
                 .ToArrayAsync(cancellationToken);
         }
@@ -218,7 +218,7 @@ namespace BreakingNewGround.Server.Services
                 image.Height,
                 image.SizeBytes,
                 image.UploadedAtUtc,
-                image.Tags.Select(t => t.Name).OrderBy(t => t).ToArray());
+                image.Tags.Select(t => t.Name).Order().ToArray());
         }
 
         public async Task<ImageMetadataDto?> SetFavoriteAsync(Guid id, bool isFavorite, CancellationToken cancellationToken)

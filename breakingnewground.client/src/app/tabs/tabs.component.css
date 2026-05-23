@@ -24,3 +24,13 @@ mat-tab-nav-panel {
   padding-top: 20px;
   box-sizing: border-box;
 }
+
+@media (max-width: 600px) {
+  .horizontalTabs {
+    font-size: 1em;
+  }
+
+  mat-tab-nav-panel {
+    padding-top: 12px;
+  }
+}
