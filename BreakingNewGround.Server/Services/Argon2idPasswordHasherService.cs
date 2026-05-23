@@ -11,7 +11,7 @@ namespace BreakingNewGround.Server.Services
     /// <summary>
     /// Хэшируем пароли через Argon2id (OWASP-рекомендуемые параметры)
     /// </summary>
-    public class Argon2PasswordHasher : IPasswordHasher<ApplicationUser>
+    public class Argon2idPasswordHasherService : IPasswordHasher<ApplicationUser>
     {
         private const int MemoryKb = 19_456;       // 19 MiB
         private const int Iterations = 2;
@@ -86,7 +86,7 @@ namespace BreakingNewGround.Server.Services
 
         private static byte[] ComputeHash(string password, byte[] salt, int memoryKb, int iterations, int parallelism, int hashLength)
         {
-            using var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
+            using var argon2id = new Argon2id(Encoding.UTF8.GetBytes(password))
             {
                 Salt = salt,
                 MemorySize = memoryKb,
@@ -94,7 +94,7 @@ namespace BreakingNewGround.Server.Services
                 DegreeOfParallelism = parallelism
             };
 
-            return argon2.GetBytes(hashLength);
+            return argon2id.GetBytes(hashLength);
         }
 
         private static string FormatPhc(byte[] salt, byte[] hash, int memoryKb, int iterations, int parallelism)

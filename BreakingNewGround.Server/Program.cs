@@ -27,7 +27,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnectionAzureSQL"), o => o.EnableRetryOnFailure(3)));
 
-builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, Argon2PasswordHasher>();
+builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, Argon2idPasswordHasherService>();
 
 builder.Services.AddHttpClient<IWeatherForecastService, WeatherForecastService>();
 
