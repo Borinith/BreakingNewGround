@@ -54,14 +54,14 @@ namespace BreakingNewGround.Server.Services
                     .Select(p => p.Split('='))
                     .ToDictionary(p => p[0], p => int.Parse(p[1]));
 
-                int memory = paramsDict["m"];
-                int iterations = paramsDict["t"];
-                int parallelism = paramsDict["p"];
+                var memory = paramsDict["m"];
+                var iterations = paramsDict["t"];
+                var parallelism = paramsDict["p"];
 
-                byte[] salt = Convert.FromBase64String(PadBase64(parts[4]));
-                byte[] expectedHash = Convert.FromBase64String(PadBase64(parts[5]));
+                var salt = Convert.FromBase64String(PadBase64(parts[4]));
+                var expectedHash = Convert.FromBase64String(PadBase64(parts[5]));
 
-                byte[] actualHash = ComputeHash(password, salt, memory, iterations, parallelism, expectedHash.Length);
+                var actualHash = ComputeHash(password, salt, memory, iterations, parallelism, expectedHash.Length);
 
                 if (!CryptographicOperations.FixedTimeEquals(actualHash, expectedHash))
                 {
@@ -69,7 +69,7 @@ namespace BreakingNewGround.Server.Services
                 }
 
                 // Если параметры не совпадают с текущими дефолтами — просим Identity перехэшировать
-                bool parametersOutdated =
+                var parametersOutdated =
                     memory != MemoryKb ||
                     iterations != Iterations ||
                     parallelism != DegreeOfParallelism;
@@ -99,15 +99,15 @@ namespace BreakingNewGround.Server.Services
 
         private static string FormatPhc(byte[] salt, byte[] hash, int memoryKb, int iterations, int parallelism)
         {
-            string saltB64 = Convert.ToBase64String(salt).TrimEnd('=');
-            string hashB64 = Convert.ToBase64String(hash).TrimEnd('=');
+            var saltB64 = Convert.ToBase64String(salt).TrimEnd('=');
+            var hashB64 = Convert.ToBase64String(hash).TrimEnd('=');
 
             return $"$argon2id$v=19$m={memoryKb},t={iterations},p={parallelism}${saltB64}${hashB64}";
         }
 
         private static string PadBase64(string value)
         {
-            int padding = (4 - value.Length % 4) % 4;
+            var padding = (4 - value.Length % 4) % 4;
 
             return padding > 0 ? value + new string('=', padding) : value;
         }
