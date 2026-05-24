@@ -26,8 +26,8 @@ mat-tab-nav-panel {
 }
 
 @media (max-width: 600px) {
-  .horizontalTabs {
-    font-size: 1em;
+  .horizontalTabs ::ng-deep .mdc-tab__text-label {
+    font-size: 0.9em;
   }
 
   mat-tab-nav-panel {
