@@ -173,6 +173,10 @@
       grid-column: 1 / -1;
     }
 
+    .current-grid .current-detail {
+      justify-content: center;
+    }
+
   .daily-grid {
     grid-template-columns: 1fr;
   }
@@ -201,6 +205,10 @@
 
   .daily-card .daily-temp {
     grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .daily-card .daily-row {
     justify-content: center;
   }
 }
