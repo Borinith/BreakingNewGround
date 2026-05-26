@@ -1,4 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
@@ -35,10 +36,15 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
     private service: ImagesService,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private confirmDialogService: ConfirmDialogService,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
     private destroyRef: DestroyRef) { }
+
+  goBack(): void {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

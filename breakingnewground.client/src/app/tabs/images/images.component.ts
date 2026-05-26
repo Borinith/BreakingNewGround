@@ -181,6 +181,15 @@ export class ImagesComponent implements OnInit, OnDestroy {
     return image.id;
   }
 
+  navigateToTag(tag: string): void {
+    if (this.searchControl.value === tag) {
+      return;
+    }
+    this.router.navigate(['/tabs/images'], {
+      queryParams: this.buildQueryParams(tag)
+    });
+  }
+
   ngOnDestroy(): void {
     this.pageReset$.next();
     this.pageReset$.complete();
@@ -188,19 +197,23 @@ export class ImagesComponent implements OnInit, OnDestroy {
   }
 
   private syncUrl(): void {
-    const trimmed = this.searchControl.value.trim();
+    this.router.navigate(['/tabs/images'], {
+      queryParams: this.buildQueryParams(),
+      replaceUrl: true
+    });
+  }
+
+  private buildQueryParams(tagOverride?: string): Record<string, string> {
+    const tag = tagOverride !== undefined ? tagOverride : this.searchControl.value.trim();
     const onlyFavorites = this.favoritesControl.value;
     const queryParams: Record<string, string> = {};
-    if (trimmed) {
-      queryParams['tag'] = trimmed;
+    if (tag) {
+      queryParams['tag'] = tag;
     }
     if (onlyFavorites) {
       queryParams['favorites'] = 'true';
     }
-    this.router.navigate(['/tabs/images'], {
-      queryParams,
-      replaceUrl: true
-    });
+    return queryParams;
   }
 
   private loadImages(pageIndex: number = this.paginator?.pageIndex ?? 0): void {

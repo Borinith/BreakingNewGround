@@ -115,8 +115,7 @@
             @if (image.tags.length > 0) {
               <mat-chip-set class="image-tags">
                 @for (tag of image.tags; track tag) {
-                  <mat-chip>{{ tag }}</mat-chip>
-                  <!-- <a mat-chip [routerLink]="['/tabs/images']" [queryParams]="{ tag: tag }">{{ tag }}</a> -->
+                  <mat-chip (click)="navigateToTag(tag)">{{ tag }}</mat-chip>
                 }
               </mat-chip-set>
             }

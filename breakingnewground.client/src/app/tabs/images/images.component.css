@@ -42,11 +42,12 @@
   height: 40px;
   text-decoration: none;
   justify-self: start;
+  min-width: 120px;
 }
 
 .search-field {
   grid-column: 2;
-  min-width: 300px;
+  min-width: 290px;
   max-width: 600px;
   width: 100%;
   justify-self: center;
@@ -157,6 +158,10 @@
   justify-content: center;
   background: rgba(255, 255, 255, 0.6);
   z-index: 50;
+}
+
+mat-paginator ::ng-deep .mat-mdc-paginator-container {
+  justify-content: center;
 }
 
 @media (max-width: 600px) {

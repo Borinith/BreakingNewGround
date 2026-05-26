@@ -1,8 +1,8 @@
 <div class="detail-wrapper">
   <div class="detail-toolbar">
-    <a mat-icon-button [routerLink]="['/tabs/images']" matTooltip="Назад к картинкам">
+    <button mat-icon-button (click)="goBack()" matTooltip="Назад к картинкам">
       <mat-icon>arrow_back</mat-icon>
-    </a>
+    </button>
   </div>
 
   @if (errorMessage) {
