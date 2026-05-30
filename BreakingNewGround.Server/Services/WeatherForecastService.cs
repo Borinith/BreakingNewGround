@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -50,9 +51,9 @@ namespace BreakingNewGround.Server.Services
             _settings = settings.Value;
         }
 
-        public IReadOnlyList<string> GetCities()
+        public ImmutableArray<string> GetCities()
         {
-            return _settings.Cities.Select(c => c.Name).ToList();
+            return _settings.Cities.Select(c => c.Name).ToImmutableArray();
         }
 
         public async Task<WeatherForecast> GetWeatherForecastAsync(string? cityName, bool forceRefresh, CancellationToken cancellationToken)

@@ -199,7 +199,7 @@ namespace BreakingNewGround.Server.Services
 
             var toRemove = image.Tags
                 .ExceptBy(normalized, t => t.Name, StringComparer.InvariantCultureIgnoreCase)
-                .ToList();
+                .ToArray();
 
             foreach (var tag in toRemove)
             {
