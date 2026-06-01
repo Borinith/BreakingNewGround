@@ -22,7 +22,7 @@ import { ImagesService } from './images.service';
 export class ImagesComponent implements OnInit, OnDestroy {
 
   readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
-  readonly pageSize = 20;
+  readonly pageSize = 12;
 
   @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;

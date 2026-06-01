@@ -170,13 +170,7 @@ namespace BreakingNewGround.Server.Controllers
 
         private static RefreshToken GenerateRefreshToken(string userName)
         {
-            var randomBytes = new byte[64];
-
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomBytes);
-            }
-
+            var randomBytes = RandomNumberGenerator.GetBytes(64);
             var token = WebEncoders.Base64UrlEncode(randomBytes);
 
             return new RefreshToken(

@@ -1,6 +1,5 @@
 .images-wrapper {
   position: relative;
-  padding: 20px;
 }
 
 .upload-panel {
@@ -165,10 +164,6 @@ mat-paginator ::ng-deep .mat-mdc-paginator-container {
 }
 
 @media (max-width: 600px) {
-  .images-wrapper {
-    padding: 12px;
-  }
-
   .search-row {
     grid-template-columns: auto 1fr;
   }
