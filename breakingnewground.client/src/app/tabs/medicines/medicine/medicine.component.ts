@@ -23,7 +23,7 @@ import { MedicineService } from './medicine.service';
   selector: 'app-medicine',
   templateUrl: './medicine.component.html',
   standalone: false,
-  styleUrls: ['./medicine.component.css', '../medicines.component.css']
+  styleUrls: ['../medicines.component.css', './medicine.component.css']
 })
 
 export class MedicineComponent extends BaseEntityComponent<Medicine> implements AfterViewInit {

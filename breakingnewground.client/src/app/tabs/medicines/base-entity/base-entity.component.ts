@@ -22,7 +22,7 @@ export abstract class BaseEntityComponent<T> implements AfterViewInit, OnDestroy
   updatedId: number | null = null;
   errorId: number | null = null;
   total = 0;
-  pageSize = 20;
+  pageSize = 10;
 
   protected sort?: MatSort;
   protected paginator?: MatPaginator;
