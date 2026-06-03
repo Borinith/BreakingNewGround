@@ -11,14 +11,6 @@
   margin-bottom: 16px;
 }
 
-.detail-title {
-  flex: 1;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 500;
-  word-break: break-all;
-}
-
 .error-card {
   margin-bottom: 16px;
   background-color: #ffebee;
