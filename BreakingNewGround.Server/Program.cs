@@ -5,6 +5,7 @@ using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,20 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes =
+    [
+        "text/html",
+        "text/css",
+        "text/javascript",
+        "application/javascript"
+    ];
+});
 
 /*builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnectionSQLite")));*/
@@ -84,6 +99,8 @@ using var app = builder.Build();
 #pragma warning disable DF0001
 app.MapDefaultEndpoints();
 #pragma warning restore DF0001
+
+app.UseResponseCompression();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
