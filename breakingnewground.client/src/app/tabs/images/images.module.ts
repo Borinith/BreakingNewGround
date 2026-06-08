@@ -18,12 +18,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { ImageDetailComponent } from './image-detail/image-detail.component';
 import { ImagesComponent } from './images.component';
+import { PluralRuPipe } from './plural-ru.pipe';
 import { TagsListComponent } from './tags-list/tags-list.component';
 
 @NgModule({
   declarations: [
-    ImagesComponent,
     ImageDetailComponent,
+    ImagesComponent,
+    PluralRuPipe,
     TagsListComponent
   ],
   imports: [

@@ -24,7 +24,7 @@
         <mat-card class="tag-card">
           <mat-card-content>
             <div class="tag-name">{{ tag.name }}</div>
-            <div class="tag-count">{{ tag.imageCount }} картинок</div>
+            <div class="tag-count">{{ tag.imageCount }} {{ tag.imageCount | pluralRu: 'картинка' : 'картинки' : 'картинок' }}</div>
           </mat-card-content>
         </mat-card>
       </a>

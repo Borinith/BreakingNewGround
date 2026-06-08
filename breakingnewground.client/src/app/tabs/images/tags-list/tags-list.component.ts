@@ -7,7 +7,7 @@ import { ImagesService } from '../images.service';
   selector: 'app-tags-list',
   templateUrl: './tags-list.component.html',
   standalone: false,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./tags-list.component.css']
 })
 export class TagsListComponent implements OnInit {
@@ -29,13 +29,13 @@ export class TagsListComponent implements OnInit {
       next: tags => {
         this.tags = tags;
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: err => {
         console.error('Load tags error', err);
         this.errorMessage = 'Не удалось загрузить теги';
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }

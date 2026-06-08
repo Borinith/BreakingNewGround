@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
   selector: 'app-medicines',
   templateUrl: './medicines.component.html',
   standalone: false,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./medicines.component.css']
 })
 
