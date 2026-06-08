@@ -1,4 +1,4 @@
-import { afterNextRender, AfterViewInit, ChangeDetectorRef, Component, Injector } from '@angular/core';
+import { afterNextRender, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { catchError, forkJoin, of, Subscription } from 'rxjs';
@@ -23,6 +23,7 @@ import { MedicineService } from './medicine.service';
   selector: 'app-medicine',
   templateUrl: './medicine.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['../medicines.component.css', './medicine.component.css']
 })
 

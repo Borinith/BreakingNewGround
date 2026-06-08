@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { interval, Subject, switchMap } from 'rxjs';
@@ -9,6 +9,7 @@ import { WeatherForecastService } from './weatherforecast.service';
   selector: 'app-weatherforecast',
   templateUrl: './weatherforecast.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./weatherforecast.component.css']
 })
 export class WeatherForecastComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Tag } from '../images.model';
 import { ImagesService } from '../images.service';
@@ -7,6 +7,7 @@ import { ImagesService } from '../images.service';
   selector: 'app-tags-list',
   templateUrl: './tags-list.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tags-list.component.css']
 })
 export class TagsListComponent implements OnInit {

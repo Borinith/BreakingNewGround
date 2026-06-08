@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-tabs',
   templateUrl: './tabs.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./tabs.component.css']
 })
 

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { BaseEntityComponent } from '../base-entity/base-entity.component';
@@ -9,6 +9,7 @@ import { MedicineTypeService } from './medicine-type.service';
   selector: 'app-medicinetypes',
   templateUrl: '../base-entity/base-entity.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['../medicines.component.css']
 })
 
