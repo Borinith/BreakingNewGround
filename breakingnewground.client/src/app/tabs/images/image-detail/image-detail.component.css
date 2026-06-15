@@ -89,6 +89,7 @@
   vertical-align: top;
   font-size: 14px;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .info-table td:first-child {
