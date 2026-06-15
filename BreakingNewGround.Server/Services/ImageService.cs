@@ -237,9 +237,8 @@ namespace BreakingNewGround.Server.Services
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
-            var affected = await _context.Images
-                .Where(i => i.Id == id)
-                .ExecuteDeleteAsync(cancellationToken);
+            var affected = await _context.Database
+                .ExecuteSqlAsync($"DELETE FROM [Images] WHERE [Id] = {id}", cancellationToken);
 
             /*var orphanTags = await _context.Tags
                 .Where(t => !t.Images.Any())
