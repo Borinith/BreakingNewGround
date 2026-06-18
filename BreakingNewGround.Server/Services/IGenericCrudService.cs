@@ -1,7 +1,8 @@
-﻿using System.Threading;
+﻿using BreakingNewGround.Server.Models;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace BreakingNewGround.Server.Models
+namespace BreakingNewGround.Server.Services
 {
     public interface IGenericCrudService<T>
         where T : class

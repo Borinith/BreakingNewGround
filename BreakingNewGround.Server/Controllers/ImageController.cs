@@ -1,4 +1,5 @@
-﻿using BreakingNewGround.Server.Models;
+﻿using BreakingNewGround.Server.Attributes;
+using BreakingNewGround.Server.Models;
 using BreakingNewGround.Server.Models.Image;
 using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,7 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public Task<PagedResult<ImageMetadataDto>> GetAll(
+        public async Task<ActionResult<PagedResult<ImageMetadataDto>>> GetAll(
             [FromQuery] string? query,
             [FromQuery] bool onlyFavorites,
             [FromQuery] int page,
@@ -41,25 +42,23 @@ namespace BreakingNewGround.Server.Controllers
                 pageSize = 20;
             }
 
-            return _service.GetAllAsync(query, onlyFavorites, page, pageSize, cancellationToken);
+            var result = await _service.GetAllAsync(query, onlyFavorites, page, pageSize, cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("[action]/{id:guid}")]
         public async Task<ActionResult<ImageMetadataDto>> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var image = await _service.GetByIdAsync(id, cancellationToken);
+            var result = await _service.GetByIdAsync(id, cancellationToken);
 
-            if (image is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(image);
+            return result is not null ? Ok(result) : NotFound();
         }
 
         [HttpGet]
         [Route("[action]/{id:guid}")]
+        [ImmutableResponseCache(Duration = 31536000, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetThumbnail(Guid id, CancellationToken cancellationToken)
         {
             var result = await _service.GetThumbnailAsync(id, cancellationToken);
@@ -69,13 +68,12 @@ namespace BreakingNewGround.Server.Controllers
                 return NotFound();
             }
 
-            Response.Headers.CacheControl = "private, max-age=31536000, immutable";
-
             return File(result.Value.Bytes, result.Value.ContentType);
         }
 
         [HttpGet]
         [Route("[action]/{id:guid}")]
+        [ImmutableResponseCache(Duration = 31536000, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetOriginal(Guid id, CancellationToken cancellationToken)
         {
             var result = await _service.GetOriginalAsync(id, cancellationToken);
@@ -85,23 +83,25 @@ namespace BreakingNewGround.Server.Controllers
                 return NotFound();
             }
 
-            Response.Headers.CacheControl = "private, max-age=31536000, immutable";
-
             return File(result.Value.Bytes, result.Value.ContentType, result.Value.FileName);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public Task<TagDto[]> GetAllTags(CancellationToken cancellationToken)
+        public async Task<ActionResult<TagDto[]>> GetAllTags(CancellationToken cancellationToken)
         {
-            return _service.GetAllTagsAsync(cancellationToken);
+            var result = await _service.GetAllTagsAsync(cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public Task<string[]> SuggestTags([FromQuery] string query, CancellationToken cancellationToken)
+        public async Task<ActionResult<string[]>> SuggestTags([FromQuery] string query, CancellationToken cancellationToken)
         {
-            return _service.SuggestTagsAsync(query, cancellationToken);
+            var result = await _service.SuggestTagsAsync(query, cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpPost]
@@ -130,9 +130,11 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpDelete]
         [Route("[action]/{id:guid}")]
-        public async Task<bool> Delete(Guid id, CancellationToken cancellationToken)
+        public async Task<ActionResult<bool>> Delete(Guid id, CancellationToken cancellationToken)
         {
-            return await _service.DeleteAsync(id, cancellationToken);
+            var result = await _service.DeleteAsync(id, cancellationToken);
+
+            return result ? Ok(result) : NotFound();
         }
 
         [HttpPut]
@@ -144,12 +146,7 @@ namespace BreakingNewGround.Server.Controllers
         {
             var result = await _service.SetTagsAsync(id, tags ?? [], cancellationToken);
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            return result is not null ? Ok(result) : NotFound();
         }
 
         [HttpPut]
@@ -161,12 +158,7 @@ namespace BreakingNewGround.Server.Controllers
         {
             var result = await _service.SetFavoriteAsync(id, isFavorite, cancellationToken);
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            return result is not null ? Ok(result) : NotFound();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using BreakingNewGround.Server.DAL.AzureSQL.Data;
-using BreakingNewGround.Server.Models;
+using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
