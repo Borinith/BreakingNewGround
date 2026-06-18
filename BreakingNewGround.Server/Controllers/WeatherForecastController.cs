@@ -3,6 +3,7 @@ using BreakingNewGround.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,14 +27,16 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public Task<WeatherForecast> GetWeatherForecast([FromQuery] string? city, [FromQuery] bool forceRefresh, CancellationToken cancellationToken)
+        public async Task<ActionResult<WeatherForecast>> GetWeatherForecast([FromQuery] string? city, [FromQuery] bool forceRefresh, CancellationToken cancellationToken)
         {
-            return _service.GetWeatherForecastAsync(city, forceRefresh, cancellationToken);
+            var forecast = await _service.GetWeatherForecastAsync(city, forceRefresh, cancellationToken);
+
+            return Ok(forecast);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetCities()
+        public ActionResult<ImmutableArray<string>> GetCities()
         {
             return Ok(_service.GetCities());
         }
