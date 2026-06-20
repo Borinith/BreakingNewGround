@@ -9,7 +9,7 @@ namespace BreakingNewGround.Server.Services
     {
         Task<T> CreateAsync(T model, CancellationToken cancellationToken);
 
-        Task<T> GetByIdAsync(long id, string[] includes, CancellationToken cancellationToken);
+        Task<T?> GetByIdAsync(long id, string[] includes, CancellationToken cancellationToken);
 
         Task<PagedResult<T>> GetAllAsync(GetRequest request, string[] includes, CancellationToken cancellationToken);
 

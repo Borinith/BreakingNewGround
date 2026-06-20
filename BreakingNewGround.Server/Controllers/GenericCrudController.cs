@@ -26,37 +26,47 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<T> CreateAsync(T model, CancellationToken cancellationToken)
+        public async Task<ActionResult<T>> CreateAsync(T model, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.CreateAsync(model, cancellationToken);
+            var result = await _genericCrudService.CreateAsync(model, cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("[action]/{id:long}")]
-        public async Task<T> GetByIdAsync(long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<T>> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.GetByIdAsync(id, _includes, cancellationToken);
+            var result = await _genericCrudService.GetByIdAsync(id, _includes, cancellationToken);
+
+            return result is not null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<PagedResult<T>> GetAllAsync([FromBody] GetRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<T>>> GetAllAsync([FromBody] GetRequest request, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.GetAllAsync(request, _includes, cancellationToken);
+            var result = await _genericCrudService.GetAllAsync(request, _includes, cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpPut]
         [Route("[action]")]
-        public async Task<T> UpdateAsync(T model, CancellationToken cancellationToken)
+        public async Task<ActionResult<T>> UpdateAsync(T model, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.UpdateAsync(model, cancellationToken);
+            var result = await _genericCrudService.UpdateAsync(model, cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpDelete]
         [Route("[action]/{id:long}")]
-        public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<bool>> DeleteAsync(long id, CancellationToken cancellationToken)
         {
-            return await _genericCrudService.DeleteAsync(id, cancellationToken);
+            var result = await _genericCrudService.DeleteAsync(id, cancellationToken);
+
+            return result ? Ok(result) : NotFound();
         }
     }
 }

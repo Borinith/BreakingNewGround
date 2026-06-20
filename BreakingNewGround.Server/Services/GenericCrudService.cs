@@ -36,17 +36,12 @@ namespace BreakingNewGround.Server.Services
             return model;
         }
 
-        public async Task<T> GetByIdAsync(long id, string[] includes, CancellationToken cancellationToken)
+        public async Task<T?> GetByIdAsync(long id, string[] includes, CancellationToken cancellationToken)
         {
             var query = ApplyIncludes(_context.Set<T>(), includes).AsNoTracking();
             var lambda = GetLambdaWithExtractByValue(ID, ValueTypeEnum.Long, id, ComparisonEnum.Equal);
 
             var entity = await query.FirstOrDefaultAsync(lambda, cancellationToken);
-
-            if (entity is null)
-            {
-                throw new Exception("Not found");
-            }
 
             return entity;
         }
