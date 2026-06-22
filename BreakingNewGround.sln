@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL.AzureSQL", "BreakingNewGround.Server.DAL.AzureSQL\BreakingNewGround.Server.DAL.AzureSQL.csproj", "{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingNewGround.Server.DAL.BackupApp", "BreakingNewGround.Server.DAL.BackupApp\BreakingNewGround.Server.DAL.BackupApp.csproj", "{78253F61-F445-442C-BABE-5C4E3F576B5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C092BF36-CFDA-4D37-B8EF-74B226B2C05B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78253F61-F445-442C-BABE-5C4E3F576B5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78253F61-F445-442C-BABE-5C4E3F576B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78253F61-F445-442C-BABE-5C4E3F576B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78253F61-F445-442C-BABE-5C4E3F576B5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
