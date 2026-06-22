@@ -35,11 +35,15 @@ namespace BreakingNewGround.Server.DAL.BackupApp
 
         private static async Task CopyMedicines(AzureDb azureSQLContext, SqliteDb sqliteMedicinesContext)
         {
+            var azureMedicineBodyTypes = await azureSQLContext.MedicineBodyTypes.AsNoTracking().ToArrayAsync();
+            var azureMedicineTypes = await azureSQLContext.MedicineTypes.AsNoTracking().ToArrayAsync();
+            var azureMedicines = await azureSQLContext.Medicines.AsNoTracking().ToArrayAsync();
+
+            await using var transaction = await sqliteMedicinesContext.Database.BeginTransactionAsync();
+
             await sqliteMedicinesContext.Medicines.ExecuteDeleteAsync();
             await sqliteMedicinesContext.MedicineBodyTypes.ExecuteDeleteAsync();
             await sqliteMedicinesContext.MedicineTypes.ExecuteDeleteAsync();
-
-            var azureMedicineBodyTypes = await azureSQLContext.MedicineBodyTypes.AsNoTracking().ToArrayAsync();
 
             await sqliteMedicinesContext.MedicineBodyTypes
                 .AddRangeAsync(azureMedicineBodyTypes.Select(x => new SQLite.Data.MedicineBodyType
@@ -48,16 +52,12 @@ namespace BreakingNewGround.Server.DAL.BackupApp
                     Name = x.Name
                 }));
 
-            var azureMedicineTypes = await azureSQLContext.MedicineTypes.AsNoTracking().ToArrayAsync();
-
             await sqliteMedicinesContext.MedicineTypes
                 .AddRangeAsync(azureMedicineTypes.Select(x => new SQLite.Data.MedicineType
                 {
                     Id = x.Id,
                     Name = x.Name
                 }));
-
-            var azureMedicines = await azureSQLContext.Medicines.AsNoTracking().ToArrayAsync();
 
             await sqliteMedicinesContext.Medicines
                 .AddRangeAsync(azureMedicines.Select(x => new SQLite.Data.Medicine
@@ -72,6 +72,7 @@ namespace BreakingNewGround.Server.DAL.BackupApp
                 }));
 
             await sqliteMedicinesContext.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
     }
 }
