@@ -17,7 +17,7 @@ export class AuthService {
     private router: Router,
     private jwtHelper: JwtHelperService
   ) {
-    this.scheduleExpiryLogout();
+    this.scheduleExpiryLogout(); // Comment this for registration
   }
 
   login(userName: string, password: string) {
