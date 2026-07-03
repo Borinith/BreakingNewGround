@@ -3,7 +3,7 @@
     <a mat-icon-button [routerLink]="['/tabs/images']" matTooltip="Назад к картинкам">
       <mat-icon>arrow_back</mat-icon>
     </a>
-    <h2 class="tags-title">Все теги</h2>
+    <h2 class="tags-title">Все теги ({{ totalImageCount }})</h2>
   </div>
 
   @if (errorMessage) {

@@ -13,6 +13,7 @@ import { ImagesService } from '../images.service';
 export class TagsListComponent implements OnInit {
 
   tags: Tag[] = [];
+  totalImageCount = 0;
   isLoading = false;
   errorMessage: string | null = null;
 
@@ -28,6 +29,7 @@ export class TagsListComponent implements OnInit {
     ).subscribe({
       next: tags => {
         this.tags = tags;
+        this.totalImageCount = tags.length;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
