@@ -28,7 +28,7 @@ namespace BreakingNewGround.Server.Services
             _processor = processor;
         }
 
-        public async Task<UploadResultDto> UploadAsync(IFormFile file, string[] tags, CancellationToken cancellationToken)
+        public async Task<UploadResultDto> UploadAsync(IFormFile file, string[] tags, IFormFile? thumbnail, CancellationToken cancellationToken)
         {
             var bytes = await ReadAllBytesAsync(file, cancellationToken);
             var hash = SHA256.HashData(bytes);
@@ -45,7 +45,11 @@ namespace BreakingNewGround.Server.Services
                 return new UploadResultDto(existing.Id, true, addedTagNames);
             }
 
-            var processed = await _processor.ProcessAsync(bytes, cancellationToken);
+            var thumbnailSource = (thumbnail is not null && thumbnail.Length > 0)
+                ? await ReadAllBytesAsync(thumbnail, cancellationToken)
+                : bytes;
+
+            var processed = await _processor.ProcessAsync(thumbnailSource, cancellationToken);
             var resolvedTags = await ResolveTagsAsync(normalizedTagNames, cancellationToken);
 
             var image = new ImageEntity

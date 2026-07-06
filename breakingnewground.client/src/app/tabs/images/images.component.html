@@ -10,7 +10,7 @@
       <input type="file"
              #fileInput
              hidden
-             accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff"
+             accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff,video/mp4"
              (change)="onFileSelected($event)" />
 
       <div class="upload-row">
@@ -98,17 +98,20 @@
       @for (image of images; track trackById($index, image)) {
         <mat-card class="image-card">
           <a class="image-link" [routerLink]="['/tabs/images', image.id]">
-            @if (thumbnailUrls.get(image.id); as url) {
-              <img class="image-thumb"
-                   [src]="url"
-                   [alt]="image.originalFileName" />
-            } @else {
+            <img class="image-thumb"
+                 [src]="thumbnailUrl(image.id)"
+                 [alt]="image.originalFileName"
+                 (load)="onThumbnailLoaded(image.id)" />
+            @if (!loadedThumbnails.has(image.id)) {
               <div class="image-thumb image-thumb-placeholder">
                 <mat-spinner diameter="30"></mat-spinner>
               </div>
             }
             @if (image.isFavorite) {
               <mat-icon class="favorite-overlay">favorite</mat-icon>
+            }
+            @if (image.contentType.startsWith('video/')) {
+              <mat-icon class="video-overlay">play_circle</mat-icon>
             }
           </a>
           <mat-card-content class="image-card-content">

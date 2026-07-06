@@ -1,6 +1,6 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -19,14 +19,13 @@ import { ImagesService } from '../images.service';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./image-detail.component.css']
 })
-export class ImageDetailComponent implements OnInit, OnDestroy {
+export class ImageDetailComponent implements OnInit {
 
   readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
 
   @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
 
   image: ImageMetadata | null = null;
-  originalObjectUrl: string | null = null;
   isLoading = false;
   errorMessage: string | null = null;
 
@@ -47,10 +46,14 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
+  originalUrl(id: string): string {
+    return this.service.getOriginalUrl(id);
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
-      this.errorMessage = 'Картинка не найдена';
+      this.errorMessage = 'Файл не найден';
       return;
     }
 
@@ -58,7 +61,7 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
       debounceTime(200),
       distinctUntilChanged(),
       switchMap(query => {
-        if (!query || !query.trim()) {
+        if (!query || !query.trim() || query.length < 2) {
           return of([] as string[]);
         }
         return this.service.suggestTags(query.trim()).pipe(
@@ -74,10 +77,6 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
     });
 
     this.loadImage(id);
-  }
-
-  ngOnDestroy(): void {
-    this.revokeOriginal();
   }
 
   addTagFromInput(event: MatChipInputEvent): void {
@@ -145,7 +144,7 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
             next: () => this.router.navigate(['/tabs/images']),
             error: err => {
               console.error('Delete error', err);
-              this.snackBar.open('Не удалось удалить картинку', 'OK', { duration: 5000 });
+              this.snackBar.open('Не удалось удалить файл', 'OK', { duration: 5000 });
             }
           });
         }
@@ -194,38 +193,15 @@ export class ImageDetailComponent implements OnInit, OnDestroy {
         this.image = image;
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.fetchOriginal(id);
       },
       error: err => {
         console.error('Load image error', err);
         this.errorMessage = err.status === 404
-          ? 'Картинка не найдена'
-          : 'Не удалось загрузить картинку';
+          ? 'Файл не найден'
+          : 'Не удалось загрузить файл';
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
-  }
-
-  private fetchOriginal(id: string): void {
-    this.service.getOriginalBlob(id).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: blob => {
-        this.revokeOriginal();
-        this.originalObjectUrl = URL.createObjectURL(blob);
-        this.cdr.detectChanges();
-      },
-      error: err => {
-        console.error('Original load error', err);
-      }
-    });
-  }
-
-  private revokeOriginal(): void {
-    if (this.originalObjectUrl) {
-      URL.revokeObjectURL(this.originalObjectUrl);
-      this.originalObjectUrl = null;
-    }
   }
 }

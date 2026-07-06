@@ -17,7 +17,7 @@ namespace BreakingNewGround.Server.Controllers
     [Route("api/[controller]")]
     public class ImageController : ControllerBase
     {
-        private const long MaxUploadSizeBytes = 5 * 1024 * 1024;
+        private const long MaxUploadSizeBytes = 15 * 1024 * 1024;
 
         private readonly IImageService _service;
         private readonly ILogger<ImageController> _logger;
@@ -53,37 +53,33 @@ namespace BreakingNewGround.Server.Controllers
         {
             var result = await _service.GetByIdAsync(id, cancellationToken);
 
-            return result is not null ? Ok(result) : NotFound();
+            return result.HasValue ? Ok(result) : NotFound();
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("[action]/{id:guid}")]
         [ImmutableResponseCache(Duration = 31536000, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetThumbnail(Guid id, CancellationToken cancellationToken)
         {
             var result = await _service.GetThumbnailAsync(id, cancellationToken);
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return File(result.Value.Bytes, result.Value.ContentType);
+            return result.HasValue
+                ? File(result.Value.Bytes, result.Value.ContentType)
+                : NotFound();
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("[action]/{id:guid}")]
         [ImmutableResponseCache(Duration = 31536000, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetOriginal(Guid id, CancellationToken cancellationToken)
         {
             var result = await _service.GetOriginalAsync(id, cancellationToken);
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return File(result.Value.Bytes, result.Value.ContentType, result.Value.FileName);
+            return result.HasValue
+                ? File(result.Value.Bytes, result.Value.ContentType, result.Value.FileName)
+                : NotFound();
         }
 
         [HttpGet]
@@ -111,6 +107,7 @@ namespace BreakingNewGround.Server.Controllers
         public async Task<ActionResult<UploadResultDto>> Upload(
             [FromForm] IFormFile file,
             [FromForm] string[] tags,
+            [FromForm] IFormFile? thumbnail,
             CancellationToken cancellationToken)
         {
             if (file is null || file.Length == 0)
@@ -123,7 +120,14 @@ namespace BreakingNewGround.Server.Controllers
                 return BadRequest($"File exceeds {MaxUploadSizeBytes} bytes");
             }
 
-            var result = await _service.UploadAsync(file, tags ?? [], cancellationToken);
+            var isVideo = file.ContentType?.StartsWith("video/", StringComparison.OrdinalIgnoreCase);
+
+            if (isVideo.HasValue && isVideo.Value && (thumbnail is null || thumbnail.Length == 0))
+            {
+                return BadRequest("Video upload requires a poster thumbnail");
+            }
+
+            var result = await _service.UploadAsync(file, tags ?? [], thumbnail, cancellationToken);
 
             return Ok(result);
         }
@@ -146,7 +150,7 @@ namespace BreakingNewGround.Server.Controllers
         {
             var result = await _service.SetTagsAsync(id, tags ?? [], cancellationToken);
 
-            return result is not null ? Ok(result) : NotFound();
+            return result.HasValue ? Ok(result) : NotFound();
         }
 
         [HttpPut]
@@ -158,7 +162,7 @@ namespace BreakingNewGround.Server.Controllers
         {
             var result = await _service.SetFavoriteAsync(id, isFavorite, cancellationToken);
 
-            return result is not null ? Ok(result) : NotFound();
+            return result.HasValue ? Ok(result) : NotFound();
         }
     }
 }

@@ -29,12 +29,16 @@ export class ImagesService {
     return this.http.get<PagedResult<ImageMetadata>>(`${this.baseUrl}/GetAll`, { params });
   }
 
-  upload(file: File, tags: string[]): Observable<UploadResult> {
+  upload(file: File, tags: string[], thumbnail?: Blob): Observable<UploadResult> {
     const formData = new FormData();
     formData.append('file', file);
 
     for (const tag of tags) {
       formData.append('tags', tag);
+    }
+
+    if (thumbnail) {
+      formData.append('thumbnail', thumbnail, 'poster.jpg');
     }
 
     return this.http.post<UploadResult>(`${this.baseUrl}/Upload`, formData);
@@ -66,11 +70,11 @@ export class ImagesService {
     return this.http.get<string[]>(`${this.baseUrl}/SuggestTags`, { params });
   }
 
-  getThumbnailBlob(id: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/GetThumbnail/${id}`, { responseType: 'blob' });
+  getThumbnailUrl(id: string): string {
+    return `${this.baseUrl}/GetThumbnail/${id}`;
   }
 
-  getOriginalBlob(id: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/GetOriginal/${id}`, { responseType: 'blob' });
+  getOriginalUrl(id: string): string {
+    return `${this.baseUrl}/GetOriginal/${id}`;
   }
 }

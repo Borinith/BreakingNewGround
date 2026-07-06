@@ -14,10 +14,14 @@
   @if (image) {
     <div class="detail-content">
       <div class="image-container">
-        @if (originalObjectUrl) {
-          <img class="detail-image" [src]="originalObjectUrl" [alt]="image.originalFileName" />
+        @if (image.contentType.startsWith('video/')) {
+          <video class="detail-image"
+                 [src]="originalUrl(image.id)"
+                 controls></video>
         } @else {
-          <mat-spinner diameter="40"></mat-spinner>
+          <img class="detail-image"
+               [src]="originalUrl(image.id)"
+               [alt]="image.originalFileName" />
         }
         @if (image.isFavorite) {
           <mat-icon class="favorite-overlay">favorite</mat-icon>
@@ -60,14 +64,10 @@
             <tr>
               <td>Название:</td>
               <td>
-                @if (originalObjectUrl) {
-                  <a [href]="originalObjectUrl"
-                     [download]="image.originalFileName"
-                     matTooltip="Скачать оригинал"
-                     class="download-link">{{ image.originalFileName }}</a>
-                } @else {
-                  {{ image.originalFileName }}
-                }
+                <a [href]="originalUrl(image.id)"
+                   [download]="image.originalFileName"
+                   matTooltip="Скачать оригинал"
+                   class="download-link">{{ image.originalFileName }}</a>
               </td>
             </tr>
             <tr>

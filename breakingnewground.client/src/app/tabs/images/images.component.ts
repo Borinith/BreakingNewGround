@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -8,7 +8,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, combineLatest, debounceTime, distinctUntilChanged, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, combineLatest, debounceTime, distinctUntilChanged, of, startWith, switchMap } from 'rxjs';
 import { ConfirmDialogService } from '../../dialog/confirm-dialog/confirm-dialog.service';
 import { ImageMetadata, UploadResult } from './images.model';
 import { ImagesService } from './images.service';
@@ -20,7 +20,7 @@ import { ImagesService } from './images.service';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./images.component.css']
 })
-export class ImagesComponent implements OnInit, OnDestroy {
+export class ImagesComponent implements OnInit {
 
   readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
   readonly pageSize = 12;
@@ -31,12 +31,10 @@ export class ImagesComponent implements OnInit, OnDestroy {
   @ViewChild('uploadPanel') uploadPanel?: MatExpansionPanel;
 
   images: ImageMetadata[] = [];
-  thumbnailUrls = new Map<string, string>();
+  loadedThumbnails = new Set<string>();
   total = 0;
   isLoading = false;
   errorMessage: string | null = null;
-
-  private readonly pageReset$ = new Subject<void>();
 
   searchControl = new FormControl<string>('', { nonNullable: true });
   favoritesControl = new FormControl<boolean>(false, { nonNullable: true });
@@ -76,7 +74,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
       debounceTime(200),
       distinctUntilChanged(),
       switchMap(query => {
-        if (!query || !query.trim()) {
+        if (!query || !query.trim() || query.length < 2) {
           return of([] as string[]);
         }
         return this.service.suggestTags(query.trim()).pipe(
@@ -101,6 +99,9 @@ export class ImagesComponent implements OnInit, OnDestroy {
 
   onPageChange(event: PageEvent): void {
     this.loadImages(event.pageIndex);
+    if (window.matchMedia('(max-width: 600px)').matches) {
+      window.scrollTo({ top: 0 });
+    }
   }
 
   onFileSelected(event: Event): void {
@@ -140,7 +141,24 @@ export class ImagesComponent implements OnInit, OnDestroy {
     this.isUploading = true;
     this.cdr.detectChanges();
 
-    this.service.upload(this.selectedFile, this.uploadTags).pipe(
+    const file = this.selectedFile;
+
+    if (file.type.startsWith('video/')) {
+      this.capturePoster(file)
+        .then(poster => this.sendUpload(file, poster))
+        .catch(err => {
+          console.error('Poster capture error', err);
+          this.isUploading = false;
+          this.snackBar.open('Не удалось создать превью для видео', 'OK', { duration: 5000 });
+          this.cdr.detectChanges();
+        });
+    } else {
+      this.sendUpload(file);
+    }
+  }
+
+  private sendUpload(file: File, thumbnail?: Blob): void {
+    this.service.upload(file, this.uploadTags, thumbnail).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: result => {
@@ -153,9 +171,52 @@ export class ImagesComponent implements OnInit, OnDestroy {
       error: err => {
         console.error('Upload error', err);
         this.isUploading = false;
-        this.snackBar.open('Не удалось загрузить картинку', 'OK', { duration: 5000 });
+        this.snackBar.open('Не удалось загрузить файл', 'OK', { duration: 5000 });
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  private capturePoster(file: File): Promise<Blob> {
+    return new Promise<Blob>((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      const objectUrl = URL.createObjectURL(file);
+
+      const cleanup = () => URL.revokeObjectURL(objectUrl);
+
+      video.onloadedmetadata = () => {
+        video.currentTime = Math.min(0.1, video.duration || 0);
+      };
+
+      video.onseeked = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        if (!context) {
+          cleanup();
+          reject(new Error('Canvas context unavailable'));
+          return;
+        }
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+          cleanup();
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('toBlob returned null'));
+          }
+        }, 'image/jpeg');
+      };
+
+      video.onerror = () => {
+        cleanup();
+        reject(new Error('Не удалось прочитать видео'));
+      };
+
+      video.src = objectUrl;
     });
   }
 
@@ -171,7 +232,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
             next: () => this.loadImages(),
             error: err => {
               console.error('Delete error', err);
-              this.snackBar.open('Не удалось удалить картинку', 'OK', { duration: 5000 });
+              this.snackBar.open('Не удалось удалить файл', 'OK', { duration: 5000 });
             }
           });
         }
@@ -182,6 +243,14 @@ export class ImagesComponent implements OnInit, OnDestroy {
     return image.id;
   }
 
+  thumbnailUrl(id: string): string {
+    return this.service.getThumbnailUrl(id);
+  }
+
+  onThumbnailLoaded(id: string): void {
+    this.loadedThumbnails.add(id);
+  }
+
   navigateToTag(tag: string): void {
     if (this.searchControl.value === tag) {
       return;
@@ -189,12 +258,6 @@ export class ImagesComponent implements OnInit, OnDestroy {
     this.router.navigate(['/tabs/images'], {
       queryParams: this.buildQueryParams(tag)
     });
-  }
-
-  ngOnDestroy(): void {
-    this.pageReset$.next();
-    this.pageReset$.complete();
-    this.revokeAllThumbnails();
   }
 
   private syncUrl(): void {
@@ -220,8 +283,6 @@ export class ImagesComponent implements OnInit, OnDestroy {
   private loadImages(pageIndex: number = this.paginator?.pageIndex ?? 0): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.pageReset$.next();
-    this.revokeAllThumbnails();
     this.cdr.detectChanges();
 
     this.service.getAll(this.searchControl.value.trim(), this.favoritesControl.value, pageIndex, this.pageSize).pipe(
@@ -232,46 +293,24 @@ export class ImagesComponent implements OnInit, OnDestroy {
         this.total = result.total;
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.images.forEach(img => this.fetchThumbnail(img.id));
       },
       error: err => {
         console.error('Load images error', err);
-        this.errorMessage = 'Не удалось загрузить картинки';
+        this.errorMessage = 'Не удалось загрузить файлы';
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  private fetchThumbnail(id: string): void {
-    this.service.getThumbnailBlob(id).pipe(
-      takeUntil(this.pageReset$),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: blob => {
-        const url = URL.createObjectURL(blob);
-        this.thumbnailUrls.set(id, url);
-        this.cdr.detectChanges();
-      },
-      error: err => {
-        console.error('Thumbnail load error', err);
-      }
-    });
-  }
-
-  private revokeAllThumbnails(): void {
-    this.thumbnailUrls.forEach(url => URL.revokeObjectURL(url));
-    this.thumbnailUrls.clear();
-  }
-
   private showUploadFeedback(result: UploadResult): void {
     let message: string;
     if (!result.wasDuplicate) {
-      message = 'Картинка загружена';
+      message = 'Файл загружен';
     } else if (result.addedTags.length > 0) {
-      message = `Эта картинка уже была загружена. Добавлены теги: ${result.addedTags.join(', ')}`;
+      message = `Этот файл уже был загружен. Добавлены теги: ${result.addedTags.join(', ')}`;
     } else {
-      message = 'Эта картинка уже загружена';
+      message = 'Этот файл уже загружен';
     }
     this.snackBar.open(message, 'OK', { duration: 5000 });
   }

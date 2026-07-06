@@ -9,7 +9,7 @@ namespace BreakingNewGround.Server.Services
 {
     public interface IImageService
     {
-        Task<UploadResultDto> UploadAsync(IFormFile file, string[] tags, CancellationToken cancellationToken);
+        Task<UploadResultDto> UploadAsync(IFormFile file, string[] tags, IFormFile? thumbnail, CancellationToken cancellationToken);
 
         Task<PagedResult<ImageMetadataDto>> GetAllAsync(string? query, bool onlyFavorites, int page, int pageSize, CancellationToken cancellationToken);
 
