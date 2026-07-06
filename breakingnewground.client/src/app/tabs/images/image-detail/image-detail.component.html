@@ -17,7 +17,9 @@
         @if (image.contentType.startsWith('video/')) {
           <video class="detail-image"
                  [src]="originalUrl(image.id)"
-                 controls></video>
+                 controls
+                 autoplay
+                 playsinline></video>
         } @else {
           <img class="detail-image"
                [src]="originalUrl(image.id)"
