@@ -2,6 +2,7 @@
 using BreakingNewGround.Server.Models.Image;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace BreakingNewGround.Server.Services
 
         Task<(byte[] Bytes, string ContentType, string FileName)?> GetOriginalAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<TagDto[]> GetAllTagsAsync(CancellationToken cancellationToken);
+        IAsyncEnumerable<TagDto> GetAllTagsAsync(CancellationToken cancellationToken);
 
         Task<string[]> SuggestTagsAsync(string query, CancellationToken cancellationToken);
 

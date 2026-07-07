@@ -84,9 +84,9 @@ namespace BreakingNewGround.Server.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<ActionResult<TagDto[]>> GetAllTags(CancellationToken cancellationToken)
+        public ActionResult<TagDto[]> GetAllTags(CancellationToken cancellationToken)
         {
-            var result = await _service.GetAllTagsAsync(cancellationToken);
+            var result = _service.GetAllTagsAsync(cancellationToken);
 
             return Ok(result);
         }

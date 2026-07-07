@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -163,13 +164,18 @@ namespace BreakingNewGround.Server.Services
             return (result.Original, result.ContentType, result.OriginalFileName);
         }
 
-        public async Task<TagDto[]> GetAllTagsAsync(CancellationToken cancellationToken)
+        public async IAsyncEnumerable<TagDto> GetAllTagsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            return await _context.Tags
+            var allTags = _context.Tags
                 .AsNoTracking()
                 .OrderBy(t => t.Name)
                 .Select(t => new TagDto(t.Id, t.Name, t.Images.Count))
-                .ToArrayAsync(cancellationToken);
+                .AsAsyncEnumerable();
+
+            await foreach (var tag in allTags.WithCancellation(cancellationToken))
+            {
+                yield return tag;
+            }
         }
 
         public async Task<string[]> SuggestTagsAsync(string query, CancellationToken cancellationToken)
