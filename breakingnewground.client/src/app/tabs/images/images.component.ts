@@ -9,7 +9,6 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, combineLatest, debounceTime, distinctUntilChanged, of, startWith, switchMap } from 'rxjs';
-import { ConfirmDialogService } from '../../dialog/confirm-dialog/confirm-dialog.service';
 import { ImageMetadata, UploadResult } from './images.model';
 import { ImagesService } from './images.service';
 
@@ -47,7 +46,6 @@ export class ImagesComponent implements OnInit {
 
   constructor(
     private service: ImagesService,
-    private confirmDialogService: ConfirmDialogService,
     private snackBar: MatSnackBar,
     private route: ActivatedRoute,
     private router: Router,
@@ -187,7 +185,7 @@ export class ImagesComponent implements OnInit {
       const cleanup = () => URL.revokeObjectURL(objectUrl);
 
       video.onloadedmetadata = () => {
-        video.currentTime = Math.min(0.1, video.duration || 0);
+        video.currentTime = Math.min(0.5, video.duration || 0);
       };
 
       video.onseeked = () => {
@@ -218,25 +216,6 @@ export class ImagesComponent implements OnInit {
 
       video.src = objectUrl;
     });
-  }
-
-  delete(id: string): void {
-    this.confirmDialogService.openConfirmDialog()
-      .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(result => {
-        if (result) {
-          this.service.delete(id).pipe(
-            takeUntilDestroyed(this.destroyRef)
-          ).subscribe({
-            next: () => this.loadImages(),
-            error: err => {
-              console.error('Delete error', err);
-              this.snackBar.open('Не удалось удалить файл', 'OK', { duration: 5000 });
-            }
-          });
-        }
-      });
   }
 
   trackById(_index: number, image: ImageMetadata): string {

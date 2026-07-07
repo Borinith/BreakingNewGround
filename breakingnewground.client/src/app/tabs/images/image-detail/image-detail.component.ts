@@ -141,7 +141,10 @@ export class ImageDetailComponent implements OnInit {
           this.service.delete(id).pipe(
             takeUntilDestroyed(this.destroyRef)
           ).subscribe({
-            next: () => this.router.navigate(['/tabs/images']),
+            next: () => {
+              this.router.navigate(['/tabs/images']);
+              this.snackBar.open('Файл удалён', 'OK', { duration: 5000 });
+            },
             error: err => {
               console.error('Delete error', err);
               this.snackBar.open('Не удалось удалить файл', 'OK', { duration: 5000 });
