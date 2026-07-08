@@ -78,7 +78,7 @@ namespace BreakingNewGround.Server.Controllers
             var result = await _service.GetOriginalAsync(id, cancellationToken);
 
             return result.HasValue
-                ? File(result.Value.Bytes, result.Value.ContentType, result.Value.FileName)
+                ? File(result.Value.Bytes, result.Value.ContentType, result.Value.FileName, true)
                 : NotFound();
         }
 
