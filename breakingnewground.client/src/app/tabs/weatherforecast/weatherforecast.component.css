@@ -130,11 +130,15 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   background: rgba(255, 255, 255, 0.6);
   z-index: 50;
 }
+
+  .loading-overlay mat-spinner {
+    margin-top: 140px;
+  }
 
 @media (max-width: 600px) {
   .weather-wrapper {
@@ -210,5 +214,9 @@
 
   .daily-card .daily-row {
     justify-content: center;
+  }
+
+  .loading-overlay mat-spinner {
+    margin-top: 240px;
   }
 }
