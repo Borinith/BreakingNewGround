@@ -6,8 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BreakingNewGround.Server.DAL.AzureSQL.Data
 {
-    [Index(nameof(Hash), IsUnique = true)]
     [Table("Images")]
+    [Index(nameof(Hash), IsUnique = true)]
+    [Index(nameof(UploadedAtUtc))]
     public class Image
     {
         [Key]

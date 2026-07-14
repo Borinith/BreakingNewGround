@@ -8,6 +8,7 @@ namespace BreakingNewGround.Server.DAL.BackupApp.Data_SQLite_Images
 {
     [Table("images")]
     [Index(nameof(Hash), IsUnique = true)]
+    [Index(nameof(UploadedAtUtc))]
     public class Image
     {
         [Key]
