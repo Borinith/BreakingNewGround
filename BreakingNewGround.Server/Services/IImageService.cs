@@ -16,6 +16,8 @@ namespace BreakingNewGround.Server.Services
 
         Task<ImageMetadataDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
+        Task<ImageNeighboursDto?> GetNeighbourImageIds(Guid id, string? query, bool onlyFavorites, CancellationToken cancellationToken);
+
         Task<(byte[] Bytes, string ContentType)?> GetThumbnailAsync(Guid id, CancellationToken cancellationToken);
 
         Task<(byte[] Bytes, string ContentType, string FileName)?> GetOriginalAsync(Guid id, CancellationToken cancellationToken);

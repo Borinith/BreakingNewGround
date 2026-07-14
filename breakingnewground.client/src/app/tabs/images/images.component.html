@@ -97,7 +97,7 @@
     <div class="images-grid">
       @for (image of images; track trackById($index, image)) {
         <mat-card class="image-card">
-          <a class="image-link" [routerLink]="['/tabs/images', image.id]">
+          <a class="image-link" [routerLink]="['/tabs/images', image.id]" queryParamsHandling="preserve">
             <img class="image-thumb"
                  [src]="thumbnailUrl(image.id)"
                  [alt]="image.originalFileName"
@@ -129,6 +129,7 @@
 
     <mat-paginator [length]="total"
                    [pageSize]="pageSize"
+                   [pageIndex]="pageIndex"
                    [showFirstLastButtons]="true"
                    [hidePageSize]="true"
                    (page)="onPageChange($event)">

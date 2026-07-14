@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PagedResult } from '../paged-result.model';
-import { ImageMetadata, Tag, UploadResult } from './images.model';
+import { ImageMetadata, ImageNeighbours, Tag, UploadResult } from './images.model';
 
 @Injectable({
   providedIn: 'root'
@@ -50,6 +50,20 @@ export class ImagesService {
 
   getById(id: string): Observable<ImageMetadata> {
     return this.http.get<ImageMetadata>(`${this.baseUrl}/GetById/${id}`);
+  }
+
+  getNeighbours(id: string, query: string, onlyFavorites: boolean): Observable<ImageNeighbours> {
+    let params = new HttpParams();
+
+    if (query) {
+      params = params.set('query', query);
+    }
+
+    if (onlyFavorites) {
+      params = params.set('onlyFavorites', 'true');
+    }
+
+    return this.http.get<ImageNeighbours>(`${this.baseUrl}/GetNeighbourImageIds/${id}`, { params });
   }
 
   getAllTags(): Observable<Tag[]> {

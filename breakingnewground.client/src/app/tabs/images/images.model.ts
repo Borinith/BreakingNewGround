@@ -16,6 +16,11 @@ export interface UploadResult {
   addedTags: string[];
 }
 
+export interface ImageNeighbours {
+  previousImageId: string | null;
+  nextImageId: string | null;
+}
+
 export interface Tag {
   id: number;
   name: string;

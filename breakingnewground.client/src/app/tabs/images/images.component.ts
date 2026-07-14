@@ -5,10 +5,10 @@ import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, combineLatest, debounceTime, distinctUntilChanged, of, startWith, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, merge, of, switchMap } from 'rxjs';
 import { ImageMetadata, UploadResult } from './images.model';
 import { ImagesService } from './images.service';
 
@@ -24,7 +24,6 @@ export class ImagesComponent implements OnInit {
   readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
   readonly pageSize = 12;
 
-  @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
   @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
   @ViewChild('uploadPanel') uploadPanel?: MatExpansionPanel;
@@ -32,6 +31,7 @@ export class ImagesComponent implements OnInit {
   images: ImageMetadata[] = [];
   loadedThumbnails = new Set<string>();
   total = 0;
+  pageIndex = 0;
   isLoading = false;
   errorMessage: string | null = null;
 
@@ -53,19 +53,14 @@ export class ImagesComponent implements OnInit {
     private destroyRef: DestroyRef) { }
 
   ngOnInit(): void {
-    combineLatest([
-      this.searchControl.valueChanges.pipe(startWith(this.searchControl.value)),
-      this.favoritesControl.valueChanges.pipe(startWith(this.favoritesControl.value))
-    ]).pipe(
+    merge(
+      this.searchControl.valueChanges,
+      this.favoritesControl.valueChanges
+    ).pipe(
       debounceTime(200),
-      distinctUntilChanged((a, b) => a[0] === b[0] && a[1] === b[1]),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => {
-      if (this.paginator) {
-        this.paginator.pageIndex = 0;
-      }
-      this.syncUrl();
-      this.loadImages();
+      this.syncUrl(0);
     });
 
     this.tagInputControl.valueChanges.pipe(
@@ -88,15 +83,17 @@ export class ImagesComponent implements OnInit {
     this.route.queryParamMap.pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(params => {
-      const tag = params.get('tag') ?? '';
-      const favorites = params.get('favorites') === 'true';
-      this.searchControl.setValue(tag);
-      this.favoritesControl.setValue(favorites);
+      this.searchControl.setValue(params.get('tag') ?? '', { emitEvent: false });
+      this.favoritesControl.setValue(params.get('favorites') === 'true', { emitEvent: false });
+      this.pageIndex = this.parsePageIndex(params.get('page'));
+
+      this.loadImages(this.pageIndex);
     });
   }
 
   onPageChange(event: PageEvent): void {
-    this.loadImages(event.pageIndex);
+    this.syncUrl(event.pageIndex);
+
     if (window.matchMedia('(max-width: 600px)').matches) {
       window.scrollTo({ top: 0 });
     }
@@ -235,18 +232,18 @@ export class ImagesComponent implements OnInit {
       return;
     }
     this.router.navigate(['/tabs/images'], {
-      queryParams: this.buildQueryParams(tag)
+      queryParams: this.buildQueryParams(0, tag)
     });
   }
 
-  private syncUrl(): void {
+  private syncUrl(pageIndex: number): void {
     this.router.navigate(['/tabs/images'], {
-      queryParams: this.buildQueryParams(),
+      queryParams: this.buildQueryParams(pageIndex),
       replaceUrl: true
     });
   }
 
-  private buildQueryParams(tagOverride?: string): Record<string, string> {
+  private buildQueryParams(pageIndex: number, tagOverride?: string): Record<string, string> {
     const tag = tagOverride !== undefined ? tagOverride : this.searchControl.value.trim();
     const onlyFavorites = this.favoritesControl.value;
     const queryParams: Record<string, string> = {};
@@ -256,10 +253,18 @@ export class ImagesComponent implements OnInit {
     if (onlyFavorites) {
       queryParams['favorites'] = 'true';
     }
+    if (pageIndex > 0) {
+      queryParams['page'] = String(pageIndex + 1);
+    }
     return queryParams;
   }
 
-  private loadImages(pageIndex: number = this.paginator?.pageIndex ?? 0): void {
+  private parsePageIndex(value: string | null): number {
+    const page = Number(value);
+    return Number.isInteger(page) && page > 1 ? page - 1 : 0;
+  }
+
+  private loadImages(pageIndex: number = this.pageIndex): void {
     this.isLoading = true;
     this.errorMessage = null;
     this.cdr.detectChanges();

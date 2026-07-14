@@ -80,18 +80,7 @@ namespace BreakingNewGround.Server.Services
 
         public async Task<PagedResult<ImageMetadataDto>> GetAllAsync(string? query, bool onlyFavorites, int page, int pageSize, CancellationToken cancellationToken)
         {
-            var images = _context.Images.AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                var normalized = query.Trim();
-                images = images.Where(i => i.Tags.Any(t => t.Name.StartsWith(normalized)));
-            }
-
-            if (onlyFavorites)
-            {
-                images = images.Where(i => i.IsFavorite);
-            }
+            var images = FilterImages(_context.Images.AsNoTracking(), query, onlyFavorites);
 
             var total = await images.CountAsync(cancellationToken);
 
@@ -130,6 +119,36 @@ namespace BreakingNewGround.Server.Services
                     i.UploadedAtUtc,
                     i.Tags.Select(t => t.Name).Order().ToArray()))
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<ImageNeighboursDto?> GetNeighbourImageIds(Guid id, string? query, bool onlyFavorites, CancellationToken cancellationToken)
+        {
+            var uploadedAtUtc = await _context.Images
+                .AsNoTracking()
+                .Where(i => i.Id == id)
+                .Select(i => (DateTime?)i.UploadedAtUtc)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (!uploadedAtUtc.HasValue)
+            {
+                return null;
+            }
+
+            var images = FilterImages(_context.Images.AsNoTracking(), query, onlyFavorites);
+
+            var previousImageId = await images
+                .Where(i => i.UploadedAtUtc > uploadedAtUtc.Value)
+                .OrderBy(i => i.UploadedAtUtc)
+                .Select(i => (Guid?)i.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var nextImageId = await images
+                .Where(i => i.UploadedAtUtc < uploadedAtUtc.Value)
+                .OrderByDescending(i => i.UploadedAtUtc)
+                .Select(i => (Guid?)i.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return new ImageNeighboursDto(previousImageId, nextImageId);
         }
 
         public async Task<(byte[] Bytes, string ContentType)?> GetThumbnailAsync(Guid id, CancellationToken cancellationToken)
@@ -261,6 +280,22 @@ namespace BreakingNewGround.Server.Services
             }*/
 
             return affected > 0;
+        }
+
+        private static IQueryable<ImageEntity> FilterImages(IQueryable<ImageEntity> images, string? query, bool onlyFavorites)
+        {
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var normalized = query.Trim();
+                images = images.Where(i => i.Tags.Any(t => t.Name.StartsWith(normalized)));
+            }
+
+            if (onlyFavorites)
+            {
+                images = images.Where(i => i.IsFavorite);
+            }
+
+            return images;
         }
 
         private static async Task<byte[]> ReadAllBytesAsync(IFormFile file, CancellationToken cancellationToken)

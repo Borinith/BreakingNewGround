@@ -57,6 +57,19 @@ namespace BreakingNewGround.Server.Controllers
         }
 
         [HttpGet]
+        [Route("[action]/{id:guid}")]
+        public async Task<ActionResult<ImageNeighboursDto>> GetNeighbourImageIds(
+            Guid id,
+            [FromQuery] string? query,
+            [FromQuery] bool onlyFavorites,
+            CancellationToken cancellationToken)
+        {
+            var result = await _service.GetNeighbourImageIds(id, query, onlyFavorites, cancellationToken);
+
+            return result.HasValue ? Ok(result) : NotFound();
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         [Route("[action]/{id:guid}")]
         [ImmutableResponseCache(Duration = 31536000, Location = ResponseCacheLocation.Client)]

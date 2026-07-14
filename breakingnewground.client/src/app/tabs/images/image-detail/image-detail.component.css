@@ -66,6 +66,33 @@
   display: block;
 }
 
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0.6;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+  .nav-arrow:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .nav-arrow mat-icon {
+    color: #fff;
+  }
+
+.nav-arrow-prev {
+  left: 12px;
+}
+
+.nav-arrow-next {
+  right: 12px;
+}
+
 .detail-info {
   display: flex;
   flex-direction: column;

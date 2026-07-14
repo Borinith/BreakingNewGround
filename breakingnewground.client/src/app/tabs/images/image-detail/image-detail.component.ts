@@ -1,5 +1,4 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
@@ -7,7 +6,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { catchError, combineLatest, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { ConfirmDialogService } from '../../../dialog/confirm-dialog/confirm-dialog.service';
 import { ImageMetadata } from '../images.model';
 import { ImagesService } from '../images.service';
@@ -26,24 +25,32 @@ export class ImageDetailComponent implements OnInit {
   @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
 
   image: ImageMetadata | null = null;
+  previousImageId: string | null = null;
+  nextImageId: string | null = null;
   isLoading = false;
   errorMessage: string | null = null;
 
   tagInputControl = new FormControl<string>('', { nonNullable: true });
   tagSuggestions: string[] = [];
 
+  private tag = '';
+  private onlyFavorites = false;
+
   constructor(
     private service: ImagesService,
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
     private confirmDialogService: ConfirmDialogService,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
     private destroyRef: DestroyRef) { }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/tabs/images'], { queryParamsHandling: 'preserve' });
+  }
+
+  goToImage(id: string): void {
+    this.router.navigate(['/tabs/images', id], { queryParamsHandling: 'preserve' });
   }
 
   originalUrl(id: string): string {
@@ -51,12 +58,6 @@ export class ImageDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
-      this.errorMessage = 'Файл не найден';
-      return;
-    }
-
     this.tagInputControl.valueChanges.pipe(
       debounceTime(200),
       distinctUntilChanged(),
@@ -76,7 +77,23 @@ export class ImageDetailComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
-    this.loadImage(id);
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(([params, queryParams]) => {
+      const id = params.get('id');
+
+      if (!id) {
+        this.errorMessage = 'Файл не найден';
+        this.cdr.detectChanges();
+        return;
+      }
+
+      this.tag = queryParams.get('tag') ?? '';
+      this.onlyFavorites = queryParams.get('favorites') === 'true';
+
+      this.loadImage(id);
+      this.loadNeighbours(id);
+    });
   }
 
   addTagFromInput(event: MatChipInputEvent): void {
@@ -142,7 +159,7 @@ export class ImageDetailComponent implements OnInit {
             takeUntilDestroyed(this.destroyRef)
           ).subscribe({
             next: () => {
-              this.router.navigate(['/tabs/images']);
+              this.router.navigate(['/tabs/images'], { queryParamsHandling: 'preserve' });
               this.snackBar.open('Файл удалён', 'OK', { duration: 5000 });
             },
             error: err => {
@@ -183,6 +200,24 @@ export class ImageDetailComponent implements OnInit {
         console.error('Set tags error', err);
         this.snackBar.open('Не удалось обновить теги', 'OK', { duration: 5000 });
         this.loadImage(id);
+      }
+    });
+  }
+
+  private loadNeighbours(id: string): void {
+    this.previousImageId = null;
+    this.nextImageId = null;
+
+    this.service.getNeighbours(id, this.tag, this.onlyFavorites).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: neighbours => {
+        this.previousImageId = neighbours.previousImageId;
+        this.nextImageId = neighbours.nextImageId;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Load neighbours error', err);
       }
     });
   }

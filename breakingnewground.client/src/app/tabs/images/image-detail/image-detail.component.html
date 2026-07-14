@@ -28,6 +28,22 @@
         @if (image.isFavorite) {
           <mat-icon class="favorite-overlay">favorite</mat-icon>
         }
+        @if (previousImageId; as previousId) {
+          <button mat-icon-button
+                  class="nav-arrow nav-arrow-prev"
+                  matTooltip="Предыдущая"
+                  (click)="goToImage(previousId)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+        }
+        @if (nextImageId; as nextId) {
+          <button mat-icon-button
+                  class="nav-arrow nav-arrow-next"
+                  matTooltip="Следующая"
+                  (click)="goToImage(nextId)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        }
       </div>
 
       <div class="detail-info">
