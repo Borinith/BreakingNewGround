@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AzureDb = BreakingNewGround.Server.DAL.AzureSQL.Data.AppDbContext;
@@ -32,8 +33,15 @@ namespace BreakingNewGround.Server.DAL.BackupApp
             await using var sqliteMedicinesContext = new SqliteDbMedicines(sqliteMedicinesOptions);
             await using var sqliteImagesContext = new SqliteDbImages(sqliteImagesDatabaseOptions);
 
+            Console.WriteLine("Medicines are being backed up...");
             await CopyMedicines(azureSQLContext, sqliteMedicinesContext);
+            Console.WriteLine("Medicines were backed up!");
+
+            Console.WriteLine();
+
+            Console.WriteLine("Images are being backed up...");
             await CopyImages(azureSQLContext, sqliteImagesContext);
+            Console.WriteLine("Images were backed up!");
         }
 
         private static async Task CopyMedicines(AzureDb azureSQLContext, SqliteDbMedicines sqliteMedicinesContext)
