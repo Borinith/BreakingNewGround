@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="BreakingNewGround.AppHost/BreakingNewGround.AppHost.csproj" />
+  <Project Path="breakingnewground.client/breakingnewground.client.esproj">
+    <Build />
+  </Project>
+  <Project Path="BreakingNewGround.Server.DAL.AzureSQL/BreakingNewGround.Server.DAL.AzureSQL.csproj" />
+  <Project Path="BreakingNewGround.Server.DAL.BackupApp/BreakingNewGround.Server.DAL.BackupApp.csproj" />
+  <Project Path="BreakingNewGround.Server.DAL.SQLite/BreakingNewGround.Server.DAL.SQLite.csproj" />
+  <Project Path="BreakingNewGround.Server/BreakingNewGround.Server.csproj" />
+  <Project Path="BreakingNewGround.ServiceDefaults/BreakingNewGround.ServiceDefaults.csproj" />
+</Solution>

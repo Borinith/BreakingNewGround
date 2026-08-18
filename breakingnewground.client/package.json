@@ -13,17 +13,17 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^22.0.7",
-    "@angular/cdk": "^22.0.5",
-    "@angular/common": "^22.0.7",
-    "@angular/compiler": "^22.0.7",
-    "@angular/core": "^22.0.7",
-    "@angular/forms": "^22.0.7",
-    "@angular/material": "^22.0.5",
-    "@angular/material-date-fns-adapter": "^22.0.5",
-    "@angular/platform-browser": "^22.0.7",
-    "@angular/platform-browser-dynamic": "^22.0.7",
-    "@angular/router": "^22.0.7",
+    "@angular/animations": "^22.1.2",
+    "@angular/cdk": "^22.1.2",
+    "@angular/common": "^22.1.2",
+    "@angular/compiler": "^22.1.2",
+    "@angular/core": "^22.1.2",
+    "@angular/forms": "^22.1.2",
+    "@angular/material": "^22.1.2",
+    "@angular/material-date-fns-adapter": "^22.1.2",
+    "@angular/platform-browser": "^22.1.2",
+    "@angular/platform-browser-dynamic": "^22.1.2",
+    "@angular/router": "^22.1.2",
     "@auth0/angular-jwt": "^5.2.0",
     "date-fns": "^4.4.0",
     "jest-editor-support": "*",
@@ -33,9 +33,9 @@
     "zone.js": "~0.16.2"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.7",
-    "@angular/cli": "^22.0.7",
-    "@angular/compiler-cli": "^22.0.7",
+    "@angular/build": "^22.1.4",
+    "@angular/cli": "^22.1.4",
+    "@angular/compiler-cli": "^22.1.2",
     "@types/jasmine": "~6.0.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~6.3.0",
@@ -47,10 +47,10 @@
     "typescript": "~6.0.3"
   },
   "allowScripts": {
-    "esbuild@0.28.1": true,
+    "esbuild@0.28.2": true,
     "esbuild@0.27.7": true,
     "@parcel/watcher@2.5.6": true,
-    "lmdb@3.5.4": true,
+    "lmdb@3.5.6": true,
     "msgpackr-extract@3.0.4": true
   }
 }
