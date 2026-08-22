@@ -71,6 +71,8 @@ export class WeatherForecastComponent implements OnInit {
       }
     });
 
+    this.isLoading = true;
+
     this.service.getCities().pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
@@ -78,11 +80,15 @@ export class WeatherForecastComponent implements OnInit {
         this.cities = cities;
         if (cities.length > 0) {
           this.cityControl.setValue(cities[0]);
+        } else {
+          this.isLoading = false;
+          this.cdr.detectChanges();
         }
       },
       error: err => {
         console.error('Get cities error', err);
         this.errorMessage = 'Не удалось загрузить список городов';
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });

@@ -17,7 +17,7 @@ namespace BreakingNewGround.Server.Services
 {
     public class WeatherForecastService : IWeatherForecastService
     {
-        private const string OpenMeteoUrlFormat =
+        private const string OPEN_METEO_URL_FORMAT =
             "https://api.open-meteo.com/v1/forecast" +
             "?latitude={0}&longitude={1}" +
             "&current=temperature_2m,wind_speed_10m,precipitation,pressure_msl" +
@@ -97,7 +97,7 @@ namespace BreakingNewGround.Server.Services
 
         private async ValueTask<WeatherForecast> GetDataAsync(WeatherCity city, CancellationToken cancellationToken)
         {
-            var url = string.Format(CultureInfo.InvariantCulture, OpenMeteoUrlFormat, city.Latitude, city.Longitude);
+            var url = string.Format(CultureInfo.InvariantCulture, OPEN_METEO_URL_FORMAT, city.Latitude, city.Longitude);
 
             var response = await _httpClient.GetFromJsonAsync<OpenMeteoResponse>(url, cancellationToken)
                 ?? throw new InvalidOperationException("Open-Meteo returned no data");
@@ -110,9 +110,9 @@ namespace BreakingNewGround.Server.Services
             var dailyCount = r.Daily.Time.Length;
             var daily = new DailyWeather[dailyCount];
 
-            for (int d = 0; d < dailyCount; d++)
+            for (var d = 0; d < dailyCount; d++)
             {
-                int noonIdx = d * 24 + 12;
+                var noonIdx = d * 24 + 12;
                 var pressure = noonIdx < r.Hourly.PressureMsl.Length
                     ? r.Hourly.PressureMsl[noonIdx]
                     : 0;

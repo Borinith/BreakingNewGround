@@ -9,22 +9,22 @@ using System.Text;
 namespace BreakingNewGround.Server.Services
 {
     /// <summary>
-    /// Хэшируем пароли через Argon2id (OWASP-рекомендуемые параметры)
+    ///     Хэшируем пароли через Argon2id (OWASP-рекомендуемые параметры)
     /// </summary>
     public class Argon2idPasswordHasherService : IPasswordHasher<ApplicationUser>
     {
-        private const int MemoryKb = 19_456;       // 19 MiB
-        private const int Iterations = 2;
-        private const int DegreeOfParallelism = 1;
-        private const int SaltLength = 16;         // 128 bit
-        private const int HashLength = 32;         // 256 bit
+        private const int MEMORY_KB = 19_456;       // 19 MiB
+        private const int ITERATIONS = 2;
+        private const int DEGREE_OF_PARALLELISM = 1;
+        private const int SALT_LENGTH = 16;         // 128 bit
+        private const int HASH_LENGTH = 32;         // 256 bit
 
         public string HashPassword(ApplicationUser user, string password)
         {
-            var salt = RandomNumberGenerator.GetBytes(SaltLength);
-            var hash = ComputeHash(password, salt, MemoryKb, Iterations, DegreeOfParallelism, HashLength);
+            var salt = RandomNumberGenerator.GetBytes(SALT_LENGTH);
+            var hash = ComputeHash(password, salt, MEMORY_KB, ITERATIONS, DEGREE_OF_PARALLELISM, HASH_LENGTH);
 
-            return FormatPhc(salt, hash, MemoryKb, Iterations, DegreeOfParallelism);
+            return FormatPhc(salt, hash, MEMORY_KB, ITERATIONS, DEGREE_OF_PARALLELISM);
         }
 
         public PasswordVerificationResult VerifyHashedPassword(ApplicationUser user, string hashedPassword, string providedPassword)
@@ -70,9 +70,9 @@ namespace BreakingNewGround.Server.Services
 
                 // Если параметры не совпадают с текущими дефолтами — просим Identity перехэшировать
                 var parametersOutdated =
-                    memory != MemoryKb ||
-                    iterations != Iterations ||
-                    parallelism != DegreeOfParallelism;
+                    memory != MEMORY_KB ||
+                    iterations != ITERATIONS ||
+                    parallelism != DEGREE_OF_PARALLELISM;
 
                 return parametersOutdated
                     ? PasswordVerificationResult.SuccessRehashNeeded
