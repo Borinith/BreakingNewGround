@@ -1,4 +1,4 @@
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ENTER } from '@angular/cdk/keycodes';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
@@ -20,7 +20,7 @@ import { ImagesService } from '../images.service';
 })
 export class ImageDetailComponent implements OnInit {
 
-  readonly separatorKeyCodes: readonly number[] = [ENTER, COMMA];
+  readonly separatorKeyCodes: readonly number[] = [ENTER];
 
   @ViewChild('tagInput') tagInput?: ElementRef<HTMLInputElement>;
 
