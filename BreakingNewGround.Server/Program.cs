@@ -112,12 +112,12 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseRouting();
-app.MapDefaultControllerRoute();
-
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
 
