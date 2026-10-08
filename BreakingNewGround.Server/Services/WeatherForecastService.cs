@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -27,7 +28,7 @@ namespace BreakingNewGround.Server.Services
             "&forecast_days=7" +
             "&timezone=auto";
 
-        private static readonly FrozenDictionary<string, string> UnitTranslations = new Dictionary<string, string>()
+        private static readonly FrozenDictionary<string, string> UnitTranslations = new Dictionary<string, string>
         {
             ["m/s"] = "м/с",
             ["hPa"] = "гПа",
@@ -35,6 +36,7 @@ namespace BreakingNewGround.Server.Services
         }.ToFrozenDictionary();
 
         private readonly HybridCache _cache;
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> _cityLocks = new(StringComparer.OrdinalIgnoreCase);
         private readonly HttpClient _httpClient;
         private readonly ILogger<WeatherForecastService> _logger;
         private readonly WeatherSettings _settings;
@@ -61,20 +63,41 @@ namespace BreakingNewGround.Server.Services
             var city = GetCityByName(cityName);
             var cacheKey = $"weather_{city.Name}";
 
-            if (forceRefresh)
+            var options = new HybridCacheEntryOptions
             {
-                await _cache.RemoveAsync(cacheKey, cancellationToken);
+                Expiration = TimeSpan.FromMinutes(_settings.CacheMinutes)
+            };
+
+            if (!forceRefresh)
+            {
+                return await _cache.GetOrCreateAsync(
+                    cacheKey,
+                    city,
+                    GetDataAsync,
+                    options,
+                    cancellationToken: cancellationToken);
             }
 
-            return await _cache.GetOrCreateAsync(
-                cacheKey,
-                city,
-                GetDataAsync,
-                new HybridCacheEntryOptions
-                {
-                    Expiration = TimeSpan.FromMinutes(_settings.CacheMinutes)
-                },
-                cancellationToken: cancellationToken);
+            var gate = _cityLocks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
+
+            await gate.WaitAsync(cancellationToken);
+
+            try
+            {
+                var freshData = await GetDataAsync(city, cancellationToken);
+
+                await _cache.SetAsync(
+                    cacheKey,
+                    freshData,
+                    options,
+                    cancellationToken: cancellationToken);
+
+                return freshData;
+            }
+            finally
+            {
+                gate.Release();
+            }
         }
 
         private WeatherCity GetCityByName(string? city)
@@ -113,6 +136,7 @@ namespace BreakingNewGround.Server.Services
             for (var d = 0; d < dailyCount; d++)
             {
                 var noonIdx = d * 24 + 12;
+
                 var pressure = noonIdx < r.Hourly.PressureMsl.Length
                     ? r.Hourly.PressureMsl[noonIdx]
                     : 0;
